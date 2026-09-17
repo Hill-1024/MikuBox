@@ -436,6 +436,10 @@
                 layout="@layout/item_drawer_entry" />
 
             <include
+                android:id="@+id/drawer_rules"
+                layout="@layout/item_drawer_entry" />
+
+            <include
                 android:id="@+id/drawer_settings"
                 layout="@layout/item_drawer_entry" />
 

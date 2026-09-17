@@ -66,6 +66,11 @@
             android:parentActivityName=".ui.MainActivity" />
 
         <activity
+            android:name=".ui.RulesActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.MainActivity" />
+
+        <activity
             android:name=".ui.DnsActivity"
             android:exported="false"
             android:parentActivityName=".ui.SettingsActivity" />

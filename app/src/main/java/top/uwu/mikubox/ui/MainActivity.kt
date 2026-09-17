@@ -351,6 +351,7 @@ class MainActivity : EdgeToEdgeActivity(), AddProfileBottomSheet.Listener {
 
     private fun setupDrawer() {
         bindEntry(binding.drawerProxies, R.drawable.ic_lan, R.string.menu_proxies, ProxiesActivity::class.java)
+        bindEntry(binding.drawerRules, R.drawable.ic_rules_24dp, R.string.menu_rules, RulesActivity::class.java)
         bindEntry(binding.drawerSettings, R.drawable.ic_settings_24dp, R.string.settings, SettingsActivity::class.java)
         bindEntry(binding.drawerApps, R.drawable.ic_subscriptions_24dp, R.string.settings_per_app, AppListActivity::class.java)
         bindEntry(binding.drawerLogcat, R.drawable.ic_logcat_24dp, R.string.menu_log, LogcatActivity::class.java)
