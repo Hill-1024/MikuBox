@@ -140,9 +140,10 @@ class SettingsActivity : EdgeToEdgeActivity() {
     }
 
     private fun stackLabel(stack: MihomoCoreSettings.TunStack): Int = when (stack) {
+        MihomoCoreSettings.TunStack.SYSTEM -> R.string.stack_system
         MihomoCoreSettings.TunStack.GVISOR -> R.string.stack_gvisor
         MihomoCoreSettings.TunStack.MIXED -> R.string.stack_mixed
-        else -> R.string.stack_system
+        MihomoCoreSettings.TunStack.FOLLOW -> R.string.stack_follow
     }
 
     private fun pickMode() {

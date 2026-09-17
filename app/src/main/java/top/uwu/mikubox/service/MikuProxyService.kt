@@ -6,8 +6,9 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.IBinder
 import android.os.Build
+import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import top.uwu.mikubox.R
@@ -19,6 +20,9 @@ import top.uwu.mikubox.core.MihomoDnsSettings
 /** Starts Mihomo's local mixed proxy listener without creating a VPN interface. */
 class MikuProxyService : Service() {
 
+    /** Core startup (config parse + GeoSite loads) can take seconds; keep it off the main thread. */
+    private val startExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) {
             stopProxy()
@@ -28,24 +32,30 @@ class MikuProxyService : Service() {
             VpnController.disconnect(this)
             ensureChannel()
             startForeground(NOTIFICATION_ID, notification())
-            val result = MihomoCore.start(
-                this,
-                MihomoConfigStore.activeConfig(this),
-                MihomoCore.NO_TUN,
-                MihomoDnsSettings.effectiveOverride(this),
-                MihomoCoreSettings.overridesJson(this),
-            )
-            if (result.isFailure) {
-                stopProxy()
-                return START_NOT_STICKY
+            startExecutor.execute {
+                if (running) return@execute
+                val config = MihomoConfigStore.activeConfig(this)
+                val result = MihomoCore.start(
+                    this,
+                    config,
+                    MihomoCore.NO_TUN,
+                    MihomoDnsSettings.effectiveOverride(this, config),
+                    MihomoCoreSettings.overridesJson(this),
+                )
+                if (result.isFailure) {
+                    Log.e(TAG, "proxy start failed: ${result.exceptionOrNull()?.message.orEmpty()}")
+                    stopProxy()
+                    return@execute
+                }
+                running = true
             }
-            running = true
         }
         return START_STICKY
     }
 
     override fun onDestroy() {
         stopProxy()
+        startExecutor.shutdown()
         super.onDestroy()
     }
 
@@ -78,6 +88,7 @@ class MikuProxyService : Service() {
     companion object {
         private const val ACTION_STOP = "top.uwu.mikubox.action.STOP_PROXY"
         private const val NOTIFICATION_ID = 3
+        private const val TAG = "MikuBox"
 
         @Volatile
         var running = false

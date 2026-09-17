@@ -10,6 +10,7 @@ import android.content.pm.ServiceInfo
 import android.net.VpnService
 import android.os.Build
 import android.os.ParcelFileDescriptor
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import top.uwu.mikubox.R
 import top.uwu.mikubox.core.MihomoConfigStore
@@ -31,8 +32,12 @@ import top.uwu.mikubox.ui.MainActivity
  */
 class MikuVpnService : VpnService() {
 
+    @Volatile
     private var tun: ParcelFileDescriptor? = null
     private var lastTunError: Throwable? = null
+
+    /** Core startup (config parse + GeoSite loads) can take seconds; keep it off the main thread. */
+    private val startExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) {
@@ -45,6 +50,7 @@ class MikuVpnService : VpnService() {
 
     override fun onDestroy() {
         stopVpn()
+        startExecutor.shutdown()
         super.onDestroy()
     }
 
@@ -57,41 +63,48 @@ class MikuVpnService : VpnService() {
     private fun startVpn() {
         if (tun != null) return
         lastTunError = null
-        try {
-            MikuProxyService.stop(this)
-            startForegroundNotification()
-            val descriptor = establishTun() ?: run {
-                reportStartFailure(lastTunError?.message.orEmpty())
+        // The foreground notification must appear promptly; the heavy work runs after it.
+        startForegroundNotification()
+        startExecutor.execute {
+            if (tun != null) return@execute
+            try {
+                MikuProxyService.stop(this)
+                val descriptor = establishTun() ?: run {
+                    reportStartFailure(lastTunError?.message.orEmpty())
+                    stopVpn()
+                    return@execute
+                }
+                val config = MihomoConfigStore.activeConfig(this)
+                val startResult = MihomoCore.start(
+                    this,
+                    config,
+                    descriptor.fd,
+                    MihomoDnsSettings.effectiveOverride(this, config),
+                    MihomoCoreSettings.overridesJson(this, MihomoVpnSettings.mtu(this)),
+                )
+                if (startResult.isFailure) {
+                    runCatching { descriptor.close() }
+                    reportStartFailure(startResult.exceptionOrNull()?.message.orEmpty())
+                    stopVpn()
+                    return@execute
+                }
+                tun = descriptor
+                MihomoTrafficStore.begin(MihomoProfileStore.selected(this))
+                running = true
+            } catch (error: Throwable) {
+                reportStartFailure(error.message.orEmpty())
                 stopVpn()
-                return
             }
-            val startResult = MihomoCore.start(
-                this,
-                MihomoConfigStore.activeConfig(this),
-                descriptor.fd,
-                MihomoDnsSettings.effectiveOverride(this),
-                MihomoCoreSettings.overridesJson(this),
-            )
-            if (startResult.isFailure) {
-                runCatching { descriptor.close() }
-                reportStartFailure(startResult.exceptionOrNull()?.message.orEmpty())
-                stopVpn()
-                return
-            }
-            tun = descriptor
-            MihomoTrafficStore.begin(MihomoProfileStore.selected(this))
-            running = true
-        } catch (error: Throwable) {
-            reportStartFailure(error.message.orEmpty())
-            stopVpn()
         }
     }
 
     private fun reportStartFailure(detail: String) {
+        val message = detail.ifBlank { getString(R.string.mihomo_start_failed) }
+        Log.e(TAG, "VPN start failed: $message")
         sendBroadcast(
             Intent(ACTION_VPN_START_FAILED)
                 .setPackage(packageName)
-                .putExtra(EXTRA_FAILURE_DETAIL, detail.ifBlank { getString(R.string.mihomo_start_failed) }),
+                .putExtra(EXTRA_FAILURE_DETAIL, message),
         )
     }
 
@@ -219,6 +232,8 @@ class MikuVpnService : VpnService() {
         const val ACTION_STOP = "top.uwu.mikubox.action.STOP_VPN"
         const val ACTION_VPN_START_FAILED = "top.uwu.mikubox.action.VPN_START_FAILED"
         const val EXTRA_FAILURE_DETAIL = "failure_detail"
+
+        private const val TAG = "MikuBox"
 
         private const val CHANNEL_ID = "miku_vpn_status"
         private const val NOTIFICATION_ID = 1

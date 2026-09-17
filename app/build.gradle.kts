@@ -155,7 +155,10 @@ val buildMihomoBridge by tasks.registering {
                 environment("CC", clangDir.resolve(compiler + exeExt).absolutePath)
 
                 commandLine(
+                    // with_gvisor matches Mihomo's own release build; without the
+                    // tag the gvisor/mixed TUN stacks are unavailable at runtime.
                     "go", "build", "-trimpath", "-buildmode=c-shared",
+                    "-tags", "with_gvisor",
                     "-ldflags=-s -w", "-o", output.absolutePath, "."
                 )
             }

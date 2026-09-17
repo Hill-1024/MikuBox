@@ -14,7 +14,16 @@ object MihomoCoreSettings {
     /** [FOLLOW] leaves the profile's own value untouched. */
     enum class ProxyMode(val value: String?) { FOLLOW(null), RULE("rule"), GLOBAL("global"), DIRECT("direct") }
     enum class LogLevel(val value: String) { SILENT("silent"), WARNING("warning"), INFO("info"), DEBUG("debug") }
-    enum class TunStack(val value: String) { SYSTEM("system"), GVISOR("gvisor"), MIXED("mixed") }
+
+    /**
+     * [value] null means the profile's (or the core's default) stack is kept.
+     * The app defaults to [GVISOR]: it is Mihomo's own default and the only
+     * stack that stays entirely in user space, which Android's VPN file
+     * descriptor cannot always support for the kernel-assisted alternatives.
+     */
+    enum class TunStack(val value: String?) {
+        GVISOR("gvisor"), MIXED("mixed"), SYSTEM("system"), FOLLOW(null)
+    }
 
     private const val PREFS = "mihomo_core_settings"
     private const val KEY_LOG = "log_level"
@@ -40,7 +49,7 @@ object MihomoCoreSettings {
     fun allowLan(context: Context): Boolean = prefs(context).getBoolean(KEY_ALLOW_LAN, false)
     fun setAllowLan(context: Context, value: Boolean) = putBool(context, KEY_ALLOW_LAN, value)
 
-    fun tunStack(context: Context): TunStack = enumOr(prefs(context).getString(KEY_TUN_STACK, null), TunStack.SYSTEM)
+    fun tunStack(context: Context): TunStack = enumOr(prefs(context).getString(KEY_TUN_STACK, null), TunStack.GVISOR)
     fun setTunStack(context: Context, value: TunStack) = putString(context, KEY_TUN_STACK, value.name)
 
     fun ipv6(context: Context): Boolean = prefs(context).getBoolean(KEY_IPV6, true)
@@ -66,14 +75,20 @@ object MihomoCoreSettings {
     fun tcpConcurrent(context: Context): Boolean = prefs(context).getBoolean(KEY_TCP_CONCURRENT, false)
     fun setTcpConcurrent(context: Context, value: Boolean) = putBool(context, KEY_TCP_CONCURRENT, value)
 
-    /** Config-key overrides merged into the profile by the bridge, as a JSON object. */
-    fun overridesJson(context: Context): String = JSONObject().apply {
+    /**
+     * Config-key overrides merged into the profile by the bridge, as a JSON
+     * object. [tunMtu] mirrors the MTU of the interface the VPN service created:
+     * the core otherwise defaults its stack to 9000, which cannot survive the
+     * Android tunnel and stalls large transfers.
+     */
+    fun overridesJson(context: Context, tunMtu: Int? = null): String = JSONObject().apply {
         put("log-level", logLevel(context).value)
         put("allow-lan", allowLan(context))
-        put("tun-stack", tunStack(context).value)
         put("unified-delay", unifiedDelay(context))
         put("tcp-concurrent", tcpConcurrent(context))
         mode(context).value?.let { put("mode", it) }
+        tunStack(context).value?.let { put("tun-stack", it) }
+        tunMtu?.let { put("tun-mtu", it) }
     }.toString()
 
     private inline fun <reified T : Enum<T>> enumOr(name: String?, fallback: T): T =
