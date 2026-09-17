@@ -11,6 +11,9 @@ char* MihomoProxies();
 int MihomoSelectProxy(char* group, char* name);
 char* MihomoProxyDelay(char* name, char* url, int timeout_ms);
 char* MihomoValidateDns(char* dns_yaml);
+char* MihomoGroupOrder();
+char* MihomoRules();
+char* MihomoRuntimeInfo();
 }
 
 extern "C" JNIEXPORT jint JNICALL
@@ -102,5 +105,29 @@ Java_top_uwu_mikubox_core_MihomoCore_nativeValidateDns(
     env->ReleaseStringUTFChars(dns_yaml, dns_chars);
     jstring result = env->NewStringUTF(err == nullptr ? "" : err);
     std::free(err);
+    return result;
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_top_uwu_mikubox_core_MihomoCore_nativeGroupOrder(JNIEnv* env, jobject /* thiz */) {
+    char* order = MihomoGroupOrder();
+    jstring result = env->NewStringUTF(order == nullptr ? "[]" : order);
+    std::free(order);
+    return result;
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_top_uwu_mikubox_core_MihomoCore_nativeRules(JNIEnv* env, jobject /* thiz */) {
+    char* rules = MihomoRules();
+    jstring result = env->NewStringUTF(rules == nullptr ? "[]" : rules);
+    std::free(rules);
+    return result;
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_top_uwu_mikubox_core_MihomoCore_nativeRuntimeInfo(JNIEnv* env, jobject /* thiz */) {
+    char* info = MihomoRuntimeInfo();
+    jstring result = env->NewStringUTF(info == nullptr ? "{}" : info);
+    std::free(info);
     return result;
 }
