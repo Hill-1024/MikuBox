@@ -12,15 +12,19 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import top.uwu.mikubox.R
+import top.uwu.mikubox.core.MihomoConfigStore
 import top.uwu.mikubox.core.MihomoCore
 import top.uwu.mikubox.core.MihomoCoreSettings
 import top.uwu.mikubox.databinding.ActivityProxiesBinding
+import top.uwu.mikubox.profile.MihomoConfigPreview
 import top.uwu.mikubox.service.VpnController
 
 /**
- * ClashMetaForAndroid-style node manager: lists the selector groups of the running
- * core and their member nodes, allowing selection and latency testing. Nodes are
- * only available while the core is running, so this screen requires a connection.
+ * ClashMetaForAndroid-style node manager: lists every proxy group of the running
+ * core (select, url-test, fallback, load-balance) in configuration order and
+ * their member nodes. Select groups switch nodes directly; auto groups pin a
+ * node or revert to automatic selection. Nodes are only available while the
+ * core is running, so this screen requires a connection.
  */
 class ProxiesActivity : EdgeToEdgeActivity() {
 
@@ -29,8 +33,12 @@ class ProxiesActivity : EdgeToEdgeActivity() {
 
     private var allProxies: Map<String, MihomoCore.Proxy> = emptyMap()
     private var groups: List<MihomoCore.Proxy> = emptyList()
+    private var groupOrder: List<String> = emptyList()
     private val delayCache = mutableMapOf<String, Int>()
     private var sortByDelay = false
+
+    /** True while only the profile's declared groups are shown, without a core. */
+    private var offline = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,12 +77,13 @@ class ProxiesActivity : EdgeToEdgeActivity() {
 
     private fun load() {
         if (!VpnController.isRunning) {
-            showEmpty(R.string.proxies_empty_disconnected)
+            loadOfflinePreview()
             return
         }
         lifecycleScope.launch {
             allProxies = withContext(Dispatchers.IO) { MihomoCore.proxies() }
-            groups = allProxies.values.filter { it.isGroup && it.isSelector }
+            groupOrder = withContext(Dispatchers.IO) { MihomoCore.groupOrder() }
+            groups = visibleGroups()
             if (groups.isEmpty()) {
                 showEmpty(R.string.proxies_empty_none)
                 return@launch
@@ -82,8 +91,50 @@ class ProxiesActivity : EdgeToEdgeActivity() {
             binding.tvEmpty.visibility = android.view.View.GONE
             binding.rvNodes.visibility = android.view.View.VISIBLE
             binding.cardGroups.visibility = android.view.View.VISIBLE
+            binding.tvOffline.visibility = android.view.View.GONE
             buildTabs()
         }
+    }
+
+    /**
+     * While disconnected, every page still shows the nodes and groups the active
+     * profile declares, so the configuration can be inspected without starting
+     * the core. Selecting or testing requires a running core.
+     */
+    private fun loadOfflinePreview() {
+        lifecycleScope.launch {
+            val config = withContext(Dispatchers.IO) { MihomoConfigStore.activeConfig(this@ProxiesActivity) }
+            val previewNodes = withContext(Dispatchers.IO) { MihomoConfigPreview.nodes(config) }
+            val previewGroups = withContext(Dispatchers.IO) { MihomoConfigPreview.groups(config) }
+            offline = true
+            allProxies = previewNodes.mapValues { (name, node) ->
+                MihomoCore.Proxy(name = name, type = node.type, now = null, all = emptyList(), delay = 0, udp = false)
+            }
+            groups = previewGroups.map { group ->
+                MihomoCore.Proxy(name = group.name, type = group.type, now = null, all = group.members, delay = 0, udp = false)
+            }
+            if (groups.isEmpty()) {
+                showEmpty(R.string.proxies_empty_none)
+                return@launch
+            }
+            binding.tvEmpty.visibility = android.view.View.GONE
+            binding.rvNodes.visibility = android.view.View.VISIBLE
+            binding.cardGroups.visibility = android.view.View.VISIBLE
+            binding.tvOffline.setText(R.string.proxies_offline_hint)
+            binding.tvOffline.visibility = android.view.View.VISIBLE
+            buildTabs()
+        }
+    }
+
+    /**
+     * Every group the core exposes except the mode-only GLOBAL pseudo-group and
+     * groups the config marked hidden, ordered as the profile declared them
+     * (unknown names keep their map order after the declared ones).
+     */
+    private fun visibleGroups(): List<MihomoCore.Proxy> {
+        val visible = allProxies.values.filter { it.isGroup && !it.hidden && it.name != GLOBAL_GROUP }
+        val position = groupOrder.withIndex().associate { (index, name) -> name to index }
+        return visible.sortedBy { position[it.name] ?: Int.MAX_VALUE }
     }
 
     private fun buildTabs() {
@@ -95,34 +146,62 @@ class ProxiesActivity : EdgeToEdgeActivity() {
 
     private fun renderGroup(index: Int) {
         val group = groups.getOrNull(index) ?: return
-        val nodes = group.all.map { memberName ->
-            val info = allProxies[memberName]
-            ProxyNodeAdapter.Node(
-                name = memberName,
-                type = info?.type ?: "",
-                delay = delayCache[memberName] ?: (info?.delay ?: 0).let { if (it > 0) it else -2 },
-                selected = memberName == group.now,
-            )
-        }
+        val memberNodes = group.all.map { memberNode(group, it) }
         // Reachable nodes first (ascending latency); untested/testing/timeout sink to the bottom.
         val ordered = if (sortByDelay) {
-            nodes.sortedBy { if (it.delay >= 0) it.delay else Int.MAX_VALUE }
+            memberNodes.sortedBy { if (it.delay >= 0) it.delay else Int.MAX_VALUE }
         } else {
-            nodes
+            memberNodes
         }
-        adapter.submit(ordered)
+        // Auto groups lead with a virtual row that reverts them to automatic selection.
+        // The pinned state only exists while the core runs, so it is hidden offline.
+        adapter.submit(if (group.isAutoGroup && !offline) listOf(autoEntry(group)) + ordered else ordered)
     }
 
-    private fun selectNode(nodeName: String) {
+    private fun autoEntry(group: MihomoCore.Proxy) = ProxyNodeAdapter.Node(
+        name = getString(R.string.proxies_auto),
+        type = group.type,
+        delay = -2,
+        selected = group.pinnedNode == null,
+        isAutoEntry = true,
+    )
+
+    private fun memberNode(group: MihomoCore.Proxy, memberName: String): ProxyNodeAdapter.Node {
+        val info = allProxies[memberName]
+        return ProxyNodeAdapter.Node(
+            name = memberName,
+            type = info?.type ?: "",
+            delay = delayCache[memberName] ?: (info?.delay ?: 0).let { if (it > 0) it else -2 },
+            selected = memberName == group.now,
+            pinned = group.pinnedNode == memberName,
+        )
+    }
+
+    private fun selectNode(node: ProxyNodeAdapter.Node) {
+        if (offline) {
+            toast(getString(R.string.proxies_offline_hint))
+            return
+        }
+        val group = groups.getOrNull(binding.groupTab.selectedTabPosition) ?: return
+        when {
+            !group.isSelectableGroup -> toast(getString(R.string.proxies_group_not_selectable))
+            node.isAutoEntry -> applySelection(group, "")
+            else -> applySelection(group, node.name)
+        }
+    }
+
+    private fun applySelection(group: MihomoCore.Proxy, name: String) {
         val index = binding.groupTab.selectedTabPosition
-        val group = groups.getOrNull(index) ?: return
         lifecycleScope.launch {
-            val ok = withContext(Dispatchers.IO) { MihomoCore.selectProxy(group.name, nodeName) }
+            val ok = withContext(Dispatchers.IO) { MihomoCore.selectProxy(group.name, name) }
             if (ok) {
                 allProxies = withContext(Dispatchers.IO) { MihomoCore.proxies() }
-                groups = allProxies.values.filter { it.isGroup && it.isSelector }
+                groups = visibleGroups()
                 renderGroup(index)
-                toast(getString(R.string.toast_node_selected, nodeName))
+                toast(
+                    if (name.isEmpty()) getString(R.string.toast_node_auto)
+                    else getString(R.string.toast_node_selected, name),
+                )
             } else {
                 toast(getString(R.string.toast_node_select_failed))
             }
@@ -130,6 +209,10 @@ class ProxiesActivity : EdgeToEdgeActivity() {
     }
 
     private fun testCurrentGroup() {
+        if (offline) {
+            toast(getString(R.string.proxies_offline_hint))
+            return
+        }
         val index = binding.groupTab.selectedTabPosition
         val group = groups.getOrNull(index) ?: return
         val members = group.all
@@ -164,5 +247,9 @@ class ProxiesActivity : EdgeToEdgeActivity() {
 
     private fun toast(message: String) {
         android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
+    }
+
+    private companion object {
+        const val GLOBAL_GROUP = "GLOBAL"
     }
 }

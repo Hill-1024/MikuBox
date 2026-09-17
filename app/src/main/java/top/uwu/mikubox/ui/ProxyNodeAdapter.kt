@@ -9,13 +9,24 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import top.uwu.mikubox.R
 
-/** MikuRay-style list of the nodes inside one selector group. */
+/** MikuRay-style list of the nodes inside one proxy group. */
 class ProxyNodeAdapter(
-    private val onSelect: (String) -> Unit,
+    private val onSelect: (Node) -> Unit,
 ) : RecyclerView.Adapter<ProxyNodeAdapter.VH>() {
 
-    /** [delay]: -3 testing, -2 untested, -1 timeout, otherwise milliseconds. */
-    data class Node(val name: String, val type: String, val delay: Int, val selected: Boolean)
+    /**
+     * [delay]: -3 testing, -2 untested, -1 timeout, otherwise milliseconds.
+     * [isAutoEntry] marks the virtual "automatic selection" row of auto groups;
+     * [pinned] marks the node an auto group is currently pinned to.
+     */
+    data class Node(
+        val name: String,
+        val type: String,
+        val delay: Int,
+        val selected: Boolean,
+        val isAutoEntry: Boolean = false,
+        val pinned: Boolean = false,
+    )
 
     private var nodes: List<Node> = emptyList()
 
@@ -50,7 +61,11 @@ class ProxyNodeAdapter(
         fun bind(node: Node) {
             val ctx = itemView.context
             name.text = node.name
-            type.text = node.type
+            type.text = if (node.pinned) {
+                "${node.type} · ${ctx.getString(R.string.proxies_pinned)}"
+            } else {
+                node.type
+            }
             selected.visibility = if (node.selected) View.VISIBLE else View.INVISIBLE
             selectedBar.visibility = if (node.selected) View.VISIBLE else View.INVISIBLE
             when {
@@ -70,7 +85,7 @@ class ProxyNodeAdapter(
                     delay.setTextColor(ContextCompat.getColor(ctx, delayColor(node.delay)))
                 }
             }
-            itemView.setOnClickListener { onSelect(node.name) }
+            itemView.setOnClickListener { onSelect(node) }
         }
 
         private fun delayColor(ms: Int): Int = when {

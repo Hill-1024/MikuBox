@@ -4,14 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurfaceVariant"
-    android:fitsSystemWindows="true">
+    android:background="?attr/colorBg">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorBg"
+        android:background="?attr/colorPrimary"
         android:fitsSystemWindows="true"
         app:elevation="0dp">
 
@@ -19,12 +18,13 @@
             android:layout_width="match_parent"
             style="?attr/collapsingToolbarLayoutLargeStyle"
             android:layout_height="?attr/collapsingToolbarLayoutLargeSize"
-            android:background="?attr/colorBg"
-            app:collapsedTitleTextColor="?attr/colorOnSurfaceVariant"
-            app:contentScrim="?attr/colorBg"
+            android:background="?attr/colorPrimary"
+            app:collapsedTitleTextColor="?attr/colorOnPrimary"
+            app:contentScrim="?attr/colorPrimary"
+            app:statusBarScrim="?attr/colorPrimary"
             app:expandedTitleMarginEnd="24dp"
             app:expandedTitleMarginStart="24dp"
-            app:expandedTitleTextColor="?attr/colorOnSurfaceVariant"
+            app:expandedTitleTextColor="?attr/colorOnPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:title="@string/proxies_title"
             app:titleCollapseMode="scale">
@@ -36,7 +36,7 @@
                 app:layout_collapseMode="pin"
                 app:menu="@menu/menu_proxies"
                 app:navigationIcon="@drawable/uwu_circle_back"
-                app:titleTextColor="?attr/colorOnSurfaceVariant" />
+                app:titleTextColor="?attr/colorOnPrimary" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -53,6 +53,24 @@
             android:paddingStart="16dp"
             android:paddingTop="16dp"
             android:paddingEnd="16dp">
+
+            <include
+
+                android:id="@+id/page_banner"
+
+                layout="@layout/uwu_banner_page" />
+
+
+            <TextView
+                android:id="@+id/tv_offline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:text="@string/proxies_offline_hint"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="12sp"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_groups"
