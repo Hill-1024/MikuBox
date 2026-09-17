@@ -92,6 +92,8 @@
     <string name="desc_menu_tools">Ping, speed &amp; more</string>
     <string name="desc_menu_about">About this app</string>
     <string name="action_clear">Clear</string>
+    <string name="logcat_export">Export logs</string>
+    <string name="logcat_export_failed">Could not export logs: %1$s</string>
     <string name="logcat_read_failed">Failed to read log: %1$s</string>
     <string name="toast_coming_soon">Coming soon</string>
 
@@ -166,15 +168,31 @@
     <string name="proxies_testing">Testing…</string>
     <string name="proxies_delay_ms">%1$d ms</string>
     <string name="proxies_delay_timeout">timeout</string>
+    <string name="proxies_auto">Auto</string>
+    <string name="proxies_pinned">Pinned</string>
+    <string name="proxies_group_not_selectable">This group type doesn\'t support manual selection</string>
     <string name="toast_node_selected">Switched to %1$s</string>
+    <string name="toast_node_auto">Reverted to automatic selection</string>
     <string name="toast_node_select_failed">Could not switch node</string>
 
-    <!-- DNS override -->
+    <!-- Routing rules -->
+    <string name="menu_rules">Routing rules</string>
+    <string name="rules_title">Routing rules</string>
+    <string name="rules_count">%1$d rules</string>
+    <string name="rules_empty_disconnected">Connect first to view the routing rules.</string>
+    <string name="rules_empty_none">The active profile has no rules.</string>
+
+    <!-- DNS source -->
     <string name="settings_dns">DNS</string>
-    <string name="settings_dns_summary">Override the profile DNS with your own</string>
+    <string name="settings_dns_summary">Choose which DNS a profile uses</string>
     <string name="dns_title">DNS</string>
-    <string name="dns_override">Override DNS</string>
-    <string name="dns_override_summary">Replace each profile\'s dns section with the block below</string>
+    <string name="dns_source">DNS source</string>
+    <string name="dns_source_summary">How the DNS section of imported profiles is applied</string>
+    <string-array name="dns_sources">
+        <item>Profile first, else app DNS</item>
+        <item>Always app DNS</item>
+        <item>Always profile DNS</item>
+    </string-array>
     <string name="dns_yaml_hint">DNS (YAML)</string>
     <string name="dns_invalid_title">Invalid DNS configuration</string>
     <string name="dns_restart_hint">Reconnect to apply changes.</string>
@@ -222,6 +240,7 @@
     <string name="stack_system" translatable="false">System</string>
     <string name="stack_gvisor" translatable="false">gVisor</string>
     <string name="stack_mixed" translatable="false">Mixed</string>
+    <string name="stack_follow" translatable="false">Follow profile</string>
     <string name="greeting_morning">Good morning…</string>
     <string name="greeting_afternoon">Good afternoon…</string>
     <string name="greeting_evening">Good evening…</string>
@@ -240,4 +259,6 @@
     <string name="settings_unified_delay_summary">Use one latency measurement method for all proxies</string>
     <string name="settings_tcp_concurrent">TCP concurrent</string>
     <string name="settings_tcp_concurrent_summary">Connect to multiple IP addresses concurrently</string>
+    <string name="proxies_offline_hint">Offline preview from the active profile. Connect to switch or test nodes.</string>
+    <string name="rules_offline_hint">Offline preview from the profile · %1$d rules</string>
 </resources>

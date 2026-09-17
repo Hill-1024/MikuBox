@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MikuBox</string>
+    <string name="splash_version">Version %1$s</string>
     <string name="scaffold_subtitle">君の世界に、歌を届けるね。</string>
     <string name="vpn_channel_name">Status VPN</string>
     <string name="vpn_notification_running">Terhubung</string>
@@ -70,6 +71,8 @@
     <string name="desc_menu_tools">Ping, kecepatan &amp; lainnya</string>
     <string name="desc_menu_about">Tentang aplikasi ini</string>
     <string name="action_clear">Bersihkan</string>
+    <string name="logcat_export">Ekspor log</string>
+    <string name="logcat_export_failed">Tidak dapat mengekspor log: %1$s</string>
     <string name="logcat_read_failed">Gagal membaca log: %1$s</string>
     <string name="toast_coming_soon">Segera hadir</string>
 
@@ -143,9 +146,19 @@
     <string name="proxies_testing">Menguji…</string>
     <string name="proxies_delay_ms">%1$d ms</string>
     <string name="proxies_delay_timeout">waktu habis</string>
+    <string name="proxies_auto">Otomatis</string>
+    <string name="proxies_pinned">Disematkan</string>
+    <string name="proxies_group_not_selectable">Jenis grup ini tidak mendukung pemilihan manual</string>
     <string name="toast_node_selected">Beralih ke %1$s</string>
+    <string name="toast_node_auto">Kembali ke pemilihan otomatis</string>
     <string name="toast_node_select_failed">Tidak dapat mengganti node</string>
-    <string name="splash_version">Version %1$s</string>
+
+    <!-- Routing rules -->
+    <string name="menu_rules">Aturan perutean</string>
+    <string name="rules_title">Aturan perutean</string>
+    <string name="rules_count">%1$d aturan</string>
+    <string name="rules_empty_disconnected">Hubungkan dulu untuk melihat aturan perutean.</string>
+    <string name="rules_empty_none">Konfigurasi aktif tidak memiliki aturan.</string>
 
     <!-- Navigation drawer -->
     <string name="drawer_greeting">Hai, Miku 💕</string>
@@ -153,12 +166,17 @@
     <string name="drawer_section_manage">Kelola</string>
     <string name="drawer_section_tools">Alat &amp; info</string>
 
-    <!-- DNS override -->
+    <!-- DNS source -->
     <string name="settings_dns">DNS</string>
-    <string name="settings_dns_summary">Ganti DNS profil dengan milik Anda</string>
+    <string name="settings_dns_summary">Pilih DNS yang digunakan konfigurasi</string>
     <string name="dns_title">DNS</string>
-    <string name="dns_override">Ganti DNS</string>
-    <string name="dns_override_summary">Ganti bagian dns tiap profil dengan blok di bawah</string>
+    <string name="dns_source">Sumber DNS</string>
+    <string name="dns_source_summary">Bagaimana DNS dari konfigurasi impor diterapkan</string>
+    <string-array name="dns_sources">
+        <item>Konfigurasi dahulu, sisanya DNS aplikasi</item>
+        <item>Selalu DNS aplikasi</item>
+        <item>Selalu DNS konfigurasi</item>
+    </string-array>
     <string name="dns_yaml_hint">DNS (YAML)</string>
     <string name="dns_invalid_title">Konfigurasi DNS tidak valid</string>
     <string name="dns_restart_hint">Sambungkan ulang untuk menerapkan perubahan.</string>
@@ -207,4 +225,6 @@
     <string name="settings_unified_delay_summary">Gunakan satu metode pengukuran latensi untuk semua proksi</string>
     <string name="settings_tcp_concurrent">TCP serentak</string>
     <string name="settings_tcp_concurrent_summary">Hubungkan ke beberapa alamat IP secara bersamaan</string>
+    <string name="proxies_offline_hint">Pratinjau offline dari konfigurasi aktif. Hubungkan untuk mengganti atau menguji node.</string>
+    <string name="rules_offline_hint">Pratinjau offline dari konfigurasi · %1$d aturan</string>
 </resources>

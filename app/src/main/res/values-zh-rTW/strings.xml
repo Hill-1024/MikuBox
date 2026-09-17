@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MikuBox</string>
+    <string name="splash_version">Version %1$s</string>
     <string name="scaffold_subtitle">君の世界に、歌を届けるね。</string>
     <string name="vpn_channel_name">VPN 狀態</string>
     <string name="vpn_notification_running">已連線</string>
@@ -78,6 +79,8 @@
     <string name="desc_menu_tools">Ping、測速等</string>
     <string name="desc_menu_about">關於此應用程式</string>
     <string name="action_clear">清除</string>
+    <string name="logcat_export">匯出紀錄</string>
+    <string name="logcat_export_failed">匯出紀錄失敗：%1$s</string>
     <string name="logcat_read_failed">讀取紀錄失敗：%1$s</string>
     <string name="toast_coming_soon">即將推出</string>
 
@@ -151,16 +154,31 @@
     <string name="proxies_testing">測試中…</string>
     <string name="proxies_delay_ms">%1$d ms</string>
     <string name="proxies_delay_timeout">逾時</string>
+    <string name="proxies_auto">自動</string>
+    <string name="proxies_pinned">已固定</string>
+    <string name="proxies_group_not_selectable">該類型代理群組不支援手動切換</string>
     <string name="toast_node_selected">已切換至 %1$s</string>
+    <string name="toast_node_auto">已恢復自動選擇</string>
     <string name="toast_node_select_failed">無法切換節點</string>
-    <string name="splash_version">Version %1$s</string>
 
-    <!-- DNS override -->
+    <!-- Routing rules -->
+    <string name="menu_rules">分流規則</string>
+    <string name="rules_title">分流規則</string>
+    <string name="rules_count">%1$d 條規則</string>
+    <string name="rules_empty_disconnected">連線後才能查看分流規則。</string>
+    <string name="rules_empty_none">目前的設定檔沒有分流規則。</string>
+
+    <!-- DNS source -->
     <string name="settings_dns">DNS</string>
-    <string name="settings_dns_summary">以自訂 DNS 覆寫設定檔的 DNS</string>
+    <string name="settings_dns_summary">選擇設定檔使用的 DNS</string>
     <string name="dns_title">DNS</string>
-    <string name="dns_override">覆寫 DNS</string>
-    <string name="dns_override_summary">以下方的區塊取代每個設定檔的 dns 區段</string>
+    <string name="dns_source">DNS 來源</string>
+    <string name="dns_source_summary">匯入設定中的 DNS 如何生效</string>
+    <string-array name="dns_sources">
+        <item>設定檔優先，無則用應用 DNS</item>
+        <item>一律用應用 DNS</item>
+        <item>一律用設定檔 DNS</item>
+    </string-array>
     <string name="dns_yaml_hint">DNS（YAML）</string>
     <string name="dns_invalid_title">DNS 設定無效</string>
     <string name="dns_restart_hint">重新連線以套用變更。</string>
@@ -215,4 +233,6 @@
     <string name="settings_unified_delay_summary">對所有代理使用相同的延遲測量方式</string>
     <string name="settings_tcp_concurrent">TCP 並行連線</string>
     <string name="settings_tcp_concurrent_summary">同時連線到多個 IP 位址</string>
+    <string name="proxies_offline_hint">離線預覽（來自目前設定檔），連線後可切換或測試節點。</string>
+    <string name="rules_offline_hint">離線預覽（來自設定檔）· 共 %1$d 條規則</string>
 </resources>

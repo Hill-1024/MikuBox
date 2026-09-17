@@ -3,14 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurfaceVariant"
-    android:fitsSystemWindows="true">
+    android:background="?attr/colorBg">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorBg"
+        android:background="?attr/colorPrimary"
         android:fitsSystemWindows="true"
         app:elevation="0dp">
 
@@ -18,12 +17,13 @@
             android:layout_width="match_parent"
             style="?attr/collapsingToolbarLayoutLargeStyle"
             android:layout_height="?attr/collapsingToolbarLayoutLargeSize"
-            android:background="?attr/colorBg"
-            app:collapsedTitleTextColor="?attr/colorOnSurfaceVariant"
-            app:contentScrim="?attr/colorBg"
+            android:background="?attr/colorPrimary"
+            app:collapsedTitleTextColor="?attr/colorOnPrimary"
+            app:contentScrim="?attr/colorPrimary"
+            app:statusBarScrim="?attr/colorPrimary"
             app:expandedTitleMarginEnd="24dp"
             app:expandedTitleMarginStart="24dp"
-            app:expandedTitleTextColor="?attr/colorOnSurfaceVariant"
+            app:expandedTitleTextColor="?attr/colorOnPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:title="@string/dns_title"
             app:titleCollapseMode="scale">
@@ -34,11 +34,12 @@
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
                 app:navigationIcon="@drawable/uwu_circle_back"
-                app:titleTextColor="?attr/colorOnSurfaceVariant" />
+                app:titleTextColor="?attr/colorOnPrimary" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:scrollbars="none"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/uwu_background_collapse"
@@ -64,37 +65,37 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:padding="16dp">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/dns_override"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="@string/dns_override_summary"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <com.google.android.material.materialswitch.MaterialSwitch
-                        android:id="@+id/sw_override"
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp" />
+                        android:text="@string/dns_source"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/dns_source_summary"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="13sp" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_source"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp">
+
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/dropdown_source"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none" />
+                    </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

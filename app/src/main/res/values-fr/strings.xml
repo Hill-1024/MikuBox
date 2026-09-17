@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MikuBox</string>
+    <string name="splash_version">Version %1$s</string>
     <string name="scaffold_subtitle">君の世界に、歌を届けるね。</string>
 
     <!-- Service VPN -->
@@ -11,30 +12,40 @@
     <string name="subscription_update_title">Mise à jour des abonnements</string>
     <string name="vpn_tile_title">MikuBox VPN</string>
     <string name="mihomo_start_failed">Échec du démarrage de Mihomo</string>
-    <string name="local_proxy_notification_running">Le proxy Mihomo local est en cours d\'exécution</string>
+    <string name="local_proxy_notification_running">Le proxy Mihomo local est en cours d’exécution</string>
     <string name="profile_default_name">Profil</string>
     <string name="profile_subscription_default_name">Abonnement</string>
     <string name="profile_imported_default_name">Profil importé</string>
     <string name="error_mihomo_config_blank">La configuration Mihomo ne doit pas être vide</string>
-    <string name="error_subscription_url_blank">L\'URL de l\'abonnement ne doit pas être vide</string>
+    <string name="error_subscription_url_blank">L’URL de l’abonnement ne doit pas être vide</string>
     <string name="error_unknown_profile">Profil inconnu %1$s</string>
-    <string name="error_subscription_empty">L\'abonnement est vide</string>
+    <string name="error_subscription_empty">L’abonnement est vide</string>
     <string name="error_no_compatible_proxy_links">Aucun lien proxy compatible avec Mihomo trouvé</string>
-    <string name="error_subscription_http">HTTP de l\'abonnement %1$d</string>
+    <string name="error_subscription_http">HTTP de l’abonnement %1$d</string>
 
     <!-- Proxies / node list -->
     <string name="menu_proxies">Proxys</string>
     <string name="proxies_title">Proxys</string>
-    <string name="proxies_empty_disconnected">Connectez-vous d\'abord pour charger et gérer les nœuds.</string>
-    <string name="proxies_empty_none">Le profil actif n\'a aucun groupe sélectionnable.</string>
+    <string name="proxies_empty_disconnected">Connectez-vous d’abord pour charger et gérer les nœuds.</string>
+    <string name="proxies_empty_none">Le profil actif n’a aucun groupe sélectionnable.</string>
     <string name="proxies_test">Tester la latence</string>
     <string name="proxies_sort_delay">Trier par latence</string>
     <string name="proxies_testing">Test en cours…</string>
     <string name="proxies_delay_ms">%1$d ms</string>
     <string name="proxies_delay_timeout">expiré</string>
+    <string name="proxies_auto">Auto</string>
+    <string name="proxies_pinned">Épinglé</string>
+    <string name="proxies_group_not_selectable">Ce type de groupe ne prend pas en charge la sélection manuelle</string>
     <string name="toast_node_selected">Basculé vers %1$s</string>
+    <string name="toast_node_auto">Retour à la sélection automatique</string>
     <string name="toast_node_select_failed">Impossible de changer de nœud</string>
-    <string name="splash_version">Version %1$s</string>
+
+    <!-- Routing rules -->
+    <string name="menu_rules">Règles de routage</string>
+    <string name="rules_title">Règles de routage</string>
+    <string name="rules_count">%1$d règles</string>
+    <string name="rules_empty_disconnected">Connectez-vous d’abord pour voir les règles de routage.</string>
+    <string name="rules_empty_none">Le profil actif n’a aucune règle.</string>
 
     <!-- Navigation drawer -->
     <string name="drawer_greeting">Salut, Miku 💕</string>
@@ -42,12 +53,17 @@
     <string name="drawer_section_manage">Gérer</string>
     <string name="drawer_section_tools">Outils et infos</string>
 
-    <!-- DNS override -->
+    <!-- DNS source -->
     <string name="settings_dns">DNS</string>
-    <string name="settings_dns_summary">Remplacer le DNS du profil par le vôtre</string>
+    <string name="settings_dns_summary">Choisir le DNS utilisé par un profil</string>
     <string name="dns_title">DNS</string>
-    <string name="dns_override">Remplacer le DNS</string>
-    <string name="dns_override_summary">Remplacer la section dns de chaque profil par le bloc ci-dessous</string>
+    <string name="dns_source">Source DNS</string>
+    <string name="dns_source_summary">Comment appliquer la section DNS des profils importés</string>
+    <string-array name="dns_sources">
+        <item>Profil d’abord, sinon DNS de l’appli</item>
+        <item>Toujours le DNS de l’appli</item>
+        <item>Toujours le DNS du profil</item>
+    </string-array>
     <string name="dns_yaml_hint">DNS (YAML)</string>
     <string name="dns_invalid_title">Configuration DNS invalide</string>
     <string name="dns_restart_hint">Reconnectez-vous pour appliquer les modifications.</string>
@@ -76,11 +92,11 @@
     <string name="settings_log">Niveau de journal</string>
     <string name="settings_tun_stack">Pile TUN</string>
     <string name="settings_allow_lan">Autoriser le LAN</string>
-    <string name="settings_allow_lan_summary">Laisser d\'autres appareils utiliser ce proxy</string>
+    <string name="settings_allow_lan_summary">Laisser d’autres appareils utiliser ce proxy</string>
     <string name="settings_ipv6">IPv6</string>
-    <string name="settings_ipv6_summary">Router l\'IPv6 via le tunnel</string>
+    <string name="settings_ipv6_summary">Router l’IPv6 via le tunnel</string>
     <string name="settings_autoconnect">Connexion auto au lancement</string>
-    <string name="settings_autoconnect_summary">Démarrer le VPN à l\'ouverture de l\'app</string>
+    <string name="settings_autoconnect_summary">Démarrer le VPN à l’ouverture de l’app</string>
     <string name="settings_test_url">URL de test de latence</string>
     <string name="settings_test_timeout">Délai du test de latence</string>
     <string name="mode_follow">Suivre la config</string>
@@ -96,4 +112,8 @@
     <string name="settings_unified_delay_summary">Utiliser une même méthode de mesure du délai pour tous les proxys</string>
     <string name="settings_tcp_concurrent">TCP simultané</string>
     <string name="settings_tcp_concurrent_summary">Se connecter à plusieurs adresses IP simultanément</string>
+    <string name="logcat_export">Exporter les journaux</string>
+    <string name="logcat_export_failed">Impossible d’exporter les journaux : %1$s</string>
+    <string name="proxies_offline_hint">Aperçu hors ligne du profil actif. Connectez-vous pour changer de nœud.</string>
+    <string name="rules_offline_hint">Aperçu hors ligne du profil · %1$d règles</string>
 </resources>

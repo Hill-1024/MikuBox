@@ -8,10 +8,14 @@ import top.uwu.mikubox.core.MihomoCore
 import top.uwu.mikubox.core.MihomoDnsSettings
 import top.uwu.mikubox.databinding.ActivityDnsBinding
 
-/** Editor for the user-configurable DNS block that overrides a profile's `dns:`. */
+/**
+ * Editor for the app DNS block and for how it combines with a profile's own
+ * `dns:` section (profile-first, always-app, or always-profile).
+ */
 class DnsActivity : EdgeToEdgeActivity() {
 
     private lateinit var binding: ActivityDnsBinding
+    private val sources = MihomoDnsSettings.DnsSource.entries
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,13 +25,9 @@ class DnsActivity : EdgeToEdgeActivity() {
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         binding.etDns.setText(MihomoDnsSettings.yaml(this))
-        binding.swOverride.isChecked = MihomoDnsSettings.overrideEnabled(this)
-        applyEnabled(binding.swOverride.isChecked)
+        setupSourceSelector()
+        applyEnabled(MihomoDnsSettings.source(this))
 
-        binding.swOverride.setOnCheckedChangeListener { _, checked ->
-            MihomoDnsSettings.setOverrideEnabled(this, checked)
-            applyEnabled(checked)
-        }
         binding.btnSave.setOnClickListener {
             val yaml = binding.etDns.text?.toString().orEmpty()
             val error = MihomoCore.validateDns(yaml)
@@ -49,7 +49,19 @@ class DnsActivity : EdgeToEdgeActivity() {
         }
     }
 
-    private fun applyEnabled(enabled: Boolean) {
+    private fun setupSourceSelector() {
+        val labels = resources.getStringArray(R.array.dns_sources)
+        binding.dropdownSource.setSimpleItems(labels)
+        binding.dropdownSource.setText(labels[sources.indexOf(MihomoDnsSettings.source(this)).coerceAtLeast(0)], false)
+        binding.dropdownSource.setOnItemClickListener { _, _, position, _ ->
+            MihomoDnsSettings.setSource(this, sources[position])
+            applyEnabled(sources[position])
+        }
+    }
+
+    /** The app block is only editable while a mode can actually use it. */
+    private fun applyEnabled(source: MihomoDnsSettings.DnsSource) {
+        val enabled = source != MihomoDnsSettings.DnsSource.CONFIG
         binding.tilDns.isEnabled = enabled
         binding.etDns.isEnabled = enabled
         binding.btnSave.isEnabled = enabled
