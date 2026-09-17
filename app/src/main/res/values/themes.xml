@@ -8,9 +8,13 @@
         Theme.MikuBoxCla below.
     -->
     <style name="AppThemeBase" parent="Theme.Material3Expressive.DayNight.NoActionBar">
+        <!-- The chrome (app bar, status panel) is colourPrimary, so the system
+             bar icons ride on-primary: white in the light theme, ink at night. -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.App.SmallComponent</item>
         <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.App.MediumComponent</item>
         <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.App.LargeComponent</item>
@@ -113,8 +117,27 @@
         <item name="colorSurfaceContainerHigh">@color/miku_surface_container_high</item>
         <item name="colorSurfaceContainerHighest">@color/miku_surface_container_highest</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@color/miku_background</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+    </style>
+
+    <!--
+        Chrome surfaces. Every screen paints its app bar with colourPrimary and
+        its content with colourBg, so these two styles are the only place the
+        light / night split has to be expressed per-layout.
+    -->
+    <style name="UwuAppBar" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="elevation">0dp</item>
+    </style>
+
+    <style name="UwuCollapsingToolbar" parent="@style/Widget.Material3.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/TextAppearance.Miku.CollapsingExpanded</item>
+        <item name="collapsedTitleTextAppearance">@style/TextAppearance.Miku.CollapsingCollapsed</item>
     </style>
 
     <style name="ShapeAppearance.App.SmallComponent" parent="ShapeAppearance.Material3.Corner.Small">

@@ -19,17 +19,34 @@ class ProfileAdapter(
     private val onUpdate: (MihomoProfileStore.Profile) -> Unit,
     private val onDelete: (MihomoProfileStore.Profile) -> Unit,
     private val onShare: (MihomoProfileStore.Profile) -> Unit,
-) : RecyclerView.Adapter<ProfileAdapter.VH>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var profiles: List<MihomoProfileStore.Profile> = emptyList()
     private var selectedId: String? = null
     private var updatingId: String? = null
+    private var bannerSubtitle: CharSequence = ""
+    private var empty = false
+
+    private companion object {
+        const val TYPE_BANNER = 0
+        const val TYPE_PROFILE = 1
+        const val TYPE_EMPTY = 2
+    }
 
     @SuppressWarnings("NotifyDataSetChanged")
     fun submit(list: List<MihomoProfileStore.Profile>, selectedId: String?) {
         this.profiles = list
         this.selectedId = selectedId
+        this.empty = list.isEmpty()
         notifyDataSetChanged()
+    }
+
+    /** Time-of-day greeting shown under the home banner. */
+    @SuppressWarnings("NotifyDataSetChanged")
+    fun setBannerSubtitle(text: CharSequence) {
+        if (bannerSubtitle == text) return
+        bannerSubtitle = text
+        if (itemCount > 0) notifyItemChanged(0)
     }
 
     /** Show/hide the indeterminate progress bar on the card being refreshed. */
@@ -39,15 +56,43 @@ class ProfileAdapter(
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH =
-        VH(LayoutInflater.from(parent.context).inflate(R.layout.item_profile, parent, false))
-
-    override fun getItemCount(): Int = profiles.size
-
-    override fun onBindViewHolder(holder: VH, position: Int) {
-        val profile = profiles[position]
-        holder.bind(profile, profile.id == selectedId, profile.id == updatingId)
+    override fun getItemViewType(position: Int): Int = when {
+        position == 0 -> TYPE_BANNER
+        empty -> TYPE_EMPTY
+        else -> TYPE_PROFILE
     }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        return when (viewType) {
+            TYPE_BANNER -> BannerVH(inflater.inflate(R.layout.item_home_banner, parent, false))
+            TYPE_EMPTY -> EmptyVH(inflater.inflate(R.layout.item_empty, parent, false))
+            else -> VH(inflater.inflate(R.layout.item_profile, parent, false))
+        }
+    }
+
+    override fun getItemCount(): Int = if (empty) 2 else profiles.size + 1
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (holder) {
+            is BannerVH -> holder.bind(bannerSubtitle)
+            is EmptyVH -> Unit
+            else -> {
+                val profile = profiles[position - 1]
+                (holder as VH).bind(profile, profile.id == selectedId, profile.id == updatingId)
+            }
+        }
+    }
+
+    inner class BannerVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val subtitle: TextView = itemView.findViewById(R.id.tv_banner_subtitle)
+
+        fun bind(text: CharSequence) {
+            subtitle.text = text
+        }
+    }
+
+    inner class EmptyVH(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val card = itemView as MaterialCardView

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MikuBox</string>
-    <string name="splash_version">Version %1$s</string>
+    <string name="splash_version">VERSION %1$s (%2$d)</string>
+    <string name="splash_made_with">Made With ❤️</string>
+    <string name="splash_by">By HatsuneMikuUwU Development</string>
     <string name="scaffold_subtitle">君の世界に、歌を届けるね。</string>
 
     <!-- Traffic footer -->
@@ -98,6 +100,10 @@
     <string name="toast_coming_soon">Coming soon</string>
 
     <!-- Settings -->
+    <string name="uwu_banner_settings_title">Hello there…</string>
+    <string name="uwu_banner_settings_summary">Welcome to the settings menu, please select whichever option you need.</string>
+    <string name="uwu_maintainer_title">This app is under maintenance</string>
+    <string name="uwu_maintainer_summary">HatsuneMikuUwU Development</string>
     <string name="settings_section_appearance">Appearance</string>
     <string name="settings_section_connection">Connection</string>
     <string name="settings_theme">Theme</string>

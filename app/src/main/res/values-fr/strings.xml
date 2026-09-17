@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="uwu_banner_settings_title">Bonjour…</string>
+    <string name="uwu_banner_settings_summary">Bienvenue dans les paramètres, choisissez l’option souhaitée.</string>
+    <string name="uwu_maintainer_title">Cette application est en maintenance</string>
+    <string name="uwu_maintainer_summary">HatsuneMikuUwU Development</string>
     <string name="app_name">MikuBox</string>
-    <string name="splash_version">Version %1$s</string>
+    <string name="splash_version">VERSION %1$s (%2$d)</string>
+    <string name="splash_made_with">Fait avec ❤️</string>
+    <string name="splash_by">Par HatsuneMikuUwU Development</string>
     <string name="scaffold_subtitle">君の世界に、歌を届けるね。</string>
 
     <!-- Service VPN -->

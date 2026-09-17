@@ -29,8 +29,11 @@
         <item name="colorSurfaceContainerHigh">@color/miku_surface_container_high_dark</item>
         <item name="colorSurfaceContainerHighest">@color/miku_surface_container_highest_dark</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@color/miku_background_dark</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- night chrome is mint, so the system bar icons have to go dark -->
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
     </style>
 
 </resources>

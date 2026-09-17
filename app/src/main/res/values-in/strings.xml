@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MikuBox</string>
-    <string name="splash_version">Version %1$s</string>
+    <string name="splash_version">VERSI %1$s (%2$d)</string>
+    <string name="splash_made_with">Dibuat dengan ❤️</string>
+    <string name="splash_by">Oleh HatsuneMikuUwU Development</string>
     <string name="scaffold_subtitle">君の世界に、歌を届けるね。</string>
     <string name="vpn_channel_name">Status VPN</string>
     <string name="vpn_notification_running">Terhubung</string>
@@ -77,6 +79,10 @@
     <string name="toast_coming_soon">Segera hadir</string>
 
     <!-- Settings -->
+    <string name="uwu_banner_settings_title">Halo…</string>
+    <string name="uwu_banner_settings_summary">Selamat datang di pengaturan, pilih opsi yang kamu butuhkan.</string>
+    <string name="uwu_maintainer_title">Aplikasi ini sedang dalam pemeliharaan</string>
+    <string name="uwu_maintainer_summary">HatsuneMikuUwU Development</string>
     <string name="settings_section_appearance">Tampilan</string>
     <string name="settings_section_connection">Koneksi</string>
     <string name="settings_theme">Tema</string>

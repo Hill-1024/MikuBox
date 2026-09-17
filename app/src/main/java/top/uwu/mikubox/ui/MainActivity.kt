@@ -103,7 +103,7 @@ class MainActivity : EdgeToEdgeActivity(), AddProfileBottomSheet.Listener {
         setupDrawer()
         binding.fab.setOnClickListener { toggleConnection() }
         binding.cardBottomStatus.setOnClickListener { toggleConnection() }
-        binding.tvGreeting.setText(greetingRes())
+        adapter.setBannerSubtitle(getString(greetingRes()))
 
         requestNotificationPermission()
 
@@ -124,15 +124,21 @@ class MainActivity : EdgeToEdgeActivity(), AddProfileBottomSheet.Listener {
     }
 
     private fun applyMainSystemBarInsets() {
+        val panelPadding = resources.getDimensionPixelSize(R.dimen.uwu_status_panel_padding_bottom)
+        val listPadding = resources.getDimensionPixelSize(R.dimen.uwu_list_bottom_padding)
         ViewCompat.setOnApplyWindowInsetsListener(binding.mainContent) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val cutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
             view.updatePadding(
                 left = maxOf(bars.left, cutout.left),
                 right = maxOf(bars.right, cutout.right),
-                bottom = maxOf(bars.bottom, cutout.bottom),
             )
             binding.headerContent.updatePadding(top = maxOf(bars.top, cutout.top))
+            // The status panel paints edge to edge, so only its contents need
+            // to clear the navigation bar.
+            val bottom = maxOf(bars.bottom, cutout.bottom)
+            binding.cardBottomStatus.updatePadding(bottom = panelPadding + bottom)
+            binding.rvProfiles.updatePadding(bottom = listPadding + bottom)
             insets
         }
         ViewCompat.requestApplyInsets(binding.mainContent)
@@ -223,7 +229,6 @@ class MainActivity : EdgeToEdgeActivity(), AddProfileBottomSheet.Listener {
                 }
             }
         adapter.submit(profiles, selected?.id)
-        binding.emptyCard.visibility = if (profiles.isEmpty()) View.VISIBLE else View.GONE
         val running = VpnController.isRunning
         binding.fab.setImageResource(if (running) R.drawable.ic_service_busy else R.drawable.ic_service_idle)
         binding.status.text = when {

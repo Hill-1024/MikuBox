@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Clearance for the pinned tab strip plus the bottom status panel. -->
+    <dimen name="uwu_list_bottom_padding">150dp</dimen>
+    <!-- The status panel is edge-to-edge; only its contents clear the nav bar. -->
+    <dimen name="uwu_status_panel_padding_bottom">18dp</dimen>
+</resources>

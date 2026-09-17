@@ -19,9 +19,11 @@ abstract class EdgeToEdgeActivity : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val cutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
+            // The app bar owns the status-bar strip (it is colourPrimary and
+            // has fitsSystemWindows), so the root only takes the side and
+            // bottom insets -- padding it here would paint colourBg up there.
             view.updatePadding(
                 left = maxOf(bars.left, cutout.left),
-                top = maxOf(bars.top, cutout.top),
                 right = maxOf(bars.right, cutout.right),
                 bottom = maxOf(bars.bottom, cutout.bottom),
             )
