@@ -48,6 +48,16 @@ class MikuVpnService : VpnService() {
     private val generation = java.util.concurrent.atomic.AtomicInteger()
     private var starting = false
 
+    /**
+     * Set while a start request is outstanding; cleared when one begins or when
+     * the user disconnects. A start that meets a tunnel still registered from a
+     * previous run is replayed once the teardown queue drained — returning there
+     * used to drop the request and leave the VPN down while the UI reported the
+     * service as restarting.
+     */
+    private var startRequested = false
+    private var startReplayQueued = false
+
     private val checkpointHandler = Handler(Looper.getMainLooper())
 
     private var wakeLock: android.os.PowerManager.WakeLock? = null
@@ -85,6 +95,9 @@ class MikuVpnService : VpnService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_STOP -> {
+                startRequested = false
+                startReplayQueued = false
+                Log.i(TAG, "stop requested")
                 stopVpn()
                 return START_NOT_STICKY
             }
@@ -100,6 +113,7 @@ class MikuVpnService : VpnService() {
                 return START_STICKY
             }
         }
+        startRequested = true
         startVpn()
         return START_STICKY
     }
@@ -116,7 +130,24 @@ class MikuVpnService : VpnService() {
     }
 
     private fun startVpn() {
-        if (starting || tunFd != MihomoCore.NO_TUN) return
+        if (starting) return
+        if (tunFd != MihomoCore.NO_TUN) {
+            // A tunnel is still registered: either it already serves this request,
+            // or a teardown that was asked for a moment ago is queued behind it.
+            // Replay the request after that queue drained instead of dropping it.
+            if (startRequested && !startReplayQueued) {
+                Log.i(TAG, "start deferred, tunnel still registered (running=$running)")
+                startReplayQueued = true
+                startExecutor.execute {
+                    checkpointHandler.post {
+                        startReplayQueued = false
+                        if (startRequested) startVpn()
+                    }
+                }
+            }
+            return
+        }
+        startRequested = false
         starting = true
         val request = generation.incrementAndGet()
         MikuProxyService.stop(this)
@@ -167,6 +198,7 @@ class MikuVpnService : VpnService() {
                     tunFd = fd
                     running = true
                     startedAtMillis = System.currentTimeMillis()
+                    Log.i(TAG, "tunnel up (fd=$fd)")
                     checkpointHandler.post(trafficCheckpoint)
                     acquireWakeLock()
                 }

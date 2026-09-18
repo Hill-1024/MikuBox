@@ -796,9 +796,11 @@ class MainActivity : EdgeToEdgeActivity(), AddConfigBottomSheet.Listener {
     }
 
     private fun restartVpn() {
-        VpnController.disconnect(this)
+        // Reload in place instead of a stop plus a delayed start: that sequence
+        // raced the teardown, and when the reconnect fired before the stop had
+        // been handled the request was dropped and the tunnel stayed down.
+        VpnController.restart(this)
         UwuSnackbar.info(this, getString(R.string.service_restart_started))
-        handler.postDelayed({ if (!VpnController.isRunning) VpnController.connect(this) }, 800)
         handler.postDelayed({ refresh() }, 1600)
     }
 
