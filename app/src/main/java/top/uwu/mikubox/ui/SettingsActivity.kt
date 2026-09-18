@@ -1,33 +1,33 @@
 package top.uwu.mikubox.ui
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.text.InputType
-import android.widget.EditText
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import top.uwu.mikubox.R
 import top.uwu.mikubox.core.AppSettings
-import top.uwu.mikubox.core.MihomoCoreSettings
-import top.uwu.mikubox.databinding.ActivitySettingsBinding
-import android.content.Intent
-import android.net.Uri
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import top.uwu.mikubox.core.BackupManager
+import top.uwu.mikubox.core.MihomoCoreSettings
+import top.uwu.mikubox.core.ThemeManager
+import top.uwu.mikubox.core.RoutingMode
+import top.uwu.mikubox.databinding.ActivitySettingsBinding
 import top.uwu.mikubox.profile.MihomoProfileStore
 import top.uwu.mikubox.service.MihomoVpnSettings
 import top.uwu.mikubox.service.MihomoVpnSettings.AppMode
+import top.uwu.mikubox.service.VpnController
 
+/**
+ * Settings, laid out as the release design's stacked rows: grouped sections
+ * with a headline, and every row a card whose trailing widget is a switch, a
+ * current value or a navigation arrow.
+ */
 class SettingsActivity : EdgeToEdgeActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
-
-    private val nightModes = intArrayOf(
-        AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM,
-        AppCompatDelegate.MODE_NIGHT_NO,
-        AppCompatDelegate.MODE_NIGHT_YES,
-    )
 
     private val exportBackup = registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/json")
@@ -43,69 +43,7 @@ class SettingsActivity : EdgeToEdgeActivity() {
         setContentView(binding.root)
         applySystemBarInsets(binding.root)
         binding.toolbar.setNavigationOnClickListener { finish() }
-
-        binding.rowTheme.setOnClickListener { pickTheme() }
-        binding.rowLanguage.setOnClickListener { pickLanguage() }
-        binding.rowMtu.setOnClickListener { editMtu() }
-        binding.rowDns.setOnClickListener {
-            startActivity(Intent(this, DnsActivity::class.java))
-        }
-        binding.rowApps.setOnClickListener {
-            startActivity(Intent(this, AppListActivity::class.java))
-        }
-        binding.rowExport.setOnClickListener { exportBackup.launch("mikubox-backup.json") }
-        binding.rowImport.setOnClickListener { importBackup.launch(arrayOf("application/json", "text/*")) }
-
-        binding.swParticles.isChecked = AppSettings.particlesEnabled(this)
-        binding.rowParticles.setOnClickListener {
-            val enabled = !binding.swParticles.isChecked
-            binding.swParticles.isChecked = enabled
-            AppSettings.setParticlesEnabled(this, enabled)
-        }
-
-        binding.swBoot.isChecked = MihomoProfileStore.autoStart(this)
-        binding.rowBoot.setOnClickListener {
-            val enabled = !binding.swBoot.isChecked
-            binding.swBoot.isChecked = enabled
-            MihomoProfileStore.setAutoStart(this, enabled)
-        }
-
-        binding.rowMode.setOnClickListener { pickMode() }
-        binding.rowLog.setOnClickListener { pickLog() }
-        binding.rowTunStack.setOnClickListener { pickStack() }
-        binding.rowTestUrl.setOnClickListener { editTestUrl() }
-        binding.rowTestTimeout.setOnClickListener { editTestTimeout() }
-
-        binding.swAllowLan.isChecked = MihomoCoreSettings.allowLan(this)
-        binding.rowAllowLan.setOnClickListener {
-            val enabled = !binding.swAllowLan.isChecked
-            binding.swAllowLan.isChecked = enabled
-            MihomoCoreSettings.setAllowLan(this, enabled)
-        }
-        binding.swUnifiedDelay.isChecked = MihomoCoreSettings.unifiedDelay(this)
-        binding.rowUnifiedDelay.setOnClickListener {
-            val enabled = !binding.swUnifiedDelay.isChecked
-            binding.swUnifiedDelay.isChecked = enabled
-            MihomoCoreSettings.setUnifiedDelay(this, enabled)
-        }
-        binding.swTcpConcurrent.isChecked = MihomoCoreSettings.tcpConcurrent(this)
-        binding.rowTcpConcurrent.setOnClickListener {
-            val enabled = !binding.swTcpConcurrent.isChecked
-            binding.swTcpConcurrent.isChecked = enabled
-            MihomoCoreSettings.setTcpConcurrent(this, enabled)
-        }
-        binding.swIpv6.isChecked = MihomoCoreSettings.ipv6(this)
-        binding.rowIpv6.setOnClickListener {
-            val enabled = !binding.swIpv6.isChecked
-            binding.swIpv6.isChecked = enabled
-            MihomoCoreSettings.setIpv6(this, enabled)
-        }
-        binding.swAutoconnect.isChecked = MihomoCoreSettings.autoConnectOnStart(this)
-        binding.rowAutoconnect.setOnClickListener {
-            val enabled = !binding.swAutoconnect.isChecked
-            binding.swAutoconnect.isChecked = enabled
-            MihomoCoreSettings.setAutoConnectOnStart(this, enabled)
-        }
+        setupRows()
     }
 
     override fun onResume() {
@@ -113,17 +51,448 @@ class SettingsActivity : EdgeToEdgeActivity() {
         render()
     }
 
-    private fun render() {
-        binding.tvThemeValue.text = getString(themeLabel(AppSettings.nightMode(this)))
-        binding.tvLanguageValue.text = getString(languageLabel(AppSettings.language(this)))
-        binding.tvMtuValue.text = MihomoVpnSettings.mtu(this).toString()
-        binding.tvAppsValue.setText(appModeLabel(MihomoVpnSettings.appMode(this)))
-        binding.tvModeValue.setText(modeLabel(MihomoCoreSettings.mode(this)))
-        binding.tvLogValue.setText(logLabel(MihomoCoreSettings.logLevel(this)))
-        binding.tvStackValue.setText(stackLabel(MihomoCoreSettings.tunStack(this)))
-        binding.tvTestUrlValue.text = MihomoCoreSettings.testUrl(this)
-        binding.tvTestTimeoutValue.text = getString(R.string.settings_test_timeout_value, MihomoCoreSettings.testTimeout(this))
+    private fun setupRows() {
+        UwuRow.bind(
+            binding.rowThemeColor,
+            UwuRow.Slot.TOP,
+            R.drawable.ic_palette_24,
+            getString(R.string.settings_theme_color),
+            getString(R.string.settings_theme_color_summary),
+        ) { ThemeDialogs.showThemeColor(this) { render() } }
+        UwuRow.bind(
+            binding.rowDynamicColor,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_baseline_color_lens_24,
+            getString(R.string.settings_dynamic_color),
+            if (ThemeManager.supportsDynamicColor()) {
+                getString(R.string.settings_dynamic_color_summary)
+            } else {
+                getString(R.string.settings_dynamic_unavailable)
+            },
+            switchState = AppSettings.dynamicColor(this) && ThemeManager.supportsDynamicColor(),
+        ) { toggleDynamicColor() }
+        UwuRow.bind(
+            binding.rowDynamicBanner,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_image_24dp,
+            getString(R.string.settings_dynamic_banner),
+            if (ThemeManager.supportsDynamicColor()) {
+                getString(R.string.settings_dynamic_banner_summary)
+            } else {
+                getString(R.string.settings_dynamic_unavailable)
+            },
+            switchState = AppSettings.dynamicColorFromBanner(this) &&
+                ThemeManager.supportsDynamicColor(),
+        ) { toggleDynamicBanner() }
+        UwuRow.bind(
+            binding.rowDarkMode,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_baseline_blur_on_24,
+            getString(R.string.settings_dark_mode),
+        ) { pickDarkMode() }
+        UwuRow.bind(
+            binding.rowTrueBlack,
+            UwuRow.Slot.BOTTOM,
+            R.drawable.ic_circle,
+            getString(R.string.settings_true_black),
+            if (ThemeManager.isDarkMode(this)) {
+                getString(R.string.settings_true_black_summary)
+            } else {
+                getString(R.string.settings_true_black_night_only)
+            },
+            switchState = AppSettings.trueBlack(this) && ThemeManager.isDarkMode(this),
+        ) { toggleTrueBlack() }
+
+        UwuRow.bind(
+            binding.rowFont,
+            UwuRow.Slot.TOP,
+            R.drawable.ic_format_font,
+            getString(R.string.settings_font),
+            getString(R.string.settings_font_summary),
+        ) { FontPickerBottomSheet.show(supportFragmentManager) }
+        UwuRow.bind(
+            binding.rowFontSize,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_format_font,
+            getString(R.string.settings_font_size),
+        ) { editFontScale() }
+        UwuRow.bind(
+            binding.rowBoldText,
+            UwuRow.Slot.BOTTOM,
+            R.drawable.ic_edit_24dp,
+            getString(R.string.settings_bold_text),
+            getString(R.string.settings_bold_text_summary),
+            switchState = AppSettings.boldText(this),
+        ) { toggleBoldText() }
+
+        UwuRow.bind(
+            binding.rowLanguage,
+            UwuRow.Slot.TOP,
+            R.drawable.ic_translate,
+            getString(R.string.settings_language),
+        ) { pickLanguage() }
+        UwuRow.bind(
+            binding.rowProfileName,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_account_edit,
+            getString(R.string.settings_profile_name),
+            getString(R.string.settings_profile_name_summary),
+        ) { editProfileName() }
+        UwuRow.bind(
+            binding.rowParticles,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_sparkles_24dp,
+            getString(R.string.settings_particles),
+            getString(R.string.settings_particles_summary),
+            switchState = AppSettings.particlesEnabled(this),
+        ) { toggleParticles() }
+        UwuRow.bind(
+            binding.rowQuickActions,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_baseline_speed_24,
+            getString(R.string.settings_quick_actions),
+            getString(R.string.settings_quick_actions_summary),
+            switchState = AppSettings.quickActions(this),
+        ) { toggleQuickActions() }
+        UwuRow.bind(
+            binding.rowFabExtended,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_clock,
+            getString(R.string.settings_fab_extended),
+            getString(R.string.settings_fab_extended_summary),
+            switchState = AppSettings.fabExtended(this),
+        ) { toggleFabExtended() }
+        UwuRow.bind(
+            binding.rowCompactActions,
+            UwuRow.Slot.BOTTOM,
+            R.drawable.ic_action_note_add,
+            getString(R.string.settings_compact_actions),
+            getString(R.string.settings_compact_actions_summary),
+            switchState = AppSettings.compactListActions(this),
+        ) { toggleCompactActions() }
+
+        UwuRow.bind(
+            binding.rowApps,
+            UwuRow.Slot.TOP,
+            R.drawable.ic_per_apps_24dp,
+            getString(R.string.settings_per_app),
+            getString(R.string.desc_apps),
+            arrow = true,
+        ) { startActivity(Intent(this, AppListActivity::class.java)) }
+        UwuRow.bind(
+            binding.rowDns,
+            UwuRow.Slot.TOP,
+            R.drawable.ic_dns,
+            getString(R.string.settings_dns),
+            getString(R.string.settings_dns_summary),
+            arrow = true,
+        ) { startActivity(Intent(this, DnsActivity::class.java)) }
+        UwuRow.bind(
+            binding.rowBoot,
+            UwuRow.Slot.TOP,
+            R.drawable.ic_access_point_network,
+            getString(R.string.settings_boot),
+            getString(R.string.settings_boot_summary),
+            switchState = MihomoProfileStore.autoStart(this),
+        ) { toggleBoot() }
+        UwuRow.bind(
+            binding.rowAutoconnect,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_flash_on,
+            getString(R.string.settings_autoconnect),
+            getString(R.string.settings_autoconnect_summary),
+            switchState = MihomoCoreSettings.autoConnectOnStart(this),
+        ) { toggleAutoconnect() }
+        UwuRow.bind(
+            binding.rowAllowLan,
+            UwuRow.Slot.SINGLE,
+            R.drawable.ic_lan,
+            getString(R.string.settings_allow_lan),
+            getString(R.string.settings_allow_lan_summary),
+            switchState = MihomoCoreSettings.allowLan(this),
+        ) { toggleAllowLan() }
+        UwuRow.bind(
+            binding.rowIpv6,
+            UwuRow.Slot.BOTTOM,
+            R.drawable.ic_wan,
+            getString(R.string.settings_ipv6),
+            getString(R.string.settings_ipv6_summary),
+            switchState = MihomoCoreSettings.ipv6(this),
+        ) { toggleIpv6() }
+        UwuRow.bind(
+            binding.rowMtu,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_router,
+            getString(R.string.settings_mtu),
+        ) { editMtu() }
+
+        UwuRow.bind(
+            binding.rowMode,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_baseline_transform_24,
+            getString(R.string.settings_mode),
+        ) { pickMode() }
+        UwuRow.bind(
+            binding.rowLog,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_math_log,
+            getString(R.string.settings_log),
+        ) { pickLog() }
+        UwuRow.bind(
+            binding.rowTunStack,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_connection,
+            getString(R.string.settings_tun_stack),
+        ) { pickStack() }
+        UwuRow.bind(
+            binding.rowUnifiedDelay,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_baseline_speed_24,
+            getString(R.string.settings_unified_delay),
+            getString(R.string.settings_unified_delay_summary),
+            switchState = MihomoCoreSettings.unifiedDelay(this),
+        ) { toggleUnifiedDelay() }
+        UwuRow.bind(
+            binding.rowTcpConcurrent,
+            UwuRow.Slot.BOTTOM,
+            R.drawable.ic_crosshairs,
+            getString(R.string.settings_tcp_concurrent),
+            getString(R.string.settings_tcp_concurrent_summary),
+            switchState = MihomoCoreSettings.tcpConcurrent(this),
+        ) { toggleTcpConcurrent() }
+        UwuRow.bind(
+            binding.rowTestUrl,
+            UwuRow.Slot.TOP,
+            R.drawable.ic_web_24dp,
+            getString(R.string.settings_test_url),
+        ) { editTestUrl() }
+        UwuRow.bind(
+            binding.rowTestTimeout,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_history,
+            getString(R.string.settings_test_timeout),
+        ) { editTestTimeout() }
+        UwuRow.bind(
+            binding.rowAdvanced,
+            UwuRow.Slot.BOTTOM,
+            R.drawable.ic_settings_24dp,
+            getString(R.string.advanced_title),
+            getString(R.string.advanced_summary),
+            arrow = true,
+        ) { startActivity(Intent(this, AdvancedActivity::class.java)) }
+
+        UwuRow.bind(
+            binding.rowExport,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_backup_24dp,
+            getString(R.string.settings_export),
+            getString(R.string.settings_export_summary),
+            arrow = true,
+        ) { exportBackup.launch("mikubox-backup.json") }
+        UwuRow.bind(
+            binding.rowImport,
+            UwuRow.Slot.BOTTOM,
+            R.drawable.ic_restore_24dp,
+            getString(R.string.settings_import),
+            getString(R.string.settings_import_summary),
+            arrow = true,
+        ) { importBackup.launch(arrayOf("application/json", "text/*")) }
     }
+
+    private fun render() {
+        // Rows are re-bound on every resume: a preference can also change from
+        // the home screen, a sheet or the boot receiver, and a switch still
+        // showing the old state is worse than no switch at all.
+        setupRows()
+        setValue(binding.rowThemeColor, themeColorLabel())
+        setValue(binding.rowDarkMode, getString(darkModeLabel(AppSettings.nightMode(this))))
+        setValue(binding.rowFont, ThemeDialogs.fontLabel(this, AppSettings.fontFamily(this)))
+        setValue(
+            binding.rowFontSize,
+            getString(R.string.font_size_value, AppSettings.fontScale(this)),
+        )
+        setValue(binding.rowLanguage, getString(languageLabel(AppSettings.language(this))))
+        setValue(
+            binding.rowProfileName,
+            AppSettings.profileName(this).ifBlank { getString(R.string.uwu_profile_banner_title) },
+        )
+        setValue(binding.rowMtu, MihomoVpnSettings.mtu(this).toString())
+        setValue(binding.rowApps, getString(appModeLabel(MihomoVpnSettings.appMode(this))))
+        setValue(binding.rowMode, getString(modeLabel(MihomoCoreSettings.mode(this))))
+        setValue(binding.rowLog, getString(logLabel(MihomoCoreSettings.logLevel(this))))
+        setValue(binding.rowTunStack, getString(stackLabel(MihomoCoreSettings.tunStack(this))))
+        setValue(binding.rowTestUrl, MihomoCoreSettings.testUrl(this))
+        setValue(
+            binding.rowTestTimeout,
+            getString(R.string.settings_test_timeout_value, MihomoCoreSettings.testTimeout(this)),
+        )
+    }
+
+    /** "Dynamic", "Custom" or the active family name. */
+    private fun themeColorLabel(): CharSequence = when {
+        ThemeManager.isDynamicActive(this) -> getString(R.string.settings_theme_dynamic_label)
+        AppSettings.useCustomColor(this) -> getString(R.string.theme_custom_color)
+        else -> ThemeManager.familyDisplayName(AppSettings.themeFamily(this))
+    }
+
+    private fun setValue(row: top.uwu.mikubox.databinding.UwuRowBinding, value: CharSequence) {
+        row.rowValue.text = value
+        row.rowValue.visibility = android.view.View.VISIBLE
+        row.rowValue.setTextColor(
+            MaterialColors.getColor(
+                row.rowValue,
+                com.google.android.material.R.attr.colorOnSurfaceVariant,
+            )
+        )
+    }
+
+    // ------------------------------------------------------------- toggles
+
+    private fun toggleParticles() {
+        val enabled = !AppSettings.particlesEnabled(this)
+        AppSettings.setParticlesEnabled(this, enabled)
+        UwuRow.bind(
+            binding.rowParticles,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_sparkles_24dp,
+            getString(R.string.settings_particles),
+            getString(R.string.settings_particles_summary),
+            switchState = enabled,
+        ) { toggleParticles() }
+    }
+
+    private fun toggleQuickActions() {
+        val enabled = !AppSettings.quickActions(this)
+        AppSettings.setQuickActions(this, enabled)
+        UwuRow.bind(
+            binding.rowQuickActions,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_baseline_speed_24,
+            getString(R.string.settings_quick_actions),
+            getString(R.string.settings_quick_actions_summary),
+            switchState = enabled,
+        ) { toggleQuickActions() }
+    }
+
+    private fun toggleFabExtended() {
+        val enabled = !AppSettings.fabExtended(this)
+        AppSettings.setFabExtended(this, enabled)
+        UwuRow.bind(
+            binding.rowFabExtended,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_clock,
+            getString(R.string.settings_fab_extended),
+            getString(R.string.settings_fab_extended_summary),
+            switchState = enabled,
+        ) { toggleFabExtended() }
+    }
+
+    private fun toggleCompactActions() {
+        val enabled = !AppSettings.compactListActions(this)
+        AppSettings.setCompactListActions(this, enabled)
+        UwuRow.bind(
+            binding.rowCompactActions,
+            UwuRow.Slot.BOTTOM,
+            R.drawable.ic_action_note_add,
+            getString(R.string.settings_compact_actions),
+            getString(R.string.settings_compact_actions_summary),
+            switchState = enabled,
+        ) { toggleCompactActions() }
+    }
+
+    private fun toggleBoot() {
+        val enabled = !MihomoProfileStore.autoStart(this)
+        MihomoProfileStore.setAutoStart(this, enabled)
+        UwuRow.bind(
+            binding.rowBoot,
+            UwuRow.Slot.TOP,
+            R.drawable.ic_access_point_network,
+            getString(R.string.settings_boot),
+            getString(R.string.settings_boot_summary),
+            switchState = enabled,
+        ) { toggleBoot() }
+    }
+
+    private fun toggleAutoconnect() {
+        val enabled = !MihomoCoreSettings.autoConnectOnStart(this)
+        MihomoCoreSettings.setAutoConnectOnStart(this, enabled)
+        UwuRow.bind(
+            binding.rowAutoconnect,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_flash_on,
+            getString(R.string.settings_autoconnect),
+            getString(R.string.settings_autoconnect_summary),
+            switchState = enabled,
+        ) { toggleAutoconnect() }
+    }
+
+    private fun toggleAllowLan() {
+        val enabled = !MihomoCoreSettings.allowLan(this)
+        MihomoCoreSettings.setAllowLan(this, enabled)
+        applyCoreChange()
+        UwuRow.bind(
+            binding.rowAllowLan,
+            UwuRow.Slot.SINGLE,
+            R.drawable.ic_lan,
+            getString(R.string.settings_allow_lan),
+            getString(R.string.settings_allow_lan_summary),
+            switchState = enabled,
+        ) { toggleAllowLan() }
+    }
+
+    private fun toggleIpv6() {
+        val enabled = !MihomoCoreSettings.ipv6(this)
+        MihomoCoreSettings.setIpv6(this, enabled)
+        applyCoreChange()
+        UwuRow.bind(
+            binding.rowIpv6,
+            UwuRow.Slot.BOTTOM,
+            R.drawable.ic_wan,
+            getString(R.string.settings_ipv6),
+            getString(R.string.settings_ipv6_summary),
+            switchState = enabled,
+        ) { toggleIpv6() }
+    }
+
+    private fun toggleUnifiedDelay() {
+        val enabled = !MihomoCoreSettings.unifiedDelay(this)
+        MihomoCoreSettings.setUnifiedDelay(this, enabled)
+        applyCoreChange()
+        UwuRow.bind(
+            binding.rowUnifiedDelay,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_baseline_speed_24,
+            getString(R.string.settings_unified_delay),
+            getString(R.string.settings_unified_delay_summary),
+            switchState = enabled,
+        ) { toggleUnifiedDelay() }
+    }
+
+    private fun toggleTcpConcurrent() {
+        val enabled = !MihomoCoreSettings.tcpConcurrent(this)
+        MihomoCoreSettings.setTcpConcurrent(this, enabled)
+        applyCoreChange()
+        UwuRow.bind(
+            binding.rowTcpConcurrent,
+            UwuRow.Slot.BOTTOM,
+            R.drawable.ic_crosshairs,
+            getString(R.string.settings_tcp_concurrent),
+            getString(R.string.settings_tcp_concurrent_summary),
+            switchState = enabled,
+        ) { toggleTcpConcurrent() }
+    }
+
+    /**
+     * The core reads these settings when it starts, so a running tunnel is
+     * reloaded to apply them; while disconnected there is nothing to do.
+     */
+    private fun applyCoreChange() {
+        val running = VpnController.isRunning
+        VpnController.restart(this)
+        if (running) UwuSnackbar.info(this, getString(R.string.advanced_restarting))
+    }
+
+    // ------------------------------------------------------------- pickers
 
     private fun modeLabel(mode: MihomoCoreSettings.ProxyMode): Int = when (mode) {
         MihomoCoreSettings.ProxyMode.RULE -> R.string.mode_rule
@@ -152,7 +521,8 @@ class SettingsActivity : EdgeToEdgeActivity() {
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.settings_mode)
             .setSingleChoiceItems(labels, modes.indexOf(MihomoCoreSettings.mode(this))) { dialog, which ->
-                MihomoCoreSettings.setMode(this, modes[which])
+                // A running core switches over immediately, exactly like the home switch.
+                RoutingMode.select(this, modes[which])
                 dialog.dismiss()
                 render()
             }
@@ -169,6 +539,7 @@ class SettingsActivity : EdgeToEdgeActivity() {
                 MihomoCoreSettings.setLogLevel(this, levels[which])
                 dialog.dismiss()
                 render()
+                applyCoreChange()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
@@ -183,45 +554,65 @@ class SettingsActivity : EdgeToEdgeActivity() {
                 MihomoCoreSettings.setTunStack(this, stacks[which])
                 dialog.dismiss()
                 render()
+                applyCoreChange()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
+    }
+
+    private fun editProfileName() {
+        UwuDialogs.input(
+            context = this,
+            title = getString(R.string.settings_profile_name),
+            message = getString(R.string.uwu_profile_name_dialog),
+            initial = AppSettings.profileName(this),
+        ) { value ->
+            AppSettings.setProfileName(this, value)
+            render()
+        }
     }
 
     private fun editTestUrl() {
-        val input = EditText(this).apply {
-            inputType = InputType.TYPE_TEXT_VARIATION_URI
-            setText(MihomoCoreSettings.testUrl(this@SettingsActivity))
-        }
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.settings_test_url)
-            .setView(input)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                input.text.toString().trim().takeIf { it.isNotEmpty() }?.let {
-                    MihomoCoreSettings.setTestUrl(this, it)
-                    render()
-                }
+        UwuDialogs.input(
+            context = this,
+            title = getString(R.string.settings_test_url),
+            initial = MihomoCoreSettings.testUrl(this),
+            hint = getString(R.string.settings_test_url),
+        ) { value ->
+            if (value.isNotBlank()) {
+                MihomoCoreSettings.setTestUrl(this, value)
+                render()
             }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
+        }
     }
 
     private fun editTestTimeout() {
-        val input = EditText(this).apply {
-            inputType = InputType.TYPE_CLASS_NUMBER
-            setText(MihomoCoreSettings.testTimeout(this@SettingsActivity).toString())
-        }
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.settings_test_timeout)
-            .setView(input)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                input.text.toString().toIntOrNull()?.let {
-                    MihomoCoreSettings.setTestTimeout(this, it)
-                    render()
-                }
+        UwuDialogs.input(
+            context = this,
+            title = getString(R.string.settings_test_timeout),
+            initial = MihomoCoreSettings.testTimeout(this).toString(),
+            hint = getString(R.string.settings_test_timeout),
+        ) { value ->
+            value.toIntOrNull()?.let {
+                MihomoCoreSettings.setTestTimeout(this, it)
+                render()
             }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
+        }
+    }
+
+    private fun editMtu() {
+        UwuDialogs.input(
+            context = this,
+            title = getString(R.string.settings_mtu),
+            initial = MihomoVpnSettings.mtu(this).toString(),
+            hint = getString(R.string.settings_mtu),
+        ) { value ->
+            value.toIntOrNull()?.let {
+                MihomoVpnSettings.setMtu(this, it)
+                render()
+                applyCoreChange()
+            }
+        }
     }
 
     private fun appModeLabel(mode: AppMode): Int = when (mode) {
@@ -230,24 +621,73 @@ class SettingsActivity : EdgeToEdgeActivity() {
         else -> R.string.per_app_mode_all
     }
 
-    private fun themeLabel(mode: Int): Int = when (mode) {
-        AppCompatDelegate.MODE_NIGHT_NO -> R.string.settings_theme_light
-        AppCompatDelegate.MODE_NIGHT_YES -> R.string.settings_theme_dark
+    private fun darkModeLabel(mode: String): Int = when (mode) {
+        AppSettings.NIGHT_LIGHT -> R.string.settings_theme_light
+        AppSettings.NIGHT_DARK -> R.string.settings_theme_dark
+        AppSettings.NIGHT_AUTO -> R.string.settings_theme_auto
         else -> R.string.settings_theme_system
     }
 
-    private fun pickTheme() {
-        val labels = nightModes.map { getString(themeLabel(it)) }.toTypedArray()
-        val current = nightModes.indexOf(AppSettings.nightMode(this)).coerceAtLeast(0)
+    private fun pickDarkMode() {
+        val modes = AppSettings.nightModes
+        val labels = modes.map { getString(darkModeLabel(it)) }.toTypedArray()
+        val current = modes.indexOf(AppSettings.nightMode(this)).coerceAtLeast(0)
         MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.settings_theme)
+            .setTitle(R.string.settings_dark_mode)
             .setSingleChoiceItems(labels, current) { dialog, which ->
-                AppSettings.setNightMode(this, nightModes[which])
+                AppSettings.setNightMode(this, modes[which])
                 dialog.dismiss()
-                render()
+                recreate()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
+    }
+
+    private fun toggleDynamicColor() {
+        if (!ThemeManager.supportsDynamicColor()) {
+            UwuSnackbar.error(this, getString(R.string.settings_dynamic_unavailable))
+            return
+        }
+        val enabled = !AppSettings.dynamicColor(this)
+        AppSettings.setDynamicColor(this, enabled)
+        if (enabled) AppSettings.setDynamicColorFromBanner(this, false)
+        recreate()
+    }
+
+    private fun toggleDynamicBanner() {
+        if (!ThemeManager.supportsDynamicColor()) {
+            UwuSnackbar.error(this, getString(R.string.settings_dynamic_unavailable))
+            return
+        }
+        val enabled = !AppSettings.dynamicColorFromBanner(this)
+        AppSettings.setDynamicColorFromBanner(this, enabled)
+        if (enabled) AppSettings.setDynamicColor(this, false)
+        recreate()
+    }
+
+    private fun toggleTrueBlack() {
+        if (!ThemeManager.isDarkMode(this)) {
+            UwuSnackbar.info(this, getString(R.string.settings_true_black_night_only))
+            return
+        }
+        AppSettings.setTrueBlack(this, !AppSettings.trueBlack(this))
+        recreate()
+    }
+
+    private fun toggleBoldText() {
+        AppSettings.setBoldText(this, !AppSettings.boldText(this))
+        recreate()
+    }
+
+    private fun editFontScale() {
+        ThemeDialogs.showSlider(
+            activity = this,
+            titleRes = R.string.settings_font_size,
+            value = AppSettings.fontScale(this),
+            min = AppSettings.FONT_SCALE_MIN,
+            max = AppSettings.FONT_SCALE_MAX,
+            step = 5,
+        ) { percent -> AppSettings.setFontScale(this, percent) }
     }
 
     private fun languageLabel(language: String): Int = when (language) {
@@ -281,11 +721,11 @@ class SettingsActivity : EdgeToEdgeActivity() {
                 it.write(BackupManager.export(this).toByteArray())
             } ?: error("no stream")
         }.isSuccess
-        Toast.makeText(
-            this,
-            if (ok) R.string.toast_backup_exported else R.string.toast_backup_failed,
-            Toast.LENGTH_SHORT,
-        ).show()
+        if (ok) {
+            UwuSnackbar.success(this, getString(R.string.toast_backup_exported))
+        } else {
+            UwuSnackbar.error(this, getString(R.string.toast_backup_failed))
+        }
     }
 
     private fun readBackup(uri: Uri) {
@@ -296,31 +736,11 @@ class SettingsActivity : EdgeToEdgeActivity() {
             BackupManager.import(this, json)
         }.isSuccess
         if (ok) {
-            AppCompatDelegate.setDefaultNightMode(AppSettings.nightMode(this))
+            AppSettings.applyNightMode(this)
             render()
+            UwuSnackbar.success(this, getString(R.string.toast_backup_imported))
+        } else {
+            UwuSnackbar.error(this, getString(R.string.toast_backup_failed))
         }
-        Toast.makeText(
-            this,
-            if (ok) R.string.toast_backup_imported else R.string.toast_backup_failed,
-            Toast.LENGTH_SHORT,
-        ).show()
-    }
-
-    private fun editMtu() {
-        val input = EditText(this).apply {
-            inputType = InputType.TYPE_CLASS_NUMBER
-            setText(MihomoVpnSettings.mtu(this@SettingsActivity).toString())
-        }
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.settings_mtu)
-            .setView(input)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                input.text.toString().toIntOrNull()?.let {
-                    MihomoVpnSettings.setMtu(this, it)
-                    render()
-                }
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
     }
 }

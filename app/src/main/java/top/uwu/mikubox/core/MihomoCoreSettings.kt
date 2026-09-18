@@ -87,8 +87,25 @@ object MihomoCoreSettings {
         put("unified-delay", unifiedDelay(context))
         put("tcp-concurrent", tcpConcurrent(context))
         mode(context).value?.let { put("mode", it) }
-        tunStack(context).value?.let { put("tun-stack", it) }
-        tunMtu?.let { put("tun-mtu", it) }
+
+        // "tun" and "dns" are merged into the profile's own sections by the
+        // bridge, so the structured panels only touch what they list.
+        val tun = CoreOverrides.tunJson(context)
+        tunStack(context).value?.let { tun.put("stack", it) }
+        tunMtu?.let { tun.put("mtu", it) }
+        if (tun.length() > 0) put("tun", tun)
+
+        val dns = DnsOverrides.json(context)
+        if (dns.length() > 0) put("dns", dns)
+
+        val sniffer = CoreOverrides.snifferJson(context)
+        if (sniffer.length() > 0) put("sniffer", sniffer)
+
+        // Core-wide extras (find-process-mode, geodata loader, TLS fingerprint,
+        // keep-alive) are top-level keys.
+        CoreOverrides.coreJson(context).also { core ->
+            core.keys().forEach { key -> put(key, core.get(key)) }
+        }
     }.toString()
 
     private inline fun <reified T : Enum<T>> enumOr(name: String?, fallback: T): T =

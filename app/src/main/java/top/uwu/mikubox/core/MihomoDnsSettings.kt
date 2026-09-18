@@ -219,8 +219,45 @@ object MihomoDnsSettings {
     fun effectiveOverride(context: Context, configYaml: String): String = when (source(context)) {
         DnsSource.APP -> yaml(context)
         DnsSource.CONFIG -> ""
-        DnsSource.AUTO -> if (configHasDns(configYaml)) "" else yaml(context)
+        DnsSource.AUTO -> if (configHasUsableDns(configYaml)) "" else yaml(context)
     }
+
+    /**
+     * Whether the profile brings a DNS block the core can answer with. A block
+     * that is switched off does not count: the VPN's TUN captures every resolver
+     * query, so the core would hijack them and never reply, which reaches the
+     * user as a connection without internet.
+     */
+    fun configHasUsableDns(config: String): Boolean = configHasDns(config) && !configDnsDisabled(config)
+
+    /**
+     * Whether the profile's `dns:` block is explicitly disabled (`enable: false`
+     * and its YAML spellings). Line-based like [configHasDns], and it only
+     * considers keys at the block's own indentation level so a nested `enable`
+     * cannot be mistaken for the block switch.
+     */
+    fun configDnsDisabled(config: String): Boolean {
+        val lines = config.lines()
+        val headerIndex = lines.indexOfFirst { it.startsWith("dns:") }
+        if (headerIndex < 0) return false
+
+        var childIndent = -1
+        for (index in headerIndex + 1 until lines.size) {
+            val line = lines[index]
+            val trimmed = line.trim()
+            if (trimmed.isEmpty() || trimmed.startsWith("#")) continue
+            val indent = line.indexOfFirst { !it.isWhitespace() }
+            if (indent == 0) return false // a new top-level key ends the block
+            if (childIndent < 0) childIndent = indent
+            if (indent != childIndent) continue
+            if (!trimmed.startsWith("enable:")) continue
+            val value = trimmed.removePrefix("enable:").trim().substringBefore(' ').lowercase()
+            return value in FALSE_VALUES
+        }
+        return false
+    }
+
+    private val FALSE_VALUES = setOf("false", "no", "off", "0")
 
     /**
      * Whether a Mihomo configuration declares a top-level `dns:` mapping with

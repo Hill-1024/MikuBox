@@ -7,6 +7,7 @@
     android:background="?attr/colorBg">
 
     <com.google.android.material.appbar.AppBarLayout
+        app:liftOnScroll="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
@@ -23,7 +24,7 @@
             app:expandedTitleMarginEnd="24dp"
             app:expandedTitleMarginStart="24dp"
             app:expandedTitleTextColor="?attr/colorOnPrimary"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:statusBarScrim="?attr/colorPrimary"
             app:title="@string/settings"
             app:titleCollapseMode="scale">
@@ -61,7 +62,7 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="16dp"
                 app:cardBackgroundColor="?attr/colorPrimary"
-                app:cardCornerRadius="24dp"
+                app:cardCornerRadius="28dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp">
 
@@ -108,635 +109,198 @@
             </com.google.android.material.card.MaterialCardView>
 
             <!-- ===== Appearance ===== -->
-            <LinearLayout style="@style/UwuSectionHeader">
+            <LinearLayout style="@style/UwuGroupHeader">
                 <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/uwu_icon_miku" />
+                    style="@style/UwuGroupHeaderIcon"
+                    android:src="@drawable/ic_palette_24" />
+
                 <TextView
-                    style="@style/UwuSectionHeaderLabel"
+                    style="@style/UwuGroupHeaderLabel"
                     android:text="@string/settings_section_appearance" />
             </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView style="@style/SettingsCard">
+            <include
+                android:id="@+id/row_theme_color"
+                layout="@layout/uwu_row" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+            <include
+                android:id="@+id/row_dynamic_color"
+                layout="@layout/uwu_row" />
 
-                    <LinearLayout
-                        android:id="@+id/row_theme"
-                        style="@style/SettingsRow">
+            <include
+                android:id="@+id/row_dynamic_banner"
+                layout="@layout/uwu_row" />
 
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_palette_24" />
-                        </FrameLayout>
+            <include
+                android:id="@+id/row_dark_mode"
+                layout="@layout/uwu_row" />
 
-                        <LinearLayout style="@style/SettingsRowText">
+            <include
+                android:id="@+id/row_true_black"
+                layout="@layout/uwu_row" />
 
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_theme" />
+            <include
+                android:id="@+id/row_font"
+                layout="@layout/uwu_row" />
 
-                            <TextView
-                                android:id="@+id/tv_theme_value"
-                                style="@style/SettingsRowSummary"
-                                tools:ignore="MissingClass" />
-                        </LinearLayout>
+            <include
+                android:id="@+id/row_font_size"
+                layout="@layout/uwu_row" />
 
-                        <ImageView style="@style/UwuRowChevron" />
-                    </LinearLayout>
+            <include
+                android:id="@+id/row_bold_text"
+                layout="@layout/uwu_row" />
 
-                    <View style="@style/SettingsDivider" />
+            <include
+                android:id="@+id/row_language"
+                layout="@layout/uwu_row" />
 
-                    <LinearLayout
-                        android:id="@+id/row_language"
-                        style="@style/SettingsRow">
+            <include
+                android:id="@+id/row_profile_name"
+                layout="@layout/uwu_row" />
 
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_translate" />
-                        </FrameLayout>
+            <include
+                android:id="@+id/row_particles"
+                layout="@layout/uwu_row" />
 
-                        <LinearLayout style="@style/SettingsRowText">
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_language" />
-                            <TextView
-                                android:id="@+id/tv_language_value"
-                                style="@style/SettingsRowSummary" />
-                        </LinearLayout>
+            <include
+                android:id="@+id/row_quick_actions"
+                layout="@layout/uwu_row" />
 
-                        <ImageView style="@style/UwuRowChevron" />
-                    </LinearLayout>
+            <include
+                android:id="@+id/row_fab_extended"
+                layout="@layout/uwu_row" />
 
-                    <View style="@style/SettingsDivider" />
+            <include
+                android:id="@+id/row_compact_actions"
+                layout="@layout/uwu_row" />
 
-                    <LinearLayout
-                        android:id="@+id/row_particles"
-                        style="@style/SettingsRow">
-
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_baseline_blur_on_24" />
-                        </FrameLayout>
-
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_particles" />
-
-                            <TextView
-                                style="@style/SettingsRowSummary"
-                                android:text="@string/settings_particles_summary" />
-                        </LinearLayout>
-
-                        <com.google.android.material.materialswitch.MaterialSwitch
-                            android:id="@+id/sw_particles"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:clickable="false"
-                            android:focusable="false" />
-                    </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- ===== Connection ===== -->
-            <LinearLayout style="@style/UwuSectionHeader">
+            <!-- ===== General ===== -->
+            <LinearLayout style="@style/UwuGroupHeader">
                 <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/uwu_icon_miku" />
+                    style="@style/UwuGroupHeaderIcon"
+                    android:src="@drawable/ic_wan" />
+
                 <TextView
-                    style="@style/UwuSectionHeaderLabel"
-                    android:text="@string/settings_section_connection" />
+                    style="@style/UwuGroupHeaderLabel"
+                    android:text="@string/settings_section_general" />
             </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView style="@style/SettingsCard">
+            <include
+                android:id="@+id/row_boot"
+                layout="@layout/uwu_row" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+            <include
+                android:id="@+id/row_autoconnect"
+                layout="@layout/uwu_row" />
 
-                    <LinearLayout
-                        android:id="@+id/row_boot"
-                        style="@style/SettingsRow">
+            <include
+                android:id="@+id/row_mode"
+                layout="@layout/uwu_row" />
 
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_clock" />
-                        </FrameLayout>
+            <include
+                android:id="@+id/row_log"
+                layout="@layout/uwu_row" />
 
-                        <LinearLayout style="@style/SettingsRowText">
+            <include
+                android:id="@+id/row_tun_stack"
+                layout="@layout/uwu_row" />
 
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_boot" />
+            <include
+                android:id="@+id/row_mtu"
+                layout="@layout/uwu_row" />
 
-                            <TextView
-                                style="@style/SettingsRowSummary"
-                                android:text="@string/settings_boot_summary" />
-                        </LinearLayout>
+            <include
+                android:id="@+id/row_unified_delay"
+                layout="@layout/uwu_row" />
 
-                        <com.google.android.material.materialswitch.MaterialSwitch
-                            android:id="@+id/sw_boot"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:clickable="false"
-                            android:focusable="false" />
-                    </LinearLayout>
+            <include
+                android:id="@+id/row_tcp_concurrent"
+                layout="@layout/uwu_row" />
 
-                    <View style="@style/SettingsDivider" />
-
-                    <LinearLayout
-                        android:id="@+id/row_mtu"
-                        style="@style/SettingsRow">
-
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_connection" />
-                        </FrameLayout>
-
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_mtu" />
-
-                            <TextView
-                                android:id="@+id/tv_mtu_value"
-                                style="@style/SettingsRowSummary" />
-                        </LinearLayout>
-
-                        <ImageView style="@style/UwuRowChevron" />
-                    </LinearLayout>
-
-                    <View style="@style/SettingsDivider" />
-
-                    <LinearLayout
-                        android:id="@+id/row_dns"
-                        style="@style/SettingsRow">
-
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_dns" />
-                        </FrameLayout>
-
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_dns" />
-
-                            <TextView
-                                style="@style/SettingsRowSummary"
-                                android:text="@string/settings_dns_summary" />
-                        </LinearLayout>
-
-                        <ImageView style="@style/UwuRowChevron" />
-                    </LinearLayout>
-
-                    <View style="@style/SettingsDivider" />
-
-                    <LinearLayout
-                        android:id="@+id/row_apps"
-                        style="@style/SettingsRow">
-
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_per_apps_24dp" />
-                        </FrameLayout>
-
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_per_app" />
-
-                            <TextView
-                                android:id="@+id/tv_apps_value"
-                                style="@style/SettingsRowSummary" />
-                        </LinearLayout>
-
-                        <ImageView style="@style/UwuRowChevron" />
-                    </LinearLayout>
-
-                    <View style="@style/SettingsDivider" />
-
-                    <LinearLayout
-                        android:id="@+id/row_ipv6"
-                        style="@style/SettingsRow">
-
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_wan" />
-                        </FrameLayout>
-
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_ipv6" />
-
-                            <TextView
-                                style="@style/SettingsRowSummary"
-                                android:text="@string/settings_ipv6_summary" />
-                        </LinearLayout>
-
-                        <com.google.android.material.materialswitch.MaterialSwitch
-                            android:id="@+id/sw_ipv6"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:clickable="false"
-                            android:focusable="false" />
-                    </LinearLayout>
-
-                    <View style="@style/SettingsDivider" />
-
-                    <LinearLayout
-                        android:id="@+id/row_autoconnect"
-                        style="@style/SettingsRow">
-
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_service_idle" />
-                        </FrameLayout>
-
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_autoconnect" />
-
-                            <TextView
-                                style="@style/SettingsRowSummary"
-                                android:text="@string/settings_autoconnect_summary" />
-                        </LinearLayout>
-
-                        <com.google.android.material.materialswitch.MaterialSwitch
-                            android:id="@+id/sw_autoconnect"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:clickable="false"
-                            android:focusable="false" />
-                    </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- ===== Core ===== -->
-            <LinearLayout style="@style/UwuSectionHeader">
+            <!-- ===== Route ===== -->
+            <LinearLayout style="@style/UwuGroupHeader">
                 <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/uwu_icon_miku" />
+                    style="@style/UwuGroupHeaderIcon"
+                    android:src="@drawable/ic_lan" />
+
                 <TextView
-                    style="@style/UwuSectionHeaderLabel"
-                    android:text="@string/settings_section_core" />
+                    style="@style/UwuGroupHeaderLabel"
+                    android:text="@string/settings_section_route" />
             </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView style="@style/SettingsCard">
+            <include
+                android:id="@+id/row_apps"
+                layout="@layout/uwu_row" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+            <include
+                android:id="@+id/row_ipv6"
+                layout="@layout/uwu_row" />
 
-                    <LinearLayout
-                        android:id="@+id/row_mode"
-                        style="@style/SettingsRow">
-
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_routing_24dp" />
-                        </FrameLayout>
-
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_mode" />
-
-                            <TextView
-                                android:id="@+id/tv_mode_value"
-                                style="@style/SettingsRowSummary" />
-                        </LinearLayout>
-
-                        <ImageView style="@style/UwuRowChevron" />
-                    </LinearLayout>
-
-                    <View style="@style/SettingsDivider" />
-
-                    <LinearLayout
-                        android:id="@+id/row_log"
-                        style="@style/SettingsRow">
-
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_logcat_24dp" />
-                        </FrameLayout>
-
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_log" />
-
-                            <TextView
-                                android:id="@+id/tv_log_value"
-                                style="@style/SettingsRowSummary" />
-                        </LinearLayout>
-
-                        <ImageView style="@style/UwuRowChevron" />
-                    </LinearLayout>
-
-                    <View style="@style/SettingsDivider" />
-
-                    <LinearLayout
-                        android:id="@+id/row_unified_delay"
-                        style="@style/SettingsRow">
-
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_baseline_speed_24" />
-                        </FrameLayout>
-
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_unified_delay" />
-
-                            <TextView
-                                style="@style/SettingsRowSummary"
-                                android:text="@string/settings_unified_delay_summary" />
-                        </LinearLayout>
-
-                        <com.google.android.material.materialswitch.MaterialSwitch
-                            android:id="@+id/sw_unified_delay"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:clickable="false"
-                            android:focusable="false" />
-                    </LinearLayout>
-
-                    <View style="@style/SettingsDivider" />
-
-                    <LinearLayout
-                        android:id="@+id/row_tcp_concurrent"
-                        style="@style/SettingsRow">
-
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_qu_switch_24dp" />
-                        </FrameLayout>
-
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_tcp_concurrent" />
-
-                            <TextView
-                                style="@style/SettingsRowSummary"
-                                android:text="@string/settings_tcp_concurrent_summary" />
-                        </LinearLayout>
-
-                        <com.google.android.material.materialswitch.MaterialSwitch
-                            android:id="@+id/sw_tcp_concurrent"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:clickable="false"
-                            android:focusable="false" />
-                    </LinearLayout>
-
-                    <View style="@style/SettingsDivider" />
-
-                    <LinearLayout
-                        android:id="@+id/row_tun_stack"
-                        style="@style/SettingsRow">
-
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_router" />
-                        </FrameLayout>
-
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_tun_stack" />
-
-                            <TextView
-                                android:id="@+id/tv_stack_value"
-                                style="@style/SettingsRowSummary" />
-                        </LinearLayout>
-
-                        <ImageView style="@style/UwuRowChevron" />
-                    </LinearLayout>
-
-                    <View style="@style/SettingsDivider" />
-
-                    <LinearLayout
-                        android:id="@+id/row_allow_lan"
-                        style="@style/SettingsRow">
-
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_lan" />
-                        </FrameLayout>
-
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_allow_lan" />
-
-                            <TextView
-                                style="@style/SettingsRowSummary"
-                                android:text="@string/settings_allow_lan_summary" />
-                        </LinearLayout>
-
-                        <com.google.android.material.materialswitch.MaterialSwitch
-                            android:id="@+id/sw_allow_lan"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:clickable="false"
-                            android:focusable="false" />
-                    </LinearLayout>
-
-                    <View style="@style/SettingsDivider" />
-
-                    <LinearLayout
-                        android:id="@+id/row_test_url"
-                        style="@style/SettingsRow">
-
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_cloud" />
-                        </FrameLayout>
-
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_test_url" />
-
-                            <TextView
-                                android:id="@+id/tv_test_url_value"
-                                style="@style/SettingsRowSummary" />
-                        </LinearLayout>
-
-                        <ImageView style="@style/UwuRowChevron" />
-                    </LinearLayout>
-
-                    <View style="@style/SettingsDivider" />
-
-                    <LinearLayout
-                        android:id="@+id/row_test_timeout"
-                        style="@style/SettingsRow">
-
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_clock" />
-                        </FrameLayout>
-
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_test_timeout" />
-
-                            <TextView
-                                android:id="@+id/tv_test_timeout_value"
-                                style="@style/SettingsRowSummary" />
-                        </LinearLayout>
-
-                        <ImageView style="@style/UwuRowChevron" />
-                    </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- ===== Backup ===== -->
-            <LinearLayout style="@style/UwuSectionHeader">
+            <!-- ===== Inbound ===== -->
+            <LinearLayout style="@style/UwuGroupHeader">
                 <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/uwu_icon_miku" />
+                    style="@style/UwuGroupHeaderIcon"
+                    android:src="@drawable/ic_wan" />
+
                 <TextView
-                    style="@style/UwuSectionHeaderLabel"
-                    android:text="@string/settings_section_backup" />
+                    style="@style/UwuGroupHeaderLabel"
+                    android:text="@string/settings_section_inbound" />
             </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView style="@style/SettingsCard">
+            <include
+                android:id="@+id/row_allow_lan"
+                layout="@layout/uwu_row" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+            <!-- ===== DNS ===== -->
+            <LinearLayout style="@style/UwuGroupHeader">
+                <ImageView
+                    style="@style/UwuGroupHeaderIcon"
+                    android:src="@drawable/ic_dns" />
 
-                    <LinearLayout
-                        android:id="@+id/row_export"
-                        style="@style/SettingsRow">
+                <TextView
+                    style="@style/UwuGroupHeaderLabel"
+                    android:text="@string/dns_title" />
+            </LinearLayout>
 
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_backup_24dp" />
-                        </FrameLayout>
+            <include
+                android:id="@+id/row_dns"
+                layout="@layout/uwu_row" />
 
-                        <LinearLayout style="@style/SettingsRowText">
+            <include
+                android:id="@+id/row_advanced"
+                layout="@layout/uwu_row" />
 
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_export" />
+            <!-- ===== Miscellaneous ===== -->
+            <LinearLayout style="@style/UwuGroupHeader">
+                <ImageView
+                    style="@style/UwuGroupHeaderIcon"
+                    android:src="@drawable/ic_backup_24dp" />
 
-                            <TextView
-                                style="@style/SettingsRowSummary"
-                                android:text="@string/settings_export_summary" />
-                        </LinearLayout>
+                <TextView
+                    style="@style/UwuGroupHeaderLabel"
+                    android:text="@string/settings_section_misc" />
+            </LinearLayout>
 
-                        <ImageView style="@style/UwuRowChevron" />
-                    </LinearLayout>
+            <include
+                android:id="@+id/row_test_url"
+                layout="@layout/uwu_row" />
 
-                    <View style="@style/SettingsDivider" />
+            <include
+                android:id="@+id/row_test_timeout"
+                layout="@layout/uwu_row" />
 
-                    <LinearLayout
-                        android:id="@+id/row_import"
-                        style="@style/SettingsRow">
+            <include
+                android:id="@+id/row_export"
+                layout="@layout/uwu_row" />
 
-                        <FrameLayout style="@style/UwuRowBadge">
-                            <ImageView style="@style/UwuRowBadgePlate" />
-                            <ImageView
-                                style="@style/UwuRowBadgeGlyph"
-                                android:src="@drawable/ic_restore_24dp" />
-                        </FrameLayout>
+            <include
+                android:id="@+id/row_import"
+                layout="@layout/uwu_row" />
 
-                        <LinearLayout style="@style/SettingsRowText">
-
-                            <TextView
-                                style="@style/SettingsRowTitle"
-                                android:text="@string/settings_import" />
-
-                            <TextView
-                                style="@style/SettingsRowSummary"
-                                android:text="@string/settings_import_summary" />
-                        </LinearLayout>
-
-                        <ImageView style="@style/UwuRowChevron" />
-                    </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="8dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
