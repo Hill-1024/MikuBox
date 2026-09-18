@@ -59,6 +59,8 @@ android {
         viewBinding = true
     }
 
+    testOptions.unitTests.isIncludeAndroidResources = true
+
     splits {
         abi {
             isEnable = true
@@ -285,6 +287,8 @@ kotlin {
 }
 
 dependencies {
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.14.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
