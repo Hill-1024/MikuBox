@@ -26,3 +26,6 @@ build.bat
 # Go bridge: stray `go build` output next to the sources. The build task
 # writes the real artefact into the app's jniLibs directory instead.
 core/mihomo-bridge/mihomo-bridge
+
+# Local build artifacts handed over for testing
+/*.apk
