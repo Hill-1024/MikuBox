@@ -183,7 +183,12 @@ object CoreOverrides {
     private fun newSecret(): String {
         val bytes = ByteArray(18)
         java.security.SecureRandom().nextBytes(bytes)
-        return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
+        // android.util.Base64 works on every supported release; the java.util
+        // one needs API 26 (or desugaring) and would crash on Android 7.
+        return android.util.Base64.encodeToString(
+            bytes,
+            android.util.Base64.URL_SAFE or android.util.Base64.NO_WRAP or android.util.Base64.NO_PADDING,
+        )
     }
 
     /** The controller block as config keys; absent while it follows the profile. */

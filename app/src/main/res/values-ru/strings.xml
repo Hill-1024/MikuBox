@@ -22,6 +22,7 @@
     <string name="error_subscription_url_blank">URL-адрес подписки не может быть пустым</string>
     <string name="error_unknown_profile">Неизвестный профиль %1$s</string>
     <string name="error_subscription_empty">Подписка пуста</string>
+    <string name="error_import_file_empty">Файл пуст или не читается</string>
     <string name="error_no_compatible_proxy_links">Совместимые с Mihomo ссылки на прокси не найдены</string>
     <string name="error_subscription_http">HTTP подписки %1$d</string>
 

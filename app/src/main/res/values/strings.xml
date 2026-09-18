@@ -32,6 +32,7 @@
     <string name="error_subscription_url_blank">Subscription URL must not be blank</string>
     <string name="error_unknown_profile">Unknown profile %1$s</string>
     <string name="error_subscription_empty">Subscription is empty</string>
+    <string name="error_import_file_empty">File is empty or unreadable</string>
     <string name="error_no_compatible_proxy_links">No Mihomo-compatible proxy links found</string>
     <string name="error_subscription_http">Subscription HTTP %1$d</string>
 

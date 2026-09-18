@@ -37,7 +37,11 @@ object MihomoProfileStore {
         val raw = prefs(context).getString(KEY_PROFILES, "[]") ?: "[]"
         runCatching {
             JSONArray(raw).let { array ->
-                List(array.length()) { index -> array.getJSONObject(index).toProfile(context) }
+                // One malformed entry must not wipe every profile: skip it and
+                // keep the rest readable.
+                (0 until array.length()).mapNotNull { index ->
+                    runCatching { array.getJSONObject(index).toProfile(context) }.getOrNull()
+                }
             }
         }.getOrDefault(emptyList())
     }
@@ -58,8 +62,10 @@ object MihomoProfileStore {
             config = config,
             updatedAtMillis = System.currentTimeMillis(),
         )
-        replaceProfiles(context, profiles(context) + profile)
-        if (selected(context) == null) select(context, profile.id)
+        synchronized(this) {
+            replaceProfiles(context, profiles(context) + profile)
+            if (selected(context) == null) select(context, profile.id)
+        }
         return profile
     }
 
@@ -79,19 +85,36 @@ object MihomoProfileStore {
             updateIntervalMinutes = intervalMinutes.coerceAtLeast(15),
             updateWhenConnectedOnly = updateWhenConnectedOnly,
         )
-        replaceProfiles(context, profiles(context) + profile)
-        if (selected(context) == null) select(context, profile.id)
+        synchronized(this) {
+            replaceProfiles(context, profiles(context) + profile)
+            if (selected(context) == null) select(context, profile.id)
+        }
         MihomoSubscriptionUpdater.reconfigure(context)
         return profile
     }
 
     fun update(context: Context, profile: Profile) {
-        val updated = profiles(context).map { if (it.id == profile.id) profile else it }
-        require(updated.any { it.id == profile.id }) {
-            context.getString(R.string.error_unknown_profile, profile.id)
+        synchronized(this) {
+            val updated = profiles(context).map { if (it.id == profile.id) profile else it }
+            require(updated.any { it.id == profile.id }) {
+                context.getString(R.string.error_unknown_profile, profile.id)
+            }
+            replaceProfiles(context, updated)
         }
-        replaceProfiles(context, updated)
         MihomoSubscriptionUpdater.reconfigure(context)
+    }
+
+    /** Commit a download only if its source and content have not changed meanwhile. */
+    fun updateSubscription(context: Context, source: Profile, config: String) = synchronized(this) {
+        require(config.isNotBlank()) { context.getString(R.string.error_mihomo_config_blank) }
+        val current = profiles(context)
+        val latest = current.firstOrNull { it.id == source.id }
+            ?: error(context.getString(R.string.error_unknown_profile, source.id))
+        check(latest.subscriptionUrl == source.subscriptionUrl && latest.config == source.config &&
+            latest.updatedAtMillis == source.updatedAtMillis) { "Subscription changed during download" }
+        val updated = latest.copy(config = config, updatedAtMillis = System.currentTimeMillis())
+        replaceProfiles(context, current.map { if (it.id == updated.id) updated else it })
+        // Content refreshes do not change the periodic schedule.
     }
 
     fun select(context: Context, profileId: String) {
@@ -102,10 +125,12 @@ object MihomoProfileStore {
     }
 
     fun remove(context: Context, profileId: String) {
-        val remaining = profiles(context).filterNot { it.id == profileId }
-        replaceProfiles(context, remaining)
-        if (prefs(context).getString(KEY_SELECTED, null) == profileId) {
-            prefs(context).edit().putString(KEY_SELECTED, remaining.firstOrNull()?.id).commit()
+        synchronized(this) {
+            val remaining = profiles(context).filterNot { it.id == profileId }
+            replaceProfiles(context, remaining)
+            if (prefs(context).getString(KEY_SELECTED, null) == profileId) {
+                prefs(context).edit().putString(KEY_SELECTED, remaining.firstOrNull()?.id).commit()
+            }
         }
         MihomoSubscriptionUpdater.reconfigure(context)
     }
@@ -116,13 +141,15 @@ object MihomoProfileStore {
      * after a drag on the home list.
      */
     fun reorder(context: Context, orderedIds: List<String>) {
-        val current = profiles(context)
-        val byId = current.associateBy { it.id }
-        val moved = orderedIds.mapNotNull { byId[it] }
-        if (moved.isEmpty()) return
-        val movedIds = moved.map { it.id }.toSet()
-        val rest = current.filterNot { it.id in movedIds }
-        replaceProfiles(context, moved + rest)
+        synchronized(this) {
+            val current = profiles(context)
+            val byId = current.associateBy { it.id }
+            val moved = orderedIds.distinct().mapNotNull { byId[it] }
+            if (moved.isEmpty()) return
+            val movedIds = moved.map { it.id }.toSet()
+            val rest = current.filterNot { it.id in movedIds }
+            replaceProfiles(context, moved + rest)
+        }
         MihomoSubscriptionUpdater.reconfigure(context)
     }
 

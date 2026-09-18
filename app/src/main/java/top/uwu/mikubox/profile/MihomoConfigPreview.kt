@@ -35,7 +35,12 @@ object MihomoConfigPreview {
                 trimmed.isEmpty() || trimmed.startsWith("#") -> Unit
                 indent == 2 && trimmed.startsWith("- ") -> {
                     flush()
-                    name = scalar(trimmed.removePrefix("- ").substringAfter("name:"))
+                    val entry = trimmed.removePrefix("- ")
+                    // Flow-style entries stay invisible, as documented; reading
+                    // them line-wise would only mint garbage names.
+                    if (!entry.startsWith("{")) {
+                        name = scalar(entry.substringAfter("name:"))
+                    }
                 }
                 indent == 4 && trimmed.startsWith("type:") -> type = scalar(trimmed.removePrefix("type:"))
             }

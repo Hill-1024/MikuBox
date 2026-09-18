@@ -23,26 +23,35 @@ object MihomoTrafficStore {
     private const val PREFS = "mihomo_traffic"
     private const val KEY_PROXY_SUFFIX = ".proxy"
 
+    /**
+     * begin/finish/checkpoint run on the VPN service's executor while screens
+     * read [proxyTotals] from the main thread; every entry point takes this lock
+     * so the baselines cannot tear mid-fold.
+     */
+    private val lock = Any()
+
     private var activeProfileId: String? = null
     private var uploadBaseline = 0L
     private var downloadBaseline = 0L
     private var proxyBaseline: Map<String, MihomoCore.ProxyTraffic> = emptyMap()
 
-    fun begin(profile: MihomoProfileStore.Profile?) {
+    fun begin(profile: MihomoProfileStore.Profile?) = synchronized(lock) {
         activeProfileId = profile?.id
         MihomoCore.traffic().also {
             uploadBaseline = it.uploadTotal
             downloadBaseline = it.downloadTotal
         }
         proxyBaseline = emptyMap()
+        Unit
     }
 
     /** Folds everything measured so far into the profile, without ending the session. */
     fun checkpoint(context: Context) = fold(context)
 
-    fun finish(context: Context) {
+    fun finish(context: Context) = synchronized(lock) {
         fold(context)
         activeProfileId = null
+        Unit
     }
 
     fun totals(context: Context, profileId: String): Totals = Totals(
@@ -54,23 +63,30 @@ object MihomoTrafficStore {
      * Traffic each node and group carried for [profileId] so far, including the
      * part of the running session that has not been folded in yet.
      */
-    fun proxyTotals(context: Context, profileId: String): Map<String, Totals> {
+    fun proxyTotals(context: Context, profileId: String): Map<String, Totals> = synchronized(lock) {
         val stored = storedProxyTotals(context, profileId).toMutableMap()
-        foldPending(profileId, stored, MihomoCore.trafficByProxy())
-        return stored
+        if (profileId == activeProfileId) foldPending(profileId, stored, MihomoCore.trafficByProxy())
+        stored
     }
 
     /** Clears both the profile total and its per-node breakdown. */
-    fun reset(context: Context, profileId: String) {
+    fun reset(context: Context, profileId: String) = synchronized(lock) {
+        if (profileId == activeProfileId) {
+            val traffic = MihomoCore.traffic()
+            uploadBaseline = traffic.uploadTotal
+            downloadBaseline = traffic.downloadTotal
+            proxyBaseline = MihomoCore.trafficByProxy()
+        }
         prefs(context).edit()
             .remove("$profileId.upload")
             .remove("$profileId.download")
             .remove("$profileId$KEY_PROXY_SUFFIX")
             .commit()
+        Unit
     }
 
     /** Adds what the session moved since the last fold to the stored numbers. */
-    private fun fold(context: Context) {
+    private fun fold(context: Context): Unit = synchronized(lock) {
         val id = activeProfileId ?: return
         val session = MihomoCore.trafficByProxy()
         val stored = storedProxyTotals(context, id).toMutableMap()
@@ -105,7 +121,8 @@ object MihomoTrafficStore {
         stored: MutableMap<String, Totals>,
         session: Map<String, MihomoCore.ProxyTraffic>,
     ) {
-        val folded = if (profileId == activeProfileId) proxyBaseline else emptyMap()
+        if (profileId != activeProfileId) return
+        val folded = proxyBaseline
         session.forEach { (name, current) ->
             val last = folded[name]
             val upload = (current.upload - (last?.upload ?: 0L)).coerceAtLeast(0)

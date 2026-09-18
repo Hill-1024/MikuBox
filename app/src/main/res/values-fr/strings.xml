@@ -26,6 +26,7 @@
     <string name="error_subscription_url_blank">L’URL de l’abonnement ne doit pas être vide</string>
     <string name="error_unknown_profile">Profil inconnu %1$s</string>
     <string name="error_subscription_empty">L’abonnement est vide</string>
+    <string name="error_import_file_empty">Le fichier est vide ou illisible</string>
     <string name="error_no_compatible_proxy_links">Aucun lien proxy compatible avec Mihomo trouvé</string>
     <string name="error_subscription_http">HTTP de l’abonnement %1$d</string>
 

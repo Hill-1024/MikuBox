@@ -20,6 +20,7 @@
     <string name="error_subscription_url_blank">URL langganan tidak boleh kosong</string>
     <string name="error_unknown_profile">Profil tidak dikenal %1$s</string>
     <string name="error_subscription_empty">Langganan kosong</string>
+    <string name="error_import_file_empty">File kosong atau tidak dapat dibaca</string>
     <string name="error_no_compatible_proxy_links">Tidak ditemukan tautan proksi yang kompatibel dengan Mihomo</string>
     <string name="error_subscription_http">HTTP langganan %1$d</string>
 

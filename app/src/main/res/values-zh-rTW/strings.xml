@@ -20,6 +20,7 @@
     <string name="error_subscription_url_blank">訂閱網址不可空白</string>
     <string name="error_unknown_profile">未知的設定檔 %1$s</string>
     <string name="error_subscription_empty">訂閱內容為空</string>
+    <string name="error_import_file_empty">檔案為空或無法讀取</string>
     <string name="error_no_compatible_proxy_links">找不到相容於 Mihomo 的代理連結</string>
     <string name="error_subscription_http">訂閱 HTTP 狀態碼 %1$d</string>
 
