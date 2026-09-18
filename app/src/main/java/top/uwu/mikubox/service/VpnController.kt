@@ -42,8 +42,9 @@ object VpnController {
      *
      * Changing one setting is a reload, and changing five in a row is still only
      * one: requests are collected for a moment so a run through the settings page
-     * does not restart the tunnel five times. Nothing happens while disconnected,
-     * because the next connection reads the settings anyway.
+     * does not restart the tunnel five times. The running check happens again
+     * when the debounce fires, so a disconnect made during the wait stays a
+     * disconnect instead of being resurrected by the stale request.
      */
     fun restart(context: Context) {
         if (!MikuVpnService.running) return
@@ -51,6 +52,7 @@ object VpnController {
         pendingRestart?.let(handler::removeCallbacks)
         val request = Runnable {
             pendingRestart = null
+            if (!MikuVpnService.running) return@Runnable
             runCatching {
                 app.startService(
                     Intent(app, MikuVpnService::class.java).setAction(MikuVpnService.ACTION_RESTART),

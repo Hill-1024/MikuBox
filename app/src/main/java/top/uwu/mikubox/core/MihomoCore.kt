@@ -268,7 +268,6 @@ object MihomoCore {
                 download = entry.optLong("download"),
             )
         }
-        Log.d(TAG, "connection snapshot: ${raw.length} chars, ${parsed.size} parsed")
         parsed
     } catch (error: Throwable) {
         // A snapshot the app cannot read must not take the screen down, but it

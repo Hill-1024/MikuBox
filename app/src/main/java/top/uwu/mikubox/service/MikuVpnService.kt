@@ -44,33 +44,42 @@ class MikuVpnService : VpnService() {
     private var lastTunError: Throwable? = null
 
     /** Core startup (config parse + GeoSite loads) can take seconds; keep it off the main thread. */
-    private val startExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
+    private val startExecutor = CoreServiceRuntime.executor
+    private val generation = java.util.concurrent.atomic.AtomicInteger()
+    private var starting = false
 
     private val checkpointHandler = Handler(Looper.getMainLooper())
 
     private var wakeLock: android.os.PowerManager.WakeLock? = null
+    private val wakeLockLock = Any()
 
     /**
      * Keeps the CPU awake while the tunnel runs, when the user asked for it: a
      * suspended device stops forwarding traffic until something wakes it again.
+     * Both accessors take the same lock because start runs on the executor while
+     * settings changes call in from the main thread.
      */
     private fun acquireWakeLock() {
-        if (CoreOverrides.wakeLock(this) != CoreOverrides.ON || wakeLock != null) return
-        val manager = getSystemService(android.os.PowerManager::class.java) ?: return
-        wakeLock = runCatching {
-            manager.newWakeLock(
-                android.os.PowerManager.PARTIAL_WAKE_LOCK,
-                "$packageName:vpn",
-            ).apply {
-                setReferenceCounted(false)
-                acquire()
-            }
-        }.getOrNull()
+        synchronized(wakeLockLock) {
+            if (CoreOverrides.wakeLock(this) != CoreOverrides.ON || wakeLock != null) return
+            val manager = getSystemService(android.os.PowerManager::class.java) ?: return
+            wakeLock = runCatching {
+                manager.newWakeLock(
+                    android.os.PowerManager.PARTIAL_WAKE_LOCK,
+                    "$packageName:vpn",
+                ).apply {
+                    setReferenceCounted(false)
+                    acquire()
+                }
+            }.getOrNull()
+        }
     }
 
     private fun releaseWakeLock() {
-        runCatching { wakeLock?.takeIf { it.isHeld }?.release() }
-        wakeLock = null
+        synchronized(wakeLockLock) {
+            runCatching { wakeLock?.takeIf { it.isHeld }?.release() }
+            wakeLock = null
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -97,7 +106,6 @@ class MikuVpnService : VpnService() {
 
     override fun onDestroy() {
         stopVpn()
-        startExecutor.shutdown()
         super.onDestroy()
     }
 
@@ -108,27 +116,34 @@ class MikuVpnService : VpnService() {
     }
 
     private fun startVpn() {
-        if (tunFd != MihomoCore.NO_TUN) return
+        if (starting || tunFd != MihomoCore.NO_TUN) return
+        starting = true
+        val request = generation.incrementAndGet()
+        MikuProxyService.stop(this)
         lastTunError = null
         // The foreground notification must appear promptly; the heavy work runs after it.
         startForegroundNotification()
         startExecutor.execute {
-            if (tunFd != MihomoCore.NO_TUN) return@execute
+            if (generation.get() != request) return@execute
+            // Tracked so a failure between establish() and the core taking over
+            // can still close the detached descriptor instead of leaking it.
+            var fd: Int = MihomoCore.NO_TUN
+            var coreAccepted = false
             try {
-                MikuProxyService.stop(this)
-                val fd = establishTun() ?: run {
+                fd = establishTun() ?: run {
                     reportStartFailure(lastTunError?.message.orEmpty())
-                    stopVpn()
+                    checkpointHandler.post { if (generation.get() == request) stopVpn() }
                     return@execute
                 }
-                val config = MihomoConfigStore.activeConfig(this)
-                val startResult = MihomoCore.start(
+                val profile = MihomoProfileStore.selected(this)
+                val config = profile?.config ?: MihomoConfigStore.activeConfig(this)
+                val startResult = CoreServiceRuntime.start(this, { MihomoTrafficStore.finish(this) }) { MihomoCore.start(
                     this,
                     config,
                     fd,
                     MihomoDnsSettings.effectiveOverride(this, config),
                     MihomoCoreSettings.overridesJson(this, MihomoVpnSettings.mtu(this)),
-                )
+                ) }
                 if (startResult.isFailure) {
                     closeDetachedTun(fd)
                     val failure = startResult.exceptionOrNull()
@@ -136,18 +151,29 @@ class MikuVpnService : VpnService() {
                     // keep the trace in logcat for the diagnostics export.
                     runCatching { Log.e(TAG, "core start threw", failure) }
                     reportStartFailure(failure?.message.orEmpty())
-                    stopVpn()
+                    checkpointHandler.post { if (generation.get() == request) stopVpn() }
                     return@execute
                 }
-                tunFd = fd
-                MihomoTrafficStore.begin(MihomoProfileStore.selected(this))
-                running = true
-                startedAtMillis = System.currentTimeMillis()
-                checkpointHandler.post(trafficCheckpoint)
-                acquireWakeLock()
+                coreAccepted = true
+                // Native startup cannot be interrupted. Its result may already be obsolete.
+                if (generation.get() != request) {
+                    CoreServiceRuntime.stop(this)
+                    return@execute
+                }
+                MihomoTrafficStore.begin(profile)
+                checkpointHandler.post {
+                    if (generation.get() != request) return@post
+                    starting = false
+                    tunFd = fd
+                    running = true
+                    startedAtMillis = System.currentTimeMillis()
+                    checkpointHandler.post(trafficCheckpoint)
+                    acquireWakeLock()
+                }
             } catch (error: Throwable) {
+                if (!coreAccepted && fd != MihomoCore.NO_TUN) closeDetachedTun(fd)
                 reportStartFailure(error.message.orEmpty())
-                stopVpn()
+                checkpointHandler.post { if (generation.get() == request) stopVpn() }
             }
         }
     }
@@ -160,7 +186,16 @@ class MikuVpnService : VpnService() {
      */
     private val trafficCheckpoint = object : Runnable {
         override fun run() {
-            runCatching { MihomoTrafficStore.checkpoint(this@MikuVpnService) }
+            if (!running) return
+            // JNI reads plus a prefs commit stay off the main thread; the
+            // executor only runs start/stop around these while the tunnel is up,
+            // so checkpoints and the final fold still happen in order.
+            runCatching {
+                val request = generation.get()
+                startExecutor.execute {
+                    if (generation.get() == request) MihomoTrafficStore.checkpoint(this@MikuVpnService)
+                }
+            }
             checkpointHandler.postDelayed(this, CHECKPOINT_INTERVAL_MS)
         }
     }
@@ -184,15 +219,12 @@ class MikuVpnService : VpnService() {
      * having to reconnect by hand.
      */
     private fun restartVpn() {
-        if (tunFd == MihomoCore.NO_TUN) {
-            startVpn()
-            return
-        }
+        if (tunFd == MihomoCore.NO_TUN) return
         Log.i(TAG, "restarting the core for changed settings")
         stopCore()
         // Both calls run on the same executor, so the start can never overtake the
         // stop and the old core is always shut down first.
-        startExecutor.execute { startVpn() }
+        startVpn()
     }
 
     /** Re-reads the settings the tunnel can honour while it runs. */
@@ -204,6 +236,8 @@ class MikuVpnService : VpnService() {
 
     /** Tears the tunnel and the core down, leaving the service itself alive. */
     private fun stopCore() {
+        generation.incrementAndGet()
+        starting = false
         running = false
         startedAtMillis = 0L
         checkpointHandler.removeCallbacks(trafficCheckpoint)
@@ -212,9 +246,12 @@ class MikuVpnService : VpnService() {
         // so this only drops the reference. Folding the traffic has to happen
         // before the core stops (it reads the live counters).
         tunFd = MihomoCore.NO_TUN
-        startExecutor.execute {
-            runCatching { MihomoTrafficStore.finish(this) }
-            runCatching { MihomoCore.stop() }
+        // The process-wide queue outlives services; ownership prevents a late
+        // onDestroy from shutting down a newer service's core.
+        runCatching {
+            startExecutor.execute {
+                runCatching { CoreServiceRuntime.stop(this) }
+            }
         }
     }
 
@@ -322,7 +359,9 @@ class MikuVpnService : VpnService() {
             pendingFlags(),
         )
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            // The monochrome silhouette renders cleanly in the status bar; the
+            // full-colour launcher icon becomes an opaque blob there.
+            .setSmallIcon(R.mipmap.ic_launcher_monochrome)
             .setContentTitle(getString(R.string.app_name))
             .setContentText(getString(R.string.vpn_notification_running))
             .setContentIntent(configurePendingIntent())

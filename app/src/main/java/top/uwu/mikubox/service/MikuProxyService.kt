@@ -21,33 +21,51 @@ import top.uwu.mikubox.core.MihomoDnsSettings
 class MikuProxyService : Service() {
 
     /** Core startup (config parse + GeoSite loads) can take seconds; keep it off the main thread. */
-    private val startExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
+    private val startExecutor = CoreServiceRuntime.executor
+    private val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val generation = java.util.concurrent.atomic.AtomicInteger()
+    private var starting = false
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) {
             stopProxy()
             return START_NOT_STICKY
         }
-        if (!running) {
+        if (!running && !starting) {
+            starting = true
+            val request = generation.incrementAndGet()
             VpnController.disconnect(this)
             ensureChannel()
             startForeground(NOTIFICATION_ID, notification())
             startExecutor.execute {
-                if (running) return@execute
-                val config = MihomoConfigStore.activeConfig(this)
-                val result = MihomoCore.start(
-                    this,
-                    config,
-                    MihomoCore.NO_TUN,
-                    MihomoDnsSettings.effectiveOverride(this, config),
-                    MihomoCoreSettings.overridesJson(this),
-                )
-                if (result.isFailure) {
-                    Log.e(TAG, "proxy start failed: ${result.exceptionOrNull()?.message.orEmpty()}")
-                    stopProxy()
-                    return@execute
+                if (generation.get() != request) return@execute
+                try {
+                    val config = MihomoConfigStore.activeConfig(this)
+                    val result = CoreServiceRuntime.start(this) { MihomoCore.start(
+                        this,
+                        config,
+                        MihomoCore.NO_TUN,
+                        MihomoDnsSettings.effectiveOverride(this, config),
+                        MihomoCoreSettings.overridesJson(this),
+                    ) }
+                    if (result.isFailure) {
+                        Log.e(TAG, "proxy start failed: ${result.exceptionOrNull()?.message.orEmpty()}")
+                        mainHandler.post { if (generation.get() == request) stopProxy() }
+                        return@execute
+                    }
+                    if (generation.get() != request) {
+                        CoreServiceRuntime.stop(this)
+                        return@execute
+                    }
+                    mainHandler.post {
+                        if (generation.get() != request) return@post
+                        starting = false
+                        running = true
+                    }
+                } catch (error: Exception) {
+                    Log.e(TAG, "proxy start failed", error)
+                    mainHandler.post { if (generation.get() == request) stopProxy() }
                 }
-                running = true
             }
         }
         return START_STICKY
@@ -55,21 +73,25 @@ class MikuProxyService : Service() {
 
     override fun onDestroy() {
         stopProxy()
-        startExecutor.shutdown()
         super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun stopProxy() {
-        if (running) MihomoCore.stop()
+        generation.incrementAndGet()
+        starting = false
         running = false
+        // Unconditional and off the main thread: a stop racing the start task has
+        // to reach the core even though [running] is not set yet, and the native
+        // side stops idempotently.
+        runCatching { startExecutor.execute { runCatching { CoreServiceRuntime.stop(this) } } }
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
 
     private fun notification(): Notification = NotificationCompat.Builder(this, "miku_vpn_status")
-        .setSmallIcon(R.mipmap.ic_launcher)
+        .setSmallIcon(R.mipmap.ic_launcher_monochrome)
         .setContentTitle(getString(R.string.app_name))
         .setContentText(getString(R.string.local_proxy_notification_running))
         .setOngoing(true)
