@@ -48,15 +48,15 @@
         <item name="itemShapeAppearance">@style/ShapeAppearance.App.MediumComponent</item>
         <item name="collapsingToolbarLayoutLargeStyle">@style/Miku.CollapsingToolbar.Large</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.Miku.MaterialAlertDialog</item>
-        <item name="android:windowAnimationStyle">@style/Animation.Miku.Activity</item>
-    </style>
-
-    <!-- Calm shared-axis style screen transitions, applied app-wide. -->
-    <style name="Animation.Miku.Activity" parent="@android:style/Animation.Activity">
-        <item name="android:activityOpenEnterAnimation">@anim/uwu_activity_open_enter</item>
-        <item name="android:activityOpenExitAnimation">@anim/uwu_activity_open_exit</item>
-        <item name="android:activityCloseEnterAnimation">@anim/uwu_activity_close_enter</item>
-        <item name="android:activityCloseExitAnimation">@anim/uwu_activity_close_exit</item>
+        <!-- Screen transitions run as activity transitions on the content: the
+             previous window animations moved and faded the whole window, which
+             dragged the status-bar strip along and showed a seam between the two
+             screens. -->
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowEnterTransition">@transition/uwu_screen_enter</item>
+        <item name="android:windowExitTransition">@transition/uwu_screen_exit</item>
+        <item name="android:windowReturnTransition">@transition/uwu_screen_return</item>
+        <item name="android:windowReenterTransition">@transition/uwu_screen_reenter</item>
     </style>
 
     <!-- MikuRay-style dialogs: rounded surface-container background with a

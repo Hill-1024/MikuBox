@@ -35,6 +35,28 @@ object MihomoTrafficStore {
     private var downloadBaseline = 0L
     private var proxyBaseline: Map<String, MihomoCore.ProxyTraffic> = emptyMap()
 
+    /**
+     * The breakdown a screen last asked for, cached for the core's own sampling
+     * interval. The list screens read this once a second and every read crosses
+     * JNI and parses JSON, which made the per-frame work show up while scrolling.
+     * Folding always reads the counters directly, so nothing is lost by serving
+     * the screens a value that is at most one sample old.
+     */
+    private var sessionReadAt = 0L
+    private var sessionByProxy: Map<String, MihomoCore.ProxyTraffic> = emptyMap()
+
+    private fun sampledProxyTraffic(): Map<String, MihomoCore.ProxyTraffic> {
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (now - sessionReadAt < SESSION_SAMPLE_MS) return sessionByProxy
+        sessionReadAt = now
+        sessionByProxy = MihomoCore.trafficByProxy()
+        return sessionByProxy
+    }
+
+    /** Parsed breakdown cache, keyed by the raw preference it was parsed from. */
+    private var parsedKey: String? = null
+    private var parsedValue: Map<String, Totals> = emptyMap()
+
     fun begin(profile: MihomoProfileStore.Profile?) = synchronized(lock) {
         activeProfileId = profile?.id
         MihomoCore.traffic().also {
@@ -65,7 +87,7 @@ object MihomoTrafficStore {
      */
     fun proxyTotals(context: Context, profileId: String): Map<String, Totals> = synchronized(lock) {
         val stored = storedProxyTotals(context, profileId).toMutableMap()
-        if (profileId == activeProfileId) foldPending(profileId, stored, MihomoCore.trafficByProxy())
+        if (profileId == activeProfileId) foldPending(profileId, stored, sampledProxyTraffic())
         stored
     }
 
@@ -144,7 +166,8 @@ object MihomoTrafficStore {
 
     private fun storedProxyTotals(context: Context, profileId: String): Map<String, Totals> {
         val raw = prefs(context).getString("$profileId$KEY_PROXY_SUFFIX", null) ?: return emptyMap()
-        return runCatching {
+        if (raw == parsedKey) return parsedValue
+        val value = runCatching {
             val root = JSONObject(raw)
             buildMap {
                 root.keys().forEach { name ->
@@ -153,7 +176,12 @@ object MihomoTrafficStore {
                 }
             }
         }.getOrDefault(emptyMap())
+        parsedKey = raw
+        parsedValue = value
+        return value
     }
 
     private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+
+    private const val SESSION_SAMPLE_MS = 500L
 }

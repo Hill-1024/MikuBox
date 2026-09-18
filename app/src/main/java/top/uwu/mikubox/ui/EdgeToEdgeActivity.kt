@@ -40,10 +40,17 @@ abstract class EdgeToEdgeActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) ThemeManager.apply(this)
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        ThemeManager.attach(this)
+    }
+
+    override fun onDestroy() {
+        ThemeManager.detach(this)
+        super.onDestroy()
     }
 
     override fun onResume() {
         super.onResume()
+        ThemeManager.setForeground(this)
         // The palette or the typography changed while this screen sat in the back
         // stack: rebuild it so every activity follows a colour switch.
         if (appliedThemeVersion != ThemeManager.version()) {
@@ -61,6 +68,11 @@ abstract class EdgeToEdgeActivity : AppCompatActivity() {
             }
             if (wanted != current) AppSettings.applyNightMode(this)
         }
+    }
+
+    override fun onPause() {
+        ThemeManager.clearForeground(this)
+        super.onPause()
     }
 
     protected fun applySystemBarInsets(root: View) {

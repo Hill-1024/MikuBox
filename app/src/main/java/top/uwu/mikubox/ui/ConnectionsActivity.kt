@@ -29,6 +29,9 @@ class ConnectionsActivity : EdgeToEdgeActivity() {
 
     private lateinit var binding: ActivityConnectionsBinding
     private val handler = Handler(Looper.getMainLooper())
+
+    /** Row views by connection id, reused across the once-a-second snapshots. */
+    private val rows = LinkedHashMap<String, Row>()
     private val tick = object : Runnable {
         override fun run() {
             refresh()
@@ -93,14 +96,56 @@ class ConnectionsActivity : EdgeToEdgeActivity() {
             TrafficFormat.compact(down),
         )
 
-        binding.listConnections.removeAllViews()
-        connections.take(MAX_ROWS).forEach { connection ->
-            binding.listConnections.addView(row(connection))
+        val wanted = connections.take(MAX_ROWS)
+        val wantedIds = wanted.map { it.id }
+        if (rows.keys.toList() != wantedIds) rearrange(wanted)
+        wanted.forEach { connection -> bind(rows.getValue(connection.id), connection) }
+    }
+
+    /**
+     * Matches the row views to the new snapshot: rows for connections that are
+     * gone leave, new ones are created, the rest are only moved. Rebuilding every
+     * row once a second threw away and re-inflated the whole list, which showed
+     * up as dropped frames and as a list that screen readers could not follow.
+     */
+    private fun rearrange(wanted: List<MihomoCore.Connection>) {
+        val wantedIds = wanted.map { it.id }.toSet()
+        rows.keys.filterNot { it in wantedIds }.forEach { id ->
+            rows.remove(id)?.let { binding.listConnections.removeView(it.card) }
+        }
+        wanted.forEachIndexed { index, connection ->
+            val row = rows[connection.id] ?: newRow().also { rows[connection.id] = it }
+            val list = binding.listConnections
+            if (row.card.parent === list) {
+                if (list.indexOfChild(row.card) != index) {
+                    list.removeView(row.card)
+                    list.addView(row.card, index)
+                }
+            } else {
+                list.addView(row.card, index.coerceAtMost(list.childCount))
+            }
         }
     }
 
+    /** Writes one connection into an existing row, keeping the views in place. */
+    private fun bind(row: Row, connection: MihomoCore.Connection) {
+        row.connectionId = connection.id
+        row.title.text = getString(
+            R.string.connections_row_title,
+            connection.target,
+            connection.network.uppercase(),
+        )
+        row.detail.text = getString(
+            R.string.connections_row_detail,
+            connection.matchedRule,
+            connection.chains.joinToString(" → "),
+            TrafficFormat.compact(connection.upload),
+            TrafficFormat.compact(connection.download),
+        )
+    }
+
     /** One connection: target and counters on top, how it was routed below. */
-    private fun row(connection: MihomoCore.Connection): View {
+    private fun newRow(): Row {
         val card = MaterialCardView(this).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -114,51 +159,49 @@ class ConnectionsActivity : EdgeToEdgeActivity() {
             isFocusable = true
         }
         val column = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        column.addView(
-            TextView(this).apply {
-                text = getString(
-                    R.string.connections_row_title,
-                    connection.target,
-                    connection.network.uppercase(),
-                )
-                textSize = 14f
-                setTextColor(
-                    MaterialColors.getColor(
-                        this,
-                        com.google.android.material.R.attr.colorOnSurface,
-                    ),
-                )
-                maxLines = 1
-                ellipsize = android.text.TextUtils.TruncateAt.MIDDLE
-            },
-        )
-        column.addView(
-            TextView(this).apply {
-                text = getString(
-                    R.string.connections_row_detail,
-                    connection.matchedRule,
-                    connection.chains.joinToString(" → "),
-                    TrafficFormat.compact(connection.upload),
-                    TrafficFormat.compact(connection.download),
-                )
-                textSize = 12f
-                setTextColor(
-                    MaterialColors.getColor(
-                        this,
-                        com.google.android.material.R.attr.colorOnSurfaceVariant,
-                    ),
-                )
-                maxLines = 2
-            },
-        )
+        val title = TextView(this).apply {
+            textSize = 14f
+            setTextColor(
+                MaterialColors.getColor(
+                    this,
+                    com.google.android.material.R.attr.colorOnSurface,
+                ),
+            )
+            maxLines = 1
+            ellipsize = android.text.TextUtils.TruncateAt.MIDDLE
+        }
+        val detail = TextView(this).apply {
+            textSize = 12f
+            setTextColor(
+                MaterialColors.getColor(
+                    this,
+                    com.google.android.material.R.attr.colorOnSurfaceVariant,
+                ),
+            )
+            maxLines = 2
+        }
+        column.addView(title)
+        column.addView(detail)
         card.addView(column)
+        val row = Row(card, title, detail)
         card.setOnClickListener {
+            // The row is reused across snapshots, so the id is read at click time.
+            val id = row.connectionId ?: return@setOnClickListener
             lifecycleScope.launch {
-                val closed = withContext(Dispatchers.IO) { MihomoCore.closeConnection(connection.id) }
+                val closed = withContext(Dispatchers.IO) { MihomoCore.closeConnection(id) }
                 if (closed) refresh()
             }
         }
-        return card
+        return row
+    }
+
+    /** The views of one connection row, reused between snapshots. */
+    private class Row(
+        val card: MaterialCardView,
+        val title: TextView,
+        val detail: TextView,
+    ) {
+        var connectionId: String? = null
     }
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()

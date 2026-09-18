@@ -34,8 +34,39 @@ object ThemeManager {
 
     fun version(): Long = version
 
+    /**
+     * Live screens and the one in front, so a palette change can rebuild the
+     * screens behind it immediately. Leaving that to their own onResume showed
+     * the previous colours for a moment before the rebuild landed.
+     */
+    private val screens = java.util.WeakHashMap<Activity, Unit>()
+    private var foreground: Activity? = null
+
+    fun attach(activity: Activity) {
+        screens[activity] = Unit
+    }
+
+    fun detach(activity: Activity) {
+        screens.remove(activity)
+        if (foreground === activity) foreground = null
+    }
+
+    fun setForeground(activity: Activity) {
+        foreground = activity
+    }
+
+    fun clearForeground(activity: Activity) {
+        if (foreground === activity) foreground = null
+    }
+
     fun notifyThemeChanged() {
         version++
+        // The visible screen rebuilds itself (or is already rebuilding); the ones
+        // in the back stack are rebuilt here, while nobody can see them.
+        screens.keys.toList().forEach { screen ->
+            if (screen === foreground || screen.isFinishing || screen.isDestroyed) return@forEach
+            runCatching { screen.recreate() }
+        }
     }
 
     /** Theme style for a family key; unknown keys fall back to the default. */
