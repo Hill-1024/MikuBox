@@ -18,6 +18,7 @@ class ProxyNodeAdapter(
      * [delay]: -3 testing, -2 untested, -1 timeout, otherwise milliseconds.
      * [isAutoEntry] marks the virtual "automatic selection" row of auto groups;
      * [pinned] marks the node an auto group is currently pinned to.
+     * [upload]/[download] are the bytes this node carried for the profile.
      */
     data class Node(
         val name: String,
@@ -26,6 +27,8 @@ class ProxyNodeAdapter(
         val selected: Boolean,
         val isAutoEntry: Boolean = false,
         val pinned: Boolean = false,
+        val upload: Long = 0,
+        val download: Long = 0,
     )
 
     private var nodes: List<Node> = emptyList()
@@ -44,6 +47,23 @@ class ProxyNodeAdapter(
         notifyItemChanged(index)
     }
 
+    /** Streams refreshed traffic totals into the rows that changed. */
+    fun updateTraffic(totals: (String) -> Pair<Long, Long>) {
+        val current = nodes
+        var changed = false
+        val updated = current.mapIndexed { index, node ->
+            val (upload, download) = totals(node.name)
+            if (upload == node.upload && download == node.download) {
+                node
+            } else {
+                changed = true
+                notifyItemChanged(index)
+                node.copy(upload = upload, download = download)
+            }
+        }
+        if (changed) nodes = updated
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH =
         VH(LayoutInflater.from(parent.context).inflate(R.layout.item_proxy_node, parent, false))
 
@@ -54,6 +74,7 @@ class ProxyNodeAdapter(
     inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val name: TextView = itemView.findViewById(R.id.tv_name)
         private val type: TextView = itemView.findViewById(R.id.tv_type)
+        private val traffic: TextView = itemView.findViewById(R.id.tv_traffic)
         private val delay: TextView = itemView.findViewById(R.id.tv_delay)
         private val selected: ImageView = itemView.findViewById(R.id.iv_selected)
         private val selectedBar: View = itemView.findViewById(R.id.selected_view)
@@ -65,6 +86,16 @@ class ProxyNodeAdapter(
                 "${node.type} · ${ctx.getString(R.string.proxies_pinned)}"
             } else {
                 node.type
+            }
+            if (node.upload > 0 || node.download > 0) {
+                traffic.visibility = View.VISIBLE
+                traffic.text = ctx.getString(
+                    R.string.traffic_up_down,
+                    TrafficFormat.compact(node.upload),
+                    TrafficFormat.compact(node.download),
+                )
+            } else {
+                traffic.visibility = View.GONE
             }
             selected.visibility = if (node.selected) View.VISIBLE else View.INVISIBLE
             selectedBar.visibility = if (node.selected) View.VISIBLE else View.INVISIBLE

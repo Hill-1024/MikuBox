@@ -1,6 +1,8 @@
 package top.uwu.mikubox.ui
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
@@ -17,6 +19,8 @@ import top.uwu.mikubox.core.MihomoCore
 import top.uwu.mikubox.core.MihomoCoreSettings
 import top.uwu.mikubox.databinding.ActivityProxiesBinding
 import top.uwu.mikubox.profile.MihomoConfigPreview
+import top.uwu.mikubox.profile.MihomoProfileStore
+import top.uwu.mikubox.profile.MihomoTrafficStore
 import top.uwu.mikubox.service.VpnController
 
 /**
@@ -36,6 +40,16 @@ class ProxiesActivity : EdgeToEdgeActivity() {
     private var groupOrder: List<String> = emptyList()
     private val delayCache = mutableMapOf<String, Int>()
     private var sortByDelay = false
+
+    /** Bytes each node and group carried for the active profile, persisted plus the running session. */
+    private var proxyTotals: Map<String, MihomoTrafficStore.Totals> = emptyMap()
+    private val trafficHandler = Handler(Looper.getMainLooper())
+    private val trafficTick = object : Runnable {
+        override fun run() {
+            refreshTraffic()
+            trafficHandler.postDelayed(this, TRAFFIC_REFRESH_MS)
+        }
+    }
 
     /** True while only the profile's declared groups are shown, without a core. */
     private var offline = false
@@ -156,6 +170,22 @@ class ProxiesActivity : EdgeToEdgeActivity() {
         // Auto groups lead with a virtual row that reverts them to automatic selection.
         // The pinned state only exists while the core runs, so it is hidden offline.
         adapter.submit(if (group.isAutoGroup && !offline) listOf(autoEntry(group)) + ordered else ordered)
+        showGroupTraffic(group)
+    }
+
+    /** The selected group's carried traffic, so the list says what it cost to run. */
+    private fun showGroupTraffic(group: MihomoCore.Proxy) {
+        val totals = proxyTotals[group.name]
+        if (totals == null || (totals.upload == 0L && totals.download == 0L)) {
+            binding.tvGroupTraffic.visibility = android.view.View.GONE
+            return
+        }
+        binding.tvGroupTraffic.visibility = android.view.View.VISIBLE
+        binding.tvGroupTraffic.text = getString(
+            R.string.traffic_group,
+            TrafficFormat.readable(totals.upload),
+            TrafficFormat.readable(totals.download),
+        )
     }
 
     private fun autoEntry(group: MihomoCore.Proxy) = ProxyNodeAdapter.Node(
@@ -168,12 +198,15 @@ class ProxiesActivity : EdgeToEdgeActivity() {
 
     private fun memberNode(group: MihomoCore.Proxy, memberName: String): ProxyNodeAdapter.Node {
         val info = allProxies[memberName]
+        val totals = proxyTotals[memberName]
         return ProxyNodeAdapter.Node(
             name = memberName,
             type = info?.type ?: "",
             delay = delayCache[memberName] ?: (info?.delay ?: 0).let { if (it > 0) it else -2 },
             selected = memberName == group.now,
             pinned = group.pinnedNode == memberName,
+            upload = totals?.upload ?: 0,
+            download = totals?.download ?: 0,
         )
     }
 
@@ -249,7 +282,36 @@ class ProxiesActivity : EdgeToEdgeActivity() {
         android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
     }
 
+    // -------------------------------------------------------------- traffic
+
+    /**
+     * Re-reads the per-node and per-group totals while the screen is open: the
+     * stored profile totals plus whatever the running session has added.
+     */
+    private fun refreshTraffic() {
+        val profileId = MihomoProfileStore.selected(this)?.id ?: return
+        val totals = MihomoTrafficStore.proxyTotals(this, profileId)
+        if (totals == proxyTotals) return
+        proxyTotals = totals
+        adapter.updateTraffic { name ->
+            val entry = totals[name]
+            (entry?.upload ?: 0) to (entry?.download ?: 0)
+        }
+        groups.getOrNull(binding.groupTab.selectedTabPosition)?.let { showGroupTraffic(it) }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        trafficHandler.post(trafficTick)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        trafficHandler.removeCallbacks(trafficTick)
+    }
+
     private companion object {
         const val GLOBAL_GROUP = "GLOBAL"
+        const val TRAFFIC_REFRESH_MS = 2_000L
     }
 }

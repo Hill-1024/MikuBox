@@ -11,7 +11,7 @@
     android:clickable="true"
     android:focusable="true"
     app:cardBackgroundColor="?attr/colorCard"
-    app:cardCornerRadius="24dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="1dp"
     app:strokeColor="?attr/colorOutlineVariant"
     app:strokeWidth="1dp">
@@ -85,6 +85,18 @@
                     android:textSize="12sp"
                     tools:text="Vless" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_traffic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:gravity="end"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="12sp"
+                android:visibility="gone"
+                tools:text="↑1.2M ↓45.3M"
+                tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/tv_delay"
