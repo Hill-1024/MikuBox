@@ -18,6 +18,7 @@ release.keystore
 build.bat
 .video_agent/
 .zcode/
+.mimosa/
 
 # macOS
 .DS_Store
