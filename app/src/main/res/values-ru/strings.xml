@@ -221,6 +221,214 @@
     <string name="settings_test_url">URL проверки задержки</string>
     <string name="settings_test_timeout">Таймаут проверки задержки</string>
     <string name="mode_follow">Как в конфиге</string>
+    <string name="font_size_value">%1$d%%</string>
+    <string name="settings_test_timeout_value">%1$d мс</string>
+    <string name="theme_custom_color">Свой цвет</string>
+    <string name="theme_hue">Оттенок</string>
+    <string name="theme_saturation">Насыщенность</string>
+    <string name="theme_lightness">Яркость</string>
+    <string name="theme_reset_preset">Сбросить</string>
+    <string name="font_size_preview">Съешь ещё этих мягких французских булок.</string>
+    <string name="log_silent">Тишина</string>
+    <string name="log_warning">Предупреждения</string>
+    <string name="log_debug">Отладка</string>
+    <string name="log_info">Информация</string>
+    <string name="stack_system">Система</string>
+    <string name="stack_gvisor">gVisor</string>
+    <string name="stack_mixed">Смешанная</string>
+    <string name="stack_follow">Как в конфиге</string>
+    <string name="dns_mode_fake_ip">fake-ip</string>
+    <string name="dns_mode_redir_host">redir-host</string>
+    <string name="dns_mode_normal">normal</string>
+    <string name="dns_cache_arc">arc</string>
+    <string name="dns_cache_lru">lru</string>
+    <string name="fp_chrome">Chrome</string>
+    <string name="fp_firefox">Firefox</string>
+    <string name="fp_safari">Safari</string>
+    <string name="fp_ios">iOS</string>
+    <string name="fp_android">Android</string>
+    <string name="fp_random">Случайная</string>
+    <string name="fp_none">Выключено</string>
+    <string name="language_system">Системный</string>
+    <string name="language_english">English</string>
+    <string name="language_traditional_chinese">繁體中文</string>
+    <string name="language_simplified_chinese">简体中文</string>
+    <string name="language_french">Français</string>
+    <string name="language_indonesian">Bahasa Indonesia</string>
+    <string name="language_russian">Русский</string>
+    <string name="tools_test_url_default">https://www.gstatic.com/generate_204</string>
+    <string name="toast_vpn_start_failed">Не удалось запустить VPN: %1$s</string>
+    <string name="subscription_changes_title">%1$s обновлён</string>
+    <string name="subscription_changes_added">Добавлено:\n%1$s</string>
+    <string name="subscription_changes_deleted">Удалено:\n%1$s</string>
+    <string name="profile_traffic">↑ %1$s  ↓ %2$s</string>
+    <string name="traffic_up_down">↑ %1$s  ↓ %2$s</string>
+    <string name="order_selected_mark">✓</string>
+    <string name="logcat_tag_line">%1$s %2$s  %3$s</string>
+    <string name="logcat_level_verbose">(подробно)</string>
+    <string name="logcat_level_debug">(отладка)</string>
+    <string name="logcat_level_info">(инфо)</string>
+    <string name="logcat_level_warn">(предупр.)</string>
+    <string name="logcat_level_error">(ошибка)</string>
+    <string name="logcat_level_default">(лог)</string>
+    <string-array name="font_family_labels">
+        <item>По умолчанию</item>
+        <item>Miku — заголовки</item>
+        <item>Miku — текст</item>
+        <item>Miku — типографика</item>
+        <item>Google Sans</item>
+        <item>Roboto</item>
+        <item>Poppins</item>
+        <item>SF Pro Display</item>
+        <item>One UI</item>
+        <item>Rine</item>
+        <item>Choco Cooky</item>
+        <item>Simple Day</item>
+        <item>Fucek</item>
+        <item>Dancing Script</item>
+        <item>Cream</item>
+        <item>Emilys Candy</item>
+        <item>Summer Dream</item>
+        <item>Inconsolata</item>
+        <item>JetBrains Mono</item>
+    </string-array>
+    <string name="mode_rule">По правилам</string>
+    <string name="mode_global">Глобальный</string>
+    <string name="mode_direct">Напрямую</string>
+    <string name="mode_switch_failed">Не удалось переключить режим</string>
+    <string name="mode_global_exit">Глобальный выход</string>
+    <string name="mode_global_exit_row">Глобальный выход · %1$s ▾</string>
+    <string name="mode_global_exit_default">По умолчанию из профиля</string>
+    <string name="mode_global_exit_unavailable">Подключитесь, чтобы выбрать глобальный выход</string>
+    <string name="settings_language">Язык</string>
+    <string name="settings_section_general">Общие</string>
+    <string name="settings_section_route">Маршрутизация</string>
+    <string name="settings_section_inbound">Входящие</string>
+    <string name="settings_section_misc">Прочее</string>
+    <string name="settings_theme_auto">Авто (день / ночь)</string>
+    <string name="settings_theme_color">Цветовая схема</string>
+    <string name="settings_theme_color_summary">Выберите одну из палитр Material</string>
+    <string name="settings_theme_dynamic_label">Динамическая</string>
+    <string name="settings_dynamic_color">Цвета обоев</string>
+    <string name="settings_dynamic_color_summary">Палитра Material You из ваших обоев</string>
+    <string name="settings_dynamic_banner">Цвета баннера</string>
+    <string name="settings_dynamic_banner_summary">Палитра на основе рисунка на главном экране</string>
+    <string name="settings_dynamic_unavailable">Требуется Android 12 или новее</string>
+    <string name="settings_dark_mode">Тёмная тема</string>
+    <string name="settings_true_black">Чёрный AMOLED</string>
+    <string name="settings_true_black_summary">Полностью чёрные поверхности — экономит батарею на OLED</string>
+    <string name="settings_true_black_night_only">Доступно только в тёмной теме</string>
+    <string name="settings_font">Шрифт</string>
+    <string name="settings_font_summary">Шрифт, используемый во всём приложении</string>
+    <string name="settings_font_size">Размер шрифта</string>
+    <string name="settings_bold_text">Жирный текст</string>
+    <string name="settings_bold_text_summary">Более насыщенное начертание для заголовков и строк</string>
+    <string name="connections_title">Соединения</string>
+    <string name="connections_close_all">Закрыть все</string>
+    <string name="connections_empty">Нет активных соединений</string>
+    <string name="connections_offline">Подключитесь, чтобы видеть соединения</string>
+    <string name="connections_summary">%1$d соединений · ↑%2$s ↓%3$s</string>
+    <string name="connections_row_title">%1$s · %2$s</string>
+    <string name="connections_row_detail">%1$s · %2$s · ↑%3$s ↓%4$s</string>
+    <string name="connections_closed_all">Все соединения закрыты</string>
+    <string name="menu_connections">Соединения</string>
+    <string name="desc_connections">Просмотр и закрытие активных соединений</string>
+    <string name="title_main_menu">Меню</string>
+    <string name="desc_import_clipboard">Вставьте Clash YAML или ссылку</string>
+    <string name="desc_copy_config">Скопировать весь Mihomo YAML</string>
+    <string name="controller_title">Внешний контроллер</string>
+    <string name="controller_summary">Разрешить панели или другому инструменту управлять ядром</string>
+    <string name="controller_address">Адрес прослушивания</string>
+    <string name="controller_address_summary">host:port — оставьте 127.0.0.1, если не нужно подключаться с другого устройства</string>
+    <string name="controller_secret">Секрет</string>
+    <string name="controller_secret_summary">Нужен в каждом запросе; создайте новый при утечке</string>
+    <string name="controller_secret_regenerated">Создан новый секрет</string>
+    <string name="controller_secret_new">Создать новый секрет</string>
+    <string name="controller_secret_new_summary">Выпустить новый секрет и отозвать старый</string>
+    <string name="controller_address_invalid">Укажите адрес в виде host:port</string>
+    <string name="recents_title">Скрыть из недавних</string>
+    <string name="recents_summary">Не показывать приложение в списке недавних</string>
+    <string name="opt_follow">Как в профиле</string>
+    <string name="opt_on">Вкл.</string>
+    <string name="opt_off">Выкл.</string>
+    <string name="error_number">Введите число</string>
+    <string name="advanced_title">Дополнительно</string>
+    <string name="advanced_summary">Параметры DNS, fake-ip, ядра и TUN</string>
+    <string name="advanced_hint">Эти параметры переопределяют активный профиль и вступают в силу при следующем подключении.</string>
+    <string name="advanced_hint_running">Эти параметры переопределяют активный профиль. Переподключитесь, чтобы применить их к работающему ядру.</string>
+    <string name="advanced_restarting">Ядро перезапускается для применения изменений…</string>
+    <string name="advanced_section_dns">DNS</string>
+    <string name="advanced_section_core">Ядро и TUN</string>
+    <string name="advanced_section_network">Сеть</string>
+    <string name="dns_enhanced_mode">Расширенный режим</string>
+    <string name="dns_enhanced_mode_summary">Как ядро отвечает на запросы: fake-ip, redir-host или normal</string>
+    <string name="dns_fake_ip_range">Диапазон fake-ip</string>
+    <string name="dns_fake_ip_range_summary">Пул адресов для проксируемых доменов, например 198.18.0.1/16</string>
+    <string name="dns_fake_ip_filter">Фильтр fake-ip</string>
+    <string name="dns_fake_ip_filter_summary">Домены, которые сохраняют реальный адрес, по одному в строке</string>
+    <string name="dns_nameserver">DNS-серверы</string>
+    <string name="dns_nameserver_summary">Резолверы для обычных запросов: IP, DoH или DoT, по одному в строке</string>
+    <string name="dns_default_nameserver">Начальные DNS</string>
+    <string name="dns_default_nameserver_summary">Обычные IP для разрешения имён шифрованных резолверов выше</string>
+    <string name="dns_proxy_nameserver">DNS для серверов прокси</string>
+    <string name="dns_proxy_nameserver_summary">Как разрешаются имена узлов — вне прокси-цепочки</string>
+    <string name="dns_direct_nameserver">DNS для прямых</string>
+    <string name="dns_direct_nameserver_summary">Используются для соединений, которые правила отправляют напрямую</string>
+    <string name="dns_fallback">Резервные DNS</string>
+    <string name="dns_fallback_summary">Опрашиваются вместе с основными; выбор ответа определяет фильтр</string>
+    <string name="dns_fallback_cidr">Резервные ip-cidr</string>
+    <string name="dns_fallback_cidr_summary">Ответы из этих диапазонов заменяются результатом резервных серверов</string>
+    <string name="dns_fallback_geoip">Резервный geoip</string>
+    <string name="dns_fallback_geoip_summary">Использовать резервный результат, если основной ответ не из страны профиля</string>
+    <string name="dns_respect_rules">Учитывать правила</string>
+    <string name="dns_respect_rules_summary">Разрешать имена через ту группу, которую выбрали бы правила</string>
+    <string name="dns_use_hosts">Использовать hosts</string>
+    <string name="dns_use_hosts_summary">Учитывать записи hosts из профиля</string>
+    <string name="dns_use_system_hosts">Системный hosts</string>
+    <string name="dns_use_system_hosts_summary">Учитывать системный файл hosts</string>
+    <string name="dns_prefer_h3">Предпочитать HTTP/3</string>
+    <string name="dns_prefer_h3_summary">Использовать DNS over HTTP/3 для DoH-резолверов</string>
+    <string name="dns_ipv6">Разрешать IPv6</string>
+    <string name="dns_ipv6_summary">Запрашивать записи AAAA и отдавать их приложениям</string>
+    <string name="dns_direct_policy">Политика для прямых</string>
+    <string name="dns_direct_policy_summary">Применять nameserver-policy и к прямым запросам</string>
+    <string name="dns_cache_algorithm">Алгоритм кеша</string>
+    <string name="dns_cache_algorithm_summary">Политика вытеснения кеша DNS</string>
+    <string name="core_find_process">Определение процесса</string>
+    <string name="core_find_process_summary">Как ядро определяет, какому приложению принадлежит соединение</string>
+    <string name="core_find_process_always">Всегда</string>
+    <string name="core_find_process_strict">Строго</string>
+    <string name="core_find_process_off">Выкл.</string>
+    <string name="core_geodata_loader">Загрузчик Geodata</string>
+    <string name="core_geodata_loader_summary">Режим экономии памяти загружается медленнее, но занимает меньше RAM</string>
+    <string name="core_geodata_standard">Обычный</string>
+    <string name="core_geodata_memory">Экономия памяти</string>
+    <string name="core_geodata_mode">Режим Geodata</string>
+    <string name="core_geodata_mode_summary">Читать базы .dat вместо файлов rule-set</string>
+    <string name="core_fingerprint">Отпечаток TLS</string>
+    <string name="core_fingerprint_summary">Отпечаток клиента для исходящих TLS-соединений</string>
+    <string name="core_keep_alive">Интервал keep-alive</string>
+    <string name="core_keep_alive_summary">Секунды между проверками простоя; пусто — значение из профиля</string>
+    <string name="core_disable_keep_alive">Отключить keep-alive</string>
+    <string name="core_disable_keep_alive_summary">Не проверять простаивающие соединения</string>
+    <string name="core_mixed_port">Смешанный порт</string>
+    <string name="core_mixed_port_summary">Порт HTTP/SOCKS локального прокси приложения</string>
+    <string name="core_sniffing">Определение домена</string>
+    <string name="core_sniffing_summary">Восстанавливать домен из трафика туннеля, чтобы правила работали по домену</string>
+    <string name="core_sniff_override">Домен заменяет назначение</string>
+    <string name="core_sniff_override_summary">Использовать определённый домен как назначение для правил</string>
+    <string name="core_wake_lock">Не давать засыпать</string>
+    <string name="core_wake_lock_summary">Держать CPU активным во время подключения; больше расход батареи</string>
+    <string name="tun_udp_timeout">Таймаут UDP</string>
+    <string name="tun_udp_timeout_summary">Сколько секунд UDP-сессия живёт в туннеле</string>
+    <string name="tun_icmp_timeout">Таймаут ICMP</string>
+    <string name="tun_icmp_timeout_summary">Сколько секунд ICMP-сессия живёт в туннеле</string>
+    <string name="tun_endpoint_nat">Endpoint-independent NAT</string>
+    <string name="tun_endpoint_nat_summary">Одно NAT-сопоставление на исходный порт (помогает играм и звонкам)</string>
+    <string name="tun_disable_icmp">Отключить пересылку ICMP</string>
+    <string name="tun_disable_icmp_summary">Не пересылать ping через туннель</string>
+    <string name="traffic_session">За сеанс ↑ %1$s  ↓ %2$s</string>
+    <string name="traffic_group">Группа ↑ %1$s  ↓ %2$s</string>
     <string name="greeting_morning">Доброе утро…</string>
     <string name="greeting_afternoon">Добрый день…</string>
     <string name="greeting_evening">Добрый вечер…</string>
@@ -235,4 +443,134 @@
     <string name="settings_tcp_concurrent_summary">Подключаться к нескольким IP-адресам одновременно</string>
     <string name="proxies_offline_hint">Предпросмотр из активного профиля. Подключитесь, чтобы переключать узлы.</string>
     <string name="rules_offline_hint">Предпросмотр профиля · правил: %1$d</string>
+
+    <!-- Обратная связь (верхний баннер) -->
+    <string name="title_alerter_success">Успешно</string>
+    <string name="title_alerter_error">Ошибка</string>
+    <string name="title_alerter_info">Информация</string>
+
+    <!-- Главный экран: приветствие -->
+    <string name="uwu_profile_banner_title">Привет, мастер</string>
+    <string name="uwu_profile_banner_title_custom">Привет, %1$s</string>
+    <string name="uwu_profile_name_dialog">Как к вам обращаться?</string>
+    <string name="settings_profile_name">Имя профиля</string>
+    <string name="settings_profile_name_summary">Показывается рядом с приветствием на главном экране</string>
+
+    <!-- Главный экран: карточка подключения -->
+    <string name="connection_test_pending">Проверить соединение</string>
+    <string name="connection_connected">Подключено. Нажмите для теста</string>
+    <string name="connection_not_connected">Отключено</string>
+    <string name="connection_test_testing">Тестирование…</string>
+    <string name="connection_test_fail">Нет интернета</string>
+    <string name="connection_test_no_node">Нет узла для проверки</string>
+    <string name="ip_unknown">IP: неизвестен</string>
+    <string name="action_start_service">Запустить службу</string>
+    <string name="action_stop_service">Остановить службу</string>
+    <string name="service_restart_started">Служба перезапускается…</string>
+
+    <!-- Главный экран: вкладки, список, пустое состояние -->
+    <string name="filter_config_all">Все</string>
+    <string name="filter_config_subscription">Подписки</string>
+    <string name="filter_config_local">Локальные</string>
+    <string name="profile_updated_never">Никогда не обновлялся</string>
+    <string name="profile_updated_at">Обновлено %1$s</string>
+    <string name="profile_local_config">Локальная конфигурация</string>
+    <string name="profile_nodes_count">Узлов: %1$d</string>
+    <string name="profile_selected_dot">Активный профиль</string>
+    <string name="time_just_now">только что</string>
+    <string name="time_minutes_ago">%1$d мин назад</string>
+    <string name="time_hours_ago">%1$d ч назад</string>
+    <string name="time_days_ago">%1$d дн назад</string>
+
+    <!-- Главный экран: меню "ещё" -->
+    <string name="title_more_menu">Дополнительное меню</string>
+    <string name="title_category_quick_actions">Быстрые действия</string>
+    <string name="title_management">Управление</string>
+    <string name="title_service_restart">Перезапуск службы</string>
+    <string name="desc_service_restart">Переподключиться, чтобы применить текущий профиль</string>
+    <string name="title_sub_update">Обновить подписку</string>
+    <string name="desc_sub_update">Загрузить все подписки заново</string>
+    <string name="title_ping_all_server">Tcping всех конфигураций</string>
+    <string name="title_real_ping_all_server">Тест реальной задержки</string>
+    <string name="title_export_all">Экспортировать конфигурации в буфер обмена</string>
+    <string name="title_del_all_config">Удалить все конфигурации</string>
+    <string name="title_pin_server">Закрепить профиль</string>
+    <string name="action_pin_server">Закрепить вверху</string>
+    <string name="action_unpin_server">Открепить</string>
+    <string name="toast_server_pinned">Профиль закреплён вверху</string>
+    <string name="toast_server_unpinned">Профиль откреплён</string>
+    <string name="group_order">Порядок</string>
+    <string name="group_order_origin">Исходный</string>
+    <string name="group_order_by_name">По имени</string>
+    <string name="group_order_by_updated">Недавно обновлённые</string>
+    <string name="toast_action_not_allowed">Действие не разрешено</string>
+    <string name="toast_pinned_server_delete_blocked">Сначала открепите профиль</string>
+    <string name="toast_export_all_empty">Нечего экспортировать</string>
+    <string name="toast_configs_exported">Конфигурации скопированы в буфер обмена</string>
+    <string name="toast_delete_all_done">Удалено конфигураций: %1$d</string>
+
+    <!-- Главный экран: главное меню -->
+    <string name="title_oss_license">Лицензии с открытым исходным кодом</string>
+    <string name="desc_logcat">Просмотр журналов соединения и ошибок приложения</string>
+    <string name="desc_backup_restore">Экспортировать или импортировать конфигурации</string>
+    <string name="desc_about">Информация о версии и лицензии</string>
+    <string name="desc_proxies">Просмотр и закрепление узлов активного профиля</string>
+    <string name="desc_rules">Правила маршрутизации активного профиля</string>
+    <string name="desc_apps">Выберите приложения, идущие через прокси</string>
+    <string name="desc_tools">Задержка, DNS и диагностика сети</string>
+
+    <!-- Главный экран: импорт -->
+    <string name="import_configuration">Импортировать конфигурацию</string>
+    <string name="menu_item_import_config_clipboard">Импортировать из буфера обмена</string>
+    <string name="menu_item_import_config_local">Импортировать из файла</string>
+    <string name="menu_item_import_config_url">Добавить ссылку подписки</string>
+    <string name="add_subscription_section">Добавить подписку</string>
+    <string name="menu_item_import_config_qrcode">Импорт из QR-кода</string>
+    <string name="import_qr_unavailable">Сканирование QR-кодов пока не поддерживается — используйте ссылку подписки.</string>
+
+    <!-- Главный экран: поделиться -->
+    <string name="share_configuration">Поделиться конфигурацией</string>
+    <string name="share_qrcode">QR-код</string>
+    <string name="share_subscription_url">Ссылка подписки</string>
+    <string name="export_to_clipboard">Экспортировать в буфер обмена</string>
+    <string name="share_as_file">Поделиться как файлом</string>
+    <string name="toast_exported">Скопировано в буфер обмена</string>
+    <string name="qrcode_title">QR-код</string>
+
+    <!-- Главный экран: быстрые действия -->
+    <string name="settings_quick_actions">Быстрые действия</string>
+    <string name="settings_quick_actions_summary">Показывать ряд кнопок над карточкой подключения</string>
+    <string name="settings_fab_extended">Расширенная кнопка подключения</string>
+    <string name="settings_fab_extended_summary">Показывать таймер сеанса внутри кнопки подключения</string>
+    <string name="settings_compact_actions">Свернуть действия списка</string>
+    <string name="settings_compact_actions_summary">Перенести публикацию, обновление и удаление в меню строки</string>
+    <string name="quick_actions_updated">Обновлено подписок: %1$d/%2$d</string>
+
+    <!-- Подтверждение удаления -->
+    <string name="del_config_comfirm">Удалить этот профиль?</string>
+    <string name="del_config_dialog_comfirm_message">%1$s будет удалён безвозвратно.</string>
+    <string name="del_all_dialog_comfirm_message">Все профили (%1$d) будут удалены безвозвратно.</string>
+    <string name="toast_deleted">Удалено</string>
+
+    <!-- Журнал -->
+    <string name="logcat_search">Поиск в журнале</string>
+    <string name="logcat_copy">Копировать журнал</string>
+    <string name="logcat_copied">Журнал скопирован в буфер обмена</string>
+    <string name="logcat_cleared">Буфер журнала очищен</string>
+    <string name="logcat_empty">Нечего копировать</string>
+    <string name="logcat_line_copied">Строка скопирована</string>
+
+    <!-- Список приложений -->
+    <string name="apps_search">Поиск приложений</string>
+    <string name="apps_select_all">Выбрать все</string>
+    <string name="apps_invert_selection">Инвертировать выбор</string>
+    <string name="apps_selection_updated">Сохранено приложений: %1$d</string>
+    <string name="traffic_idle_up">▲ 0 B/s</string>
+    <string name="traffic_idle_down">▼ 0 B/s</string>
+    <string name="traffic_up">▲ %1$s/s</string>
+    <string name="traffic_down">▼ %1$s/s</string>
+    <string name="traffic_speed_suffix">%1$s/s</string>
+    <string name="theme_custom_summary">Любой исходный цвет (Android 12+)</string>
+    <string name="font_picker_title">Шрифт</string>
+    <string name="ip_connected">IP: %1$s</string>
 </resources>

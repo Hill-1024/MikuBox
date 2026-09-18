@@ -221,6 +221,206 @@
     <string name="settings_test_url">延遲測試連結</string>
     <string name="settings_test_timeout">延遲測試逾時</string>
     <string name="mode_follow">跟隨設定</string>
+    <string name="font_size_value">%1$d%%</string>
+    <string name="settings_test_timeout_value">%1$d 毫秒</string>
+    <string name="theme_custom_color">自訂顏色</string>
+    <string name="theme_hue">色相</string>
+    <string name="theme_saturation">飽和度</string>
+    <string name="theme_lightness">亮度</string>
+    <string name="theme_reset_preset">重設</string>
+    <string name="font_size_preview">山際見來煙，竹中窺落日。</string>
+    <string name="log_silent">靜默</string>
+    <string name="log_warning">警告</string>
+    <string name="log_debug">偵錯</string>
+    <string name="log_info">資訊</string>
+    <string name="stack_system">系統</string>
+    <string name="stack_gvisor">gVisor</string>
+    <string name="stack_mixed">混合</string>
+    <string name="stack_follow">跟隨設定</string>
+    <string name="dns_mode_fake_ip">fake-ip</string>
+    <string name="dns_mode_redir_host">redir-host</string>
+    <string name="dns_mode_normal">normal</string>
+    <string name="dns_cache_arc">arc</string>
+    <string name="dns_cache_lru">lru</string>
+    <string name="fp_chrome">Chrome</string>
+    <string name="fp_firefox">Firefox</string>
+    <string name="fp_safari">Safari</string>
+    <string name="fp_ios">iOS</string>
+    <string name="fp_android">Android</string>
+    <string name="fp_random">隨機</string>
+    <string name="fp_none">關閉</string>
+    <string name="tools_test_url_default">https://www.gstatic.com/generate_204</string>
+    <string name="toast_vpn_start_failed">VPN 啟動失敗：%1$s</string>
+    <string name="subscription_changes_title">%1$s 已更新</string>
+    <string name="subscription_changes_added">新增：\n%1$s</string>
+    <string name="subscription_changes_deleted">移除：\n%1$s</string>
+    <string name="profile_traffic">↑ %1$s  ↓ %2$s</string>
+    <string name="traffic_up_down">↑ %1$s  ↓ %2$s</string>
+    <string name="order_selected_mark">✓</string>
+    <string name="logcat_tag_line">%1$s %2$s  %3$s</string>
+    <string name="logcat_level_verbose">(詳細)</string>
+    <string name="logcat_level_debug">(偵錯)</string>
+    <string name="logcat_level_info">(資訊)</string>
+    <string name="logcat_level_warn">(警告)</string>
+    <string name="logcat_level_error">(錯誤)</string>
+    <string name="logcat_level_default">(日誌)</string>
+    <string-array name="font_family_labels">
+        <item>預設</item>
+        <item>Miku 標題</item>
+        <item>Miku 內文</item>
+        <item>Miku 排版</item>
+        <item>Google Sans</item>
+        <item>Roboto</item>
+        <item>Poppins</item>
+        <item>SF Pro Display</item>
+        <item>One UI</item>
+        <item>Rine</item>
+        <item>Choco Cooky</item>
+        <item>Simple Day</item>
+        <item>Fucek</item>
+        <item>Dancing Script</item>
+        <item>Cream</item>
+        <item>Emilys Candy</item>
+        <item>Summer Dream</item>
+        <item>Inconsolata</item>
+        <item>JetBrains Mono</item>
+    </string-array>
+    <string name="mode_rule">規則</string>
+    <string name="mode_global">全域</string>
+    <string name="mode_direct">直連</string>
+    <string name="mode_switch_failed">切換模式失敗</string>
+    <string name="advanced_title">進階</string>
+    <string name="advanced_summary">DNS、Fake-IP、內核與 TUN 選項</string>
+    <string name="advanced_hint">這些選項會覆蓋目前設定，重新連線後生效。</string>
+    <string name="advanced_hint_running">這些選項會覆蓋目前設定，重新連線後套用到執行中的內核。</string>
+    <string name="advanced_section_dns">DNS</string>
+    <string name="advanced_section_core">內核與 TUN</string>
+    <string name="advanced_section_network">網路</string>
+    <string name="opt_follow">跟隨設定</string>
+    <string name="opt_on">開</string>
+    <string name="opt_off">關</string>
+    <string name="error_number">請輸入數字</string>
+    <string name="settings_section_general">一般</string>
+    <string name="settings_section_route">路由</string>
+    <string name="settings_section_inbound">入站</string>
+    <string name="settings_section_misc">雜項</string>
+    <string name="connections_title">連線</string>
+    <string name="menu_connections">連線</string>
+    <string name="connections_close_all">全部關閉</string>
+    <string name="connections_empty">目前沒有連線</string>
+    <string name="connections_offline">連線後才能查看即時連線</string>
+    <string name="connections_summary">%1$d 個連線 · ↑%2$s ↓%3$s</string>
+    <string name="connections_row_title">%1$s · %2$s</string>
+    <string name="connections_row_detail">%1$s · %2$s · ↑%3$s ↓%4$s</string>
+    <string name="connections_closed_all">已關閉全部連線</string>
+    <string name="title_main_menu">選單</string>
+    <string name="desc_import_clipboard">貼上 Clash YAML 或分享連結</string>
+    <string name="desc_copy_config">複製完整的 Mihomo YAML</string>
+    <string name="controller_title">外部控制器</string>
+    <string name="recents_title">從最近任務隱藏</string>
+    <string name="recents_summary">不在最近任務清單中顯示本應用程式</string>
+    <string name="settings_theme_auto">自動（日間 / 夜間）</string>
+    <string name="settings_theme_color">主題配色</string>
+    <string name="settings_theme_color_summary">從 Material 調色盤中選擇</string>
+    <string name="settings_theme_dynamic_label">動態</string>
+    <string name="settings_dynamic_color">桌布取色</string>
+    <string name="settings_dynamic_color_summary">使用桌布的 Material You 配色</string>
+    <string name="settings_dynamic_banner">橫幅取色</string>
+    <string name="settings_dynamic_banner_summary">從首頁橫幅插圖擷取配色</string>
+    <string name="settings_dynamic_unavailable">需要 Android 12 或更新版本</string>
+    <string name="settings_dark_mode">深色模式</string>
+    <string name="settings_true_black">純黑（AMOLED）</string>
+    <string name="settings_true_black_summary">純黑背景，在 OLED 螢幕上更省電</string>
+    <string name="settings_true_black_night_only">僅在深色模式下可用</string>
+    <string name="settings_font">字型</string>
+    <string name="settings_font_summary">全應用程式使用的字型</string>
+    <string name="settings_font_size">字級</string>
+    <string name="settings_bold_text">粗體文字</string>
+    <string name="settings_bold_text_summary">標題與列表列使用較粗的字重</string>
+    <string name="desc_connections">查看並關閉即時連線</string>
+    <string name="controller_summary">允許面板或其它工具控制內核</string>
+    <string name="controller_address">監聽位址</string>
+    <string name="controller_address_summary">host:port——除非其他裝置要存取，否則保持 127.0.0.1</string>
+    <string name="controller_secret">金鑰</string>
+    <string name="controller_secret_summary">所有請求都必須攜帶；外洩後可重新產生</string>
+    <string name="controller_secret_regenerated">已產生新金鑰</string>
+    <string name="controller_secret_new">重新產生金鑰</string>
+    <string name="controller_secret_new_summary">產生新金鑰並使舊金鑰失效</string>
+    <string name="controller_address_invalid">請按 host:port 填寫位址</string>
+    <string name="advanced_restarting">正在重新啟動內核以套用變更…</string>
+    <string name="core_sniffing">網域嗅探</string>
+    <string name="core_sniffing_summary">從隧道流量還原網域，讓規則可依網域比對</string>
+    <string name="core_sniff_override">嗅探結果改寫目標</string>
+    <string name="core_sniff_override_summary">以嗅探到的網域作為規則比對的目標</string>
+    <string name="core_wake_lock">保持喚醒</string>
+    <string name="core_wake_lock_summary">連線期間保持 CPU 喚醒；較耗電</string>
+    <string name="dns_enhanced_mode">增強模式</string>
+    <string name="dns_enhanced_mode_summary">內核回應方式：fake-ip、redir-host 或 normal</string>
+    <string name="dns_fake_ip_range">Fake-IP 網段</string>
+    <string name="dns_fake_ip_range_summary">代理網域分配的位址池，例如 198.18.0.1/16</string>
+    <string name="dns_fake_ip_filter">Fake-IP 過濾</string>
+    <string name="dns_fake_ip_filter_summary">這些網域保留真實位址，每行一個</string>
+    <string name="dns_nameserver">一般解析器</string>
+    <string name="dns_nameserver_summary">一般查詢使用的解析器：IP、DoH 或 DoT，每行一個</string>
+    <string name="dns_default_nameserver">引導解析器</string>
+    <string name="dns_default_nameserver_summary">用於解析上述加密解析器的純 IP</string>
+    <string name="dns_proxy_nameserver">節點網域解析器</string>
+    <string name="dns_proxy_nameserver_summary">解析節點網域，不經代理鏈路</string>
+    <string name="dns_direct_nameserver">直連解析器</string>
+    <string name="dns_direct_nameserver_summary">規則判定直連的連線使用它解析</string>
+    <string name="dns_fallback">Fallback 解析器</string>
+    <string name="dns_fallback_summary">與主解析器同時查詢，由 fallback 過濾決定取值</string>
+    <string name="dns_fallback_cidr">Fallback IP 網段</string>
+    <string name="dns_fallback_cidr_summary">命中這些網段的回應改用 fallback 結果</string>
+    <string name="dns_fallback_geoip">Fallback GeoIP</string>
+    <string name="dns_fallback_geoip_summary">主結果不在設定所屬國家時改用 fallback 結果</string>
+    <string name="dns_respect_rules">遵循規則解析</string>
+    <string name="dns_respect_rules_summary">依規則選中的代理組來解析網域</string>
+    <string name="dns_use_hosts">使用 hosts</string>
+    <string name="dns_use_hosts_summary">遵循設定裡的 hosts 項目</string>
+    <string name="dns_use_system_hosts">使用系統 hosts</string>
+    <string name="dns_use_system_hosts_summary">遵循裝置的 hosts 檔案</string>
+    <string name="dns_prefer_h3">優先 HTTP/3</string>
+    <string name="dns_prefer_h3_summary">DoH 解析器優先使用 DNS over HTTP/3</string>
+    <string name="dns_ipv6">解析 IPv6</string>
+    <string name="dns_ipv6_summary">查詢 AAAA 記錄並傳回給應用程式</string>
+    <string name="dns_direct_policy">直連遵循策略</string>
+    <string name="dns_direct_policy_summary">對直連查詢同樣套用 nameserver-policy</string>
+    <string name="dns_cache_algorithm">快取演算法</string>
+    <string name="dns_cache_algorithm_summary">DNS 快取的淘汰策略</string>
+    <string name="core_find_process">程序比對</string>
+    <string name="core_find_process_summary">內核如何識別連線所屬的應用程式</string>
+    <string name="core_find_process_always">總是</string>
+    <string name="core_find_process_strict">嚴格</string>
+    <string name="core_find_process_off">關閉</string>
+    <string name="core_geodata_loader">Geodata 載入方式</string>
+    <string name="core_geodata_loader_summary">記憶體優先載入較慢但佔用更少記憶體</string>
+    <string name="core_geodata_standard">標準</string>
+    <string name="core_geodata_memory">記憶體優先</string>
+    <string name="core_geodata_mode">Geodata 模式</string>
+    <string name="core_geodata_mode_summary">使用 .dat 資料庫而非 rule-set 檔案</string>
+    <string name="core_fingerprint">TLS 指紋</string>
+    <string name="core_fingerprint_summary">出站 TLS 握手使用的客戶端指紋</string>
+    <string name="core_keep_alive">Keep-alive 間隔</string>
+    <string name="core_keep_alive_summary">探測閒置連線的間隔秒數；留空沿用設定值</string>
+    <string name="core_disable_keep_alive">停用 keep-alive</string>
+    <string name="core_disable_keep_alive_summary">不再探測閒置連線</string>
+    <string name="core_mixed_port">混合埠</string>
+    <string name="core_mixed_port_summary">本機代理模式的 HTTP/SOCKS 埠</string>
+    <string name="tun_udp_timeout">UDP 逾時</string>
+    <string name="tun_udp_timeout_summary">隧道內 UDP 關聯保持的秒數</string>
+    <string name="tun_icmp_timeout">ICMP 逾時</string>
+    <string name="tun_icmp_timeout_summary">隧道內 ICMP 工作階段保持的秒數</string>
+    <string name="tun_endpoint_nat">端點無關 NAT</string>
+    <string name="tun_endpoint_nat_summary">每個來源埠保持一個 NAT 對應（有利於遊戲與通話）</string>
+    <string name="tun_disable_icmp">關閉 ICMP 轉送</string>
+    <string name="tun_disable_icmp_summary">不再透過隧道轉送 ping</string>
+    <string name="mode_global_exit">全域出口</string>
+    <string name="mode_global_exit_row">全域出口 · %1$s ▾</string>
+    <string name="mode_global_exit_default">設定預設</string>
+    <string name="mode_global_exit_unavailable">連線後才能選擇全域出口</string>
+    <string name="traffic_session">本次 ↑ %1$s  ↓ %2$s</string>
+    <string name="traffic_group">本組 ↑ %1$s  ↓ %2$s</string>
     <string name="greeting_morning">早安…</string>
     <string name="greeting_afternoon">午安…</string>
     <string name="greeting_evening">晚上好…</string>
@@ -241,4 +441,134 @@
     <string name="settings_tcp_concurrent_summary">同時連線到多個 IP 位址</string>
     <string name="proxies_offline_hint">離線預覽（來自目前設定檔），連線後可切換或測試節點。</string>
     <string name="rules_offline_hint">離線預覽（來自設定檔）· 共 %1$d 條規則</string>
+
+    <!-- 回饋提示（頂部橫幅） -->
+    <string name="title_alerter_success">成功</string>
+    <string name="title_alerter_error">錯誤</string>
+    <string name="title_alerter_info">提示</string>
+
+    <!-- 主頁：問候區 -->
+    <string name="uwu_profile_banner_title">你好，主人</string>
+    <string name="uwu_profile_banner_title_custom">你好，%1$s</string>
+    <string name="uwu_profile_name_dialog">該怎麼稱呼你呢？</string>
+    <string name="settings_profile_name">暱稱</string>
+    <string name="settings_profile_name_summary">顯示在主頁問候語旁邊</string>
+
+    <!-- 主頁：連線卡片 -->
+    <string name="connection_test_pending">檢查連線</string>
+    <string name="connection_connected">已連線。點擊測試</string>
+    <string name="connection_not_connected">未連線</string>
+    <string name="connection_test_testing">測試中…</string>
+    <string name="connection_test_fail">無網路</string>
+    <string name="connection_test_no_node">沒有可測試的節點</string>
+    <string name="ip_unknown">IP：未知</string>
+    <string name="action_start_service">啟動服務</string>
+    <string name="action_stop_service">停止服務</string>
+    <string name="service_restart_started">正在重啟服務…</string>
+
+    <!-- 主頁：分頁、清單與空狀態 -->
+    <string name="filter_config_all">全部</string>
+    <string name="filter_config_subscription">訂閱</string>
+    <string name="filter_config_local">本機</string>
+    <string name="profile_updated_never">從未更新</string>
+    <string name="profile_updated_at">%1$s更新</string>
+    <string name="profile_local_config">本機設定檔</string>
+    <string name="profile_nodes_count">%1$d 個節點</string>
+    <string name="profile_selected_dot">目前設定檔</string>
+    <string name="time_just_now">剛剛</string>
+    <string name="time_minutes_ago">%1$d 分鐘前</string>
+    <string name="time_hours_ago">%1$d 小時前</string>
+    <string name="time_days_ago">%1$d 天前</string>
+
+    <!-- 主頁：更多選單 -->
+    <string name="title_more_menu">更多選單</string>
+    <string name="title_category_quick_actions">快捷操作</string>
+    <string name="title_management">管理</string>
+    <string name="title_service_restart">服務重啟</string>
+    <string name="desc_service_restart">重新連線以套用目前設定檔</string>
+    <string name="title_sub_update">更新訂閱</string>
+    <string name="desc_sub_update">重新拉取全部訂閱</string>
+    <string name="title_ping_all_server">Tcping 所有設定檔</string>
+    <string name="title_real_ping_all_server">真實延遲測試</string>
+    <string name="title_export_all">匯出設定檔至剪貼簿</string>
+    <string name="title_del_all_config">刪除所有設定檔</string>
+    <string name="title_pin_server">置頂設定檔</string>
+    <string name="action_pin_server">置頂</string>
+    <string name="action_unpin_server">取消置頂</string>
+    <string name="toast_server_pinned">已置頂該設定檔</string>
+    <string name="toast_server_unpinned">已取消置頂</string>
+    <string name="group_order">排序</string>
+    <string name="group_order_origin">原始</string>
+    <string name="group_order_by_name">依名稱</string>
+    <string name="group_order_by_updated">最近更新</string>
+    <string name="toast_action_not_allowed">禁止此項操作</string>
+    <string name="toast_pinned_server_delete_blocked">請先取消置頂再刪除</string>
+    <string name="toast_export_all_empty">沒有可匯出的內容</string>
+    <string name="toast_configs_exported">已複製設定檔到剪貼簿</string>
+    <string name="toast_delete_all_done">已刪除 %1$d 個設定檔</string>
+
+    <!-- 主頁：主選單 -->
+    <string name="title_oss_license">開源授權條款</string>
+    <string name="desc_logcat">檢視連線與應用程式錯誤紀錄</string>
+    <string name="desc_backup_restore">匯出或匯入你的設定檔</string>
+    <string name="desc_about">版本資訊與開源授權條款</string>
+    <string name="desc_proxies">瀏覽並置頂目前設定檔的節點</string>
+    <string name="desc_rules">檢視目前設定檔的分流規則</string>
+    <string name="desc_apps">選擇哪些應用程式走代理</string>
+    <string name="desc_tools">延遲、DNS 與網路診斷</string>
+
+    <!-- 主頁：匯入面板 -->
+    <string name="import_configuration">匯入設定檔</string>
+    <string name="menu_item_import_config_clipboard">從剪貼簿匯入</string>
+    <string name="menu_item_import_config_local">從本機匯入</string>
+    <string name="menu_item_import_config_url">新增訂閱連結</string>
+    <string name="add_subscription_section">新增訂閱</string>
+    <string name="menu_item_import_config_qrcode">從 QR Code 匯入</string>
+    <string name="import_qr_unavailable">尚未支援掃描 QR Code，請改用訂閱連結。</string>
+
+    <!-- 主頁：分享面板 -->
+    <string name="share_configuration">分享設定檔</string>
+    <string name="share_qrcode">QR Code</string>
+    <string name="share_subscription_url">訂閱連結</string>
+    <string name="export_to_clipboard">匯出至剪貼簿</string>
+    <string name="share_as_file">以檔案分享</string>
+    <string name="toast_exported">已複製到剪貼簿</string>
+    <string name="qrcode_title">QR Code</string>
+
+    <!-- 主頁：快捷操作 -->
+    <string name="settings_quick_actions">快捷操作列</string>
+    <string name="settings_quick_actions_summary">在連線卡片上方顯示快捷按鈕</string>
+    <string name="settings_fab_extended">擴展連線按鈕</string>
+    <string name="settings_fab_extended_summary">在連線按鈕中顯示本次連線時長</string>
+    <string name="settings_compact_actions">折疊清單操作</string>
+    <string name="settings_compact_actions_summary">將分享、更新與刪除收進每列的更多選單</string>
+    <string name="quick_actions_updated">已更新 %1$d/%2$d 個訂閱</string>
+
+    <!-- 刪除確認 -->
+    <string name="del_config_comfirm">刪除該設定檔？</string>
+    <string name="del_config_dialog_comfirm_message">%1$s 將被永久刪除，且無法復原。</string>
+    <string name="del_all_dialog_comfirm_message">全部 %1$d 個設定檔將被永久刪除，且無法復原。</string>
+    <string name="toast_deleted">已刪除</string>
+
+    <!-- 紀錄 -->
+    <string name="logcat_search">搜尋紀錄</string>
+    <string name="logcat_copy">複製紀錄</string>
+    <string name="logcat_copied">已複製紀錄到剪貼簿</string>
+    <string name="logcat_cleared">已清空紀錄緩衝區</string>
+    <string name="logcat_empty">沒有可複製的內容</string>
+    <string name="logcat_line_copied">已複製該行</string>
+
+    <!-- 應用程式清單 -->
+    <string name="apps_search">搜尋應用程式</string>
+    <string name="apps_select_all">全選</string>
+    <string name="apps_invert_selection">反選</string>
+    <string name="apps_selection_updated">已儲存 %1$d 個應用程式</string>
+    <string name="traffic_idle_up">▲ 0 B/s</string>
+    <string name="traffic_idle_down">▼ 0 B/s</string>
+    <string name="traffic_up">▲ %1$s/s</string>
+    <string name="traffic_down">▼ %1$s/s</string>
+    <string name="traffic_speed_suffix">%1$s/s</string>
+    <string name="theme_custom_summary">選擇任意種子色（Android 12 以上）</string>
+    <string name="font_picker_title">字型</string>
+    <string name="ip_connected">IP：%1$s</string>
 </resources>

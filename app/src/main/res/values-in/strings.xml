@@ -219,6 +219,214 @@
     <string name="settings_test_url">URL uji latensi</string>
     <string name="settings_test_timeout">Batas waktu uji latensi</string>
     <string name="mode_follow">Ikuti konfig</string>
+    <string name="font_size_value">%1$d%%</string>
+    <string name="settings_test_timeout_value">%1$d md</string>
+    <string name="theme_custom_color">Warna khusus</string>
+    <string name="theme_hue">Hue</string>
+    <string name="theme_saturation">Saturasi</string>
+    <string name="theme_lightness">Kecerahan</string>
+    <string name="theme_reset_preset">Atur ulang</string>
+    <string name="font_size_preview">Yang penting kualitas, bukan kuantitas.</string>
+    <string name="log_silent">Senyap</string>
+    <string name="log_warning">Peringatan</string>
+    <string name="log_debug">Debug</string>
+    <string name="log_info">Info</string>
+    <string name="stack_system">Sistem</string>
+    <string name="stack_gvisor">gVisor</string>
+    <string name="stack_mixed">Campuran</string>
+    <string name="stack_follow">Ikuti konfig</string>
+    <string name="dns_mode_fake_ip">fake-ip</string>
+    <string name="dns_mode_redir_host">redir-host</string>
+    <string name="dns_mode_normal">normal</string>
+    <string name="dns_cache_arc">arc</string>
+    <string name="dns_cache_lru">lru</string>
+    <string name="fp_chrome">Chrome</string>
+    <string name="fp_firefox">Firefox</string>
+    <string name="fp_safari">Safari</string>
+    <string name="fp_ios">iOS</string>
+    <string name="fp_android">Android</string>
+    <string name="fp_random">Acak</string>
+    <string name="fp_none">Nonaktif</string>
+    <string name="language_system">Bawaan sistem</string>
+    <string name="language_english">English</string>
+    <string name="language_traditional_chinese">繁體中文</string>
+    <string name="language_simplified_chinese">简体中文</string>
+    <string name="language_french">Français</string>
+    <string name="language_indonesian">Bahasa Indonesia</string>
+    <string name="language_russian">Русский</string>
+    <string name="tools_test_url_default">https://www.gstatic.com/generate_204</string>
+    <string name="toast_vpn_start_failed">VPN gagal dijalankan: %1$s</string>
+    <string name="subscription_changes_title">%1$s diperbarui</string>
+    <string name="subscription_changes_added">Ditambahkan:\n%1$s</string>
+    <string name="subscription_changes_deleted">Dihapus:\n%1$s</string>
+    <string name="profile_traffic">↑ %1$s  ↓ %2$s</string>
+    <string name="traffic_up_down">↑ %1$s  ↓ %2$s</string>
+    <string name="order_selected_mark">✓</string>
+    <string name="logcat_tag_line">%1$s %2$s  %3$s</string>
+    <string name="logcat_level_verbose">(rinci)</string>
+    <string name="logcat_level_debug">(debug)</string>
+    <string name="logcat_level_info">(info)</string>
+    <string name="logcat_level_warn">(peringatan)</string>
+    <string name="logcat_level_error">(galat)</string>
+    <string name="logcat_level_default">(log)</string>
+    <string-array name="font_family_labels">
+        <item>Bawaan</item>
+        <item>Miku Judul</item>
+        <item>Miku Isi</item>
+        <item>Miku Tipografi</item>
+        <item>Google Sans</item>
+        <item>Roboto</item>
+        <item>Poppins</item>
+        <item>SF Pro Display</item>
+        <item>One UI</item>
+        <item>Rine</item>
+        <item>Choco Cooky</item>
+        <item>Simple Day</item>
+        <item>Fucek</item>
+        <item>Dancing Script</item>
+        <item>Cream</item>
+        <item>Emilys Candy</item>
+        <item>Summer Dream</item>
+        <item>Inconsolata</item>
+        <item>JetBrains Mono</item>
+    </string-array>
+    <string name="mode_rule">Aturan</string>
+    <string name="mode_global">Global</string>
+    <string name="mode_direct">Langsung</string>
+    <string name="mode_switch_failed">Gagal mengganti mode</string>
+    <string name="mode_global_exit">Eksit global</string>
+    <string name="mode_global_exit_row">Eksit global · %1$s ▾</string>
+    <string name="mode_global_exit_default">Default profil</string>
+    <string name="mode_global_exit_unavailable">Sambungkan dulu untuk memilih eksit global</string>
+    <string name="settings_language">Bahasa</string>
+    <string name="settings_section_general">Umum</string>
+    <string name="settings_section_route">Rute</string>
+    <string name="settings_section_inbound">Masuk</string>
+    <string name="settings_section_misc">Lainnya</string>
+    <string name="settings_theme_auto">Otomatis (siang / malam)</string>
+    <string name="settings_theme_color">Warna tema</string>
+    <string name="settings_theme_color_summary">Pilih salah satu palet Material</string>
+    <string name="settings_theme_dynamic_label">Dinamis</string>
+    <string name="settings_dynamic_color">Warna wallpaper</string>
+    <string name="settings_dynamic_color_summary">Palet Material You dari wallpaper Anda</string>
+    <string name="settings_dynamic_banner">Warna dari banner</string>
+    <string name="settings_dynamic_banner_summary">Ambil palet dari gambar banner beranda</string>
+    <string name="settings_dynamic_unavailable">Perlu Android 12 atau lebih baru</string>
+    <string name="settings_dark_mode">Mode gelap</string>
+    <string name="settings_true_black">Hitam AMOLED</string>
+    <string name="settings_true_black_summary">Latar hitam murni untuk menghemat daya di layar OLED</string>
+    <string name="settings_true_black_night_only">Hanya tersedia di mode gelap</string>
+    <string name="settings_font">Font</string>
+    <string name="settings_font_summary">Font yang dipakai di seluruh aplikasi</string>
+    <string name="settings_font_size">Ukuran font</string>
+    <string name="settings_bold_text">Teks tebal</string>
+    <string name="settings_bold_text_summary">Bobot lebih tebal untuk judul dan baris</string>
+    <string name="connections_title">Koneksi</string>
+    <string name="connections_close_all">Tutup semua</string>
+    <string name="connections_empty">Tidak ada koneksi aktif</string>
+    <string name="connections_offline">Sambungkan untuk melihat koneksi</string>
+    <string name="connections_summary">%1$d koneksi · ↑%2$s ↓%3$s</string>
+    <string name="connections_row_title">%1$s · %2$s</string>
+    <string name="connections_row_detail">%1$s · %2$s · ↑%3$s ↓%4$s</string>
+    <string name="connections_closed_all">Semua koneksi ditutup</string>
+    <string name="menu_connections">Koneksi</string>
+    <string name="desc_connections">Lihat dan tutup koneksi aktif</string>
+    <string name="title_main_menu">Menu</string>
+    <string name="desc_import_clipboard">Tempel Clash YAML atau tautan</string>
+    <string name="desc_copy_config">Salin seluruh Mihomo YAML</string>
+    <string name="controller_title">Kontroler eksternal</string>
+    <string name="controller_summary">Izinkan dasbor atau alat lain mengendalikan inti</string>
+    <string name="controller_address">Alamat listen</string>
+    <string name="controller_address_summary">host:port — biarkan 127.0.0.1 kecuali perangkat lain perlu mengaksesnya</string>
+    <string name="controller_secret">Kunci rahasia</string>
+    <string name="controller_secret_summary">Wajib pada setiap permintaan; buat ulang jika bocor</string>
+    <string name="controller_secret_regenerated">Kunci rahasia baru dibuat</string>
+    <string name="controller_secret_new">Buat kunci rahasia baru</string>
+    <string name="controller_secret_new_summary">Terbitkan kunci baru dan batalkan yang lama</string>
+    <string name="controller_address_invalid">Isi alamat dalam bentuk host:port</string>
+    <string name="recents_title">Sembunyikan dari recent</string>
+    <string name="recents_summary">Jangan tampilkan aplikasi di daftar recent</string>
+    <string name="opt_follow">Profil</string>
+    <string name="opt_on">Aktif</string>
+    <string name="opt_off">Nonaktif</string>
+    <string name="error_number">Masukkan angka</string>
+    <string name="advanced_title">Lanjutan</string>
+    <string name="advanced_summary">Opsi DNS, fake-ip, inti, dan TUN</string>
+    <string name="advanced_hint">Opsi ini menimpa profil aktif dan berlaku pada koneksi berikutnya.</string>
+    <string name="advanced_hint_running">Opsi ini menimpa profil aktif. Sambungkan ulang untuk menerapkannya ke inti yang berjalan.</string>
+    <string name="advanced_restarting">Memuat ulang inti untuk menerapkan perubahan…</string>
+    <string name="advanced_section_dns">DNS</string>
+    <string name="advanced_section_core">Inti &amp; TUN</string>
+    <string name="advanced_section_network">Jaringan</string>
+    <string name="dns_enhanced_mode">Mode lanjutan</string>
+    <string name="dns_enhanced_mode_summary">Cara inti menjawab kueri: fake-ip, redir-host, atau normal</string>
+    <string name="dns_fake_ip_range">Rentang fake-ip</string>
+    <string name="dns_fake_ip_range_summary">Kumpulan alamat untuk domain berproksi, misalnya 198.18.0.1/16</string>
+    <string name="dns_fake_ip_filter">Filter fake-ip</string>
+    <string name="dns_fake_ip_filter_summary">Domain yang tetap memakai alamat asli, satu per baris</string>
+    <string name="dns_nameserver">Nameserver</string>
+    <string name="dns_nameserver_summary">Resolver untuk kueri biasa: IP, DoH, atau DoT, satu per baris</string>
+    <string name="dns_default_nameserver">Resolver bootstrap</string>
+    <string name="dns_default_nameserver_summary">IP biasa untuk me-resolve resolver terenkripsi di atas</string>
+    <string name="dns_proxy_nameserver">Resolver server proksi</string>
+    <string name="dns_proxy_nameserver_summary">Cara nama host node di-resolve, di luar jalur proksi</string>
+    <string name="dns_direct_nameserver">Resolver langsung</string>
+    <string name="dns_direct_nameserver_summary">Dipakai untuk koneksi yang diarahkan aturan secara langsung</string>
+    <string name="dns_fallback">Resolver fallback</string>
+    <string name="dns_fallback_summary">Dikueri bersama server utama; filter fallback yang memilih jawabannya</string>
+    <string name="dns_fallback_cidr">ip-cidr fallback</string>
+    <string name="dns_fallback_cidr_summary">Jawaban dalam rentang ini diganti dengan hasil fallback</string>
+    <string name="dns_fallback_geoip">geoip fallback</string>
+    <string name="dns_fallback_geoip_summary">Pakai hasil fallback jika jawaban utama bukan dari negara profil</string>
+    <string name="dns_respect_rules">Patuhi aturan</string>
+    <string name="dns_respect_rules_summary">Resolve melalui grup proksi yang akan dipilih aturan</string>
+    <string name="dns_use_hosts">Gunakan hosts</string>
+    <string name="dns_use_hosts_summary">Hormati entri hosts dari profil</string>
+    <string name="dns_use_system_hosts">Hosts sistem</string>
+    <string name="dns_use_system_hosts_summary">Hormati berkas hosts perangkat</string>
+    <string name="dns_prefer_h3">Utamakan HTTP/3</string>
+    <string name="dns_prefer_h3_summary">Pakai DNS over HTTP/3 untuk resolver DoH</string>
+    <string name="dns_ipv6">Resolusi IPv6</string>
+    <string name="dns_ipv6_summary">Minta rekaman AAAA dan berikan ke aplikasi</string>
+    <string name="dns_direct_policy">Kebijakan koneksi langsung</string>
+    <string name="dns_direct_policy_summary">Terapkan nameserver-policy juga pada kueri langsung</string>
+    <string name="dns_cache_algorithm">Algoritma cache</string>
+    <string name="dns_cache_algorithm_summary">Kebijakan penghapusan cache DNS</string>
+    <string name="core_find_process">Pencocokan proses</string>
+    <string name="core_find_process_summary">Cara inti mengenali aplikasi pemilik koneksi</string>
+    <string name="core_find_process_always">Selalu</string>
+    <string name="core_find_process_strict">Ketat</string>
+    <string name="core_find_process_off">Mati</string>
+    <string name="core_geodata_loader">Pemuat Geodata</string>
+    <string name="core_geodata_loader_summary">Mode hemat memori lebih lambat dimuat tetapi memakai RAM lebih sedikit</string>
+    <string name="core_geodata_standard">Standar</string>
+    <string name="core_geodata_memory">Hemat memori</string>
+    <string name="core_geodata_mode">Mode Geodata</string>
+    <string name="core_geodata_mode_summary">Baca basis data .dat alih-alih berkas rule-set</string>
+    <string name="core_fingerprint">Sidik jari TLS</string>
+    <string name="core_fingerprint_summary">Sidik jari klien untuk jabat tangan TLS keluar</string>
+    <string name="core_keep_alive">Interval keep-alive</string>
+    <string name="core_keep_alive_summary">Detik antarprobe koneksi menganggur; kosong mengikuti profil</string>
+    <string name="core_disable_keep_alive">Nonaktifkan keep-alive</string>
+    <string name="core_disable_keep_alive_summary">Berhenti memeriksa koneksi menganggur</string>
+    <string name="core_mixed_port">Port campuran</string>
+    <string name="core_mixed_port_summary">Port HTTP/SOCKS mode proksi lokal aplikasi</string>
+    <string name="core_sniffing">Deteksi domain</string>
+    <string name="core_sniffing_summary">Pulihkan nama domain dari lalu lintas terowongan agar aturan bisa mencocokkan domain</string>
+    <string name="core_sniff_override">Hasil deteksi mengganti tujuan</string>
+    <string name="core_sniff_override_summary">Pakai domain hasil deteksi sebagai tujuan yang dicocokkan aturan</string>
+    <string name="core_wake_lock">Tetap terjaga</string>
+    <string name="core_wake_lock_summary">Jaga CPU tetap aktif saat tersambung; lebih boros baterai</string>
+    <string name="tun_udp_timeout">Batas waktu UDP</string>
+    <string name="tun_udp_timeout_summary">Berapa detik asosiasi UDP bertahan di terowongan</string>
+    <string name="tun_icmp_timeout">Batas waktu ICMP</string>
+    <string name="tun_icmp_timeout_summary">Berapa detik sesi ICMP bertahan di terowongan</string>
+    <string name="tun_endpoint_nat">NAT endpoint-independent</string>
+    <string name="tun_endpoint_nat_summary">Satu pemetaan NAT per port sumber (membantu game dan panggilan)</string>
+    <string name="tun_disable_icmp">Nonaktifkan penerusan ICMP</string>
+    <string name="tun_disable_icmp_summary">Berhenti meneruskan ping melalui terowongan</string>
+    <string name="traffic_session">Sesi ini ↑ %1$s  ↓ %2$s</string>
+    <string name="traffic_group">Grup ini ↑ %1$s  ↓ %2$s</string>
     <string name="greeting_morning">Selamat pagi…</string>
     <string name="greeting_afternoon">Selamat siang…</string>
     <string name="greeting_evening">Selamat sore…</string>
@@ -233,4 +441,134 @@
     <string name="settings_tcp_concurrent_summary">Hubungkan ke beberapa alamat IP secara bersamaan</string>
     <string name="proxies_offline_hint">Pratinjau offline dari konfigurasi aktif. Hubungkan untuk mengganti atau menguji node.</string>
     <string name="rules_offline_hint">Pratinjau offline dari konfigurasi · %1$d aturan</string>
+
+    <!-- Umpan balik (banner atas) -->
+    <string name="title_alerter_success">Mantap Berhasil</string>
+    <string name="title_alerter_error">Yah Gagal</string>
+    <string name="title_alerter_info">Info</string>
+
+    <!-- Beranda: sapaan -->
+    <string name="uwu_profile_banner_title">Hai, master</string>
+    <string name="uwu_profile_banner_title_custom">Hai, %1$s</string>
+    <string name="uwu_profile_name_dialog">Mau dipanggil apa?</string>
+    <string name="settings_profile_name">Nama panggilan</string>
+    <string name="settings_profile_name_summary">Ditampilkan di samping sapaan pada beranda</string>
+
+    <!-- Beranda: kartu koneksi -->
+    <string name="connection_test_pending">Cek Koneksi</string>
+    <string name="connection_connected">Udah konek. Tap buat tes</string>
+    <string name="connection_not_connected">Gak konek</string>
+    <string name="connection_test_testing">Lagi ngecek…</string>
+    <string name="connection_test_fail">Gak ada internet</string>
+    <string name="connection_test_no_node">Belum ada node buat dites</string>
+    <string name="ip_unknown">IP: tidak diketahui</string>
+    <string name="action_start_service">Nyalakan servis</string>
+    <string name="action_stop_service">Matiin servis</string>
+    <string name="service_restart_started">Servis lagi dimulai ulang…</string>
+
+    <!-- Beranda: tab, daftar, dan keadaan kosong -->
+    <string name="filter_config_all">Semua</string>
+    <string name="filter_config_subscription">Langganan</string>
+    <string name="filter_config_local">Lokal</string>
+    <string name="profile_updated_never">Belum pernah diupdate</string>
+    <string name="profile_updated_at">Diupdate %1$s</string>
+    <string name="profile_local_config">Konfigurasi lokal</string>
+    <string name="profile_nodes_count">%1$d node</string>
+    <string name="profile_selected_dot">Konfigurasi aktif</string>
+    <string name="time_just_now">baru aja</string>
+    <string name="time_minutes_ago">%1$d menit lalu</string>
+    <string name="time_hours_ago">%1$d jam lalu</string>
+    <string name="time_days_ago">%1$d hari lalu</string>
+
+    <!-- Beranda: menu lainnya -->
+    <string name="title_more_menu">Menu Lainnya</string>
+    <string name="title_category_quick_actions">Aksi Cepat</string>
+    <string name="title_management">Manajemen</string>
+    <string name="title_service_restart">Restart Servis</string>
+    <string name="desc_service_restart">Sambung ulang biar konfigurasi aktif kepakai</string>
+    <string name="title_sub_update">Update langganan</string>
+    <string name="desc_sub_update">Ambil ulang semua langganan</string>
+    <string name="title_ping_all_server">Tcping semua konfig</string>
+    <string name="title_real_ping_all_server">Tes latensi asli</string>
+    <string name="title_export_all">Salin semua konfig ke clipboard</string>
+    <string name="title_del_all_config">Hapus semua konfig</string>
+    <string name="title_pin_server">Pin Konfigurasi</string>
+    <string name="action_pin_server">Pin ke atas</string>
+    <string name="action_unpin_server">Lepas pin</string>
+    <string name="toast_server_pinned">Konfigurasi dipin ke atas</string>
+    <string name="toast_server_unpinned">Pin konfigurasi dilepas</string>
+    <string name="group_order">Urutan</string>
+    <string name="group_order_origin">Urutan Asli</string>
+    <string name="group_order_by_name">Sesuai Nama</string>
+    <string name="group_order_by_updated">Baru Diupdate</string>
+    <string name="toast_action_not_allowed">Eh, ga boleh ngelakuin ini</string>
+    <string name="toast_pinned_server_delete_blocked">Lepas pin dulu sebelum hapus</string>
+    <string name="toast_export_all_empty">Ga ada yang bisa diekspor</string>
+    <string name="toast_configs_exported">Konfig disalin ke clipboard</string>
+    <string name="toast_delete_all_done">%1$d konfig dihapus</string>
+
+    <!-- Beranda: menu utama -->
+    <string name="title_oss_license">Lisensi Open Source</string>
+    <string name="desc_logcat">Cek log koneksi kalo ada error</string>
+    <string name="desc_backup_restore">Simpen aman konfig kamu atau balikin lagi</string>
+    <string name="desc_about">Info versi sama lisensi sumber terbuka</string>
+    <string name="desc_proxies">Lihat dan pin semua node konfigurasi aktif</string>
+    <string name="desc_rules">Lihat aturan routing konfigurasi aktif</string>
+    <string name="desc_apps">Pilih aplikasi mana yang lewat proxy</string>
+    <string name="desc_tools">Latensi, DNS, dan diagnosa jaringan</string>
+
+    <!-- Beranda: impor -->
+    <string name="import_configuration">Masukin Konfig Baru</string>
+    <string name="menu_item_import_config_clipboard">Impor dari Clipboard</string>
+    <string name="menu_item_import_config_local">Impor dari HP</string>
+    <string name="menu_item_import_config_url">Tambah link langganan</string>
+    <string name="add_subscription_section">Tambah langganan</string>
+    <string name="menu_item_import_config_qrcode">Impor dari QR Code</string>
+    <string name="import_qr_unavailable">Scan QR Code belum didukung — pakai link langganan dulu ya.</string>
+
+    <!-- Beranda: bagikan -->
+    <string name="share_configuration">Bagi-bagi Konfig</string>
+    <string name="share_qrcode">Pake QR Code</string>
+    <string name="share_subscription_url">Link langganan</string>
+    <string name="export_to_clipboard">Salin ke Clipboard</string>
+    <string name="share_as_file">Bagikan sebagai file</string>
+    <string name="toast_exported">Disalin ke clipboard</string>
+    <string name="qrcode_title">QR Code</string>
+
+    <!-- Beranda: aksi cepat -->
+    <string name="settings_quick_actions">Aksi cepat</string>
+    <string name="settings_quick_actions_summary">Tampilkan baris tombol di atas kartu koneksi</string>
+    <string name="settings_fab_extended">Tombol koneksi diperpanjang</string>
+    <string name="settings_fab_extended_summary">Tampilkan durasi sesi di dalam tombol koneksi</string>
+    <string name="settings_compact_actions">Rapatkan aksi daftar</string>
+    <string name="settings_compact_actions_summary">Pindahkan bagikan, update, dan hapus ke menu per baris</string>
+    <string name="quick_actions_updated">%1$d/%2$d langganan diupdate</string>
+
+    <!-- Konfirmasi hapus -->
+    <string name="del_config_comfirm">Hapus konfig ini?</string>
+    <string name="del_config_dialog_comfirm_message">%1$s bakal hilang selamanya.</string>
+    <string name="del_all_dialog_comfirm_message">Semua %1$d konfig bakal hilang selamanya.</string>
+    <string name="toast_deleted">Udah dihapus</string>
+
+    <!-- Log -->
+    <string name="logcat_search">Cari log</string>
+    <string name="logcat_copy">Salin log</string>
+    <string name="logcat_copied">Log disalin ke clipboard</string>
+    <string name="logcat_cleared">Buffer log udah dibersihin</string>
+    <string name="logcat_empty">Ga ada yang bisa disalin</string>
+    <string name="logcat_line_copied">Baris disalin</string>
+
+    <!-- Daftar aplikasi -->
+    <string name="apps_search">Cari aplikasi</string>
+    <string name="apps_select_all">Pilih semua</string>
+    <string name="apps_invert_selection">Balik pilihan</string>
+    <string name="apps_selection_updated">%1$d aplikasi disimpan</string>
+    <string name="traffic_idle_up">▲ 0 B/s</string>
+    <string name="traffic_idle_down">▼ 0 B/s</string>
+    <string name="traffic_up">▲ %1$s/s</string>
+    <string name="traffic_down">▼ %1$s/s</string>
+    <string name="traffic_speed_suffix">%1$s/s</string>
+    <string name="theme_custom_summary">Pilih warna sumber mana pun (Android 12+)</string>
+    <string name="font_picker_title">Font</string>
+    <string name="ip_connected">IP: %1$s</string>
 </resources>
