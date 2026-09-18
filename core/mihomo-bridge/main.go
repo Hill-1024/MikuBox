@@ -20,9 +20,11 @@ import (
 	"github.com/metacubex/mihomo/component/profile/cachefile"
 	"github.com/metacubex/mihomo/config"
 	constant "github.com/metacubex/mihomo/constant"
+	"github.com/metacubex/mihomo/dns"
 	"github.com/metacubex/mihomo/hub"
 	"github.com/metacubex/mihomo/hub/executor"
 	"github.com/metacubex/mihomo/listener"
+	listenerconfig "github.com/metacubex/mihomo/listener/config"
 	"github.com/metacubex/mihomo/log"
 	"github.com/metacubex/mihomo/tunnel"
 	"github.com/metacubex/mihomo/tunnel/statistic"
@@ -39,7 +41,7 @@ var core = struct {
 
 // bridgeRevision identifies the compiled bridge in exported diagnostics; bump
 // it whenever the native side changes so a log proves which build produced it.
-const bridgeRevision = "2026-09-17.10"
+const bridgeRevision = "2026-09-18.1"
 
 // MihomoStart initializes the Alpha core in-process. The Android app owns the
 // VPN interface and passes its already-open descriptor to Mihomo's TUN inbound.
@@ -50,13 +52,13 @@ func MihomoStart(configText *C.char, homeDir *C.char, tunFD C.int, dnsOverride *
 	defer core.Unlock()
 
 	if core.running {
-		executor.Shutdown()
-		stopTrafficSampler()
+		shutdownCore()
 		core.running = false
 	}
 
 	order, err := start(C.GoString(configText), C.GoString(homeDir), int(tunFD), C.GoString(dnsOverride), C.GoString(overridesJson))
 	if err != nil {
+		shutdownCore()
 		core.lastErr = err.Error()
 		core.groupOrder = nil
 		return 1
@@ -75,13 +77,31 @@ func MihomoStop() {
 	core.Lock()
 	defer core.Unlock()
 	log.Infoln("[Stop] closing traffic sampler")
-	stopTrafficSampler()
-	if core.running {
-		log.Infoln("[Stop] shutting down core")
-		executor.Shutdown()
-		core.running = false
-	}
+	shutdownCore()
+	core.running = false
 	log.Infoln("[Stop] done")
+}
+
+// Upstream Shutdown is intended for process exit and only cleans up TUN.
+// An embedded core must also release proxy sockets and live connections.
+func shutdownCore() {
+	stopTrafficSampler()
+	listener.ReCreateHTTP(0, tunnel.Tunnel)
+	listener.ReCreateSocks(0, tunnel.Tunnel)
+	listener.ReCreateRedir(0, tunnel.Tunnel)
+	listener.ReCreateTProxy(0, tunnel.Tunnel)
+	listener.ReCreateMixed(0, tunnel.Tunnel)
+	listener.ReCreateShadowSocks("", tunnel.Tunnel)
+	listener.ReCreateVmess("", tunnel.Tunnel)
+	listener.ReCreateTuic(listenerconfig.TuicServer{}, tunnel.Tunnel)
+	listener.PatchTunnel(nil, tunnel.Tunnel)
+	listener.PatchInboundListeners(nil, tunnel.Tunnel, true)
+	dns.ReCreateServer("", nil, nil)
+	executor.Shutdown()
+	statistic.DefaultManager.Range(func(tracker statistic.Tracker) bool {
+		_ = tracker.Close()
+		return true
+	})
 }
 
 // MihomoLastError returns the latest startup/configuration failure.

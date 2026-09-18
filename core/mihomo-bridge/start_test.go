@@ -4,8 +4,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/metacubex/mihomo/hub/executor"
 )
 
 // Android app processes run with "/" as the working directory and it is not
@@ -25,7 +23,7 @@ func TestStartWithReadOnlyWorkingDirectory(t *testing.T) {
 	if _, err := start(config, home, -1, "", ""); err != nil {
 		t.Fatalf("start failed: %v", err)
 	}
-	defer executor.Shutdown()
+	defer shutdownCore()
 
 	if _, err := os.Stat(filepath.Join(home, "config.yaml")); err != nil {
 		t.Fatalf("initial config.yaml not created in home dir: %v", err)
