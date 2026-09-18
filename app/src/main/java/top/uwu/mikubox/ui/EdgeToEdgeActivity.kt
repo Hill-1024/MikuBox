@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import top.uwu.mikubox.R
 import top.uwu.mikubox.core.AppSettings
 import top.uwu.mikubox.core.ThemeManager
 import java.util.Locale
@@ -76,12 +77,17 @@ abstract class EdgeToEdgeActivity : AppCompatActivity() {
     }
 
     protected fun applySystemBarInsets(root: View) {
+        // The app bar owns the status-bar strip (it is colourPrimary). It used to
+        // leave that to the platform's fitsSystemWindows, which some ROMs do not
+        // honour -- the title then sat under the status bar. Take it over here:
+        // the flag is cleared so nothing pads twice, and the inset becomes the
+        // app bar's own top padding.
+        val appBar = root.findViewById<View?>(R.id.appbar) ?: root.findViewById<View?>(R.id.app_bar)
+        appBar?.let { ViewCompat.setFitsSystemWindows(it, false) }
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val cutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
-            // The app bar owns the status-bar strip (it is colourPrimary and
-            // has fitsSystemWindows), so the root only takes the side and
-            // bottom insets -- padding it here would paint colourBg up there.
+            appBar?.updatePadding(top = maxOf(bars.top, cutout.top))
             view.updatePadding(
                 left = maxOf(bars.left, cutout.left),
                 right = maxOf(bars.right, cutout.right),
