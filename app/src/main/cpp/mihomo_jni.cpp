@@ -14,6 +14,11 @@ char* MihomoValidateDns(char* dns_yaml);
 char* MihomoGroupOrder();
 char* MihomoRules();
 char* MihomoRuntimeInfo();
+int MihomoSetMode(char* mode);
+char* MihomoTrafficByProxy();
+char* MihomoConnections();
+int MihomoCloseConnections();
+int MihomoCloseConnection(char* id);
 }
 
 extern "C" JNIEXPORT jint JNICALL
@@ -129,5 +134,44 @@ Java_top_uwu_mikubox_core_MihomoCore_nativeRuntimeInfo(JNIEnv* env, jobject /* t
     char* info = MihomoRuntimeInfo();
     jstring result = env->NewStringUTF(info == nullptr ? "{}" : info);
     std::free(info);
+    return result;
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_top_uwu_mikubox_core_MihomoCore_nativeSetMode(
+        JNIEnv* env, jobject /* thiz */, jstring mode) {
+    const char* mode_chars = env->GetStringUTFChars(mode, nullptr);
+    const int result = MihomoSetMode(const_cast<char*>(mode_chars));
+    env->ReleaseStringUTFChars(mode, mode_chars);
+    return result;
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_top_uwu_mikubox_core_MihomoCore_nativeTrafficByProxy(JNIEnv* env, jobject /* thiz */) {
+    char* traffic = MihomoTrafficByProxy();
+    jstring result = env->NewStringUTF(traffic == nullptr ? "{}" : traffic);
+    std::free(traffic);
+    return result;
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_top_uwu_mikubox_core_MihomoCore_nativeConnections(JNIEnv* env, jobject /* thiz */) {
+    char* connections = MihomoConnections();
+    jstring result = env->NewStringUTF(connections == nullptr ? "{}" : connections);
+    std::free(connections);
+    return result;
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_top_uwu_mikubox_core_MihomoCore_nativeCloseConnections(JNIEnv* /* env */, jobject /* thiz */) {
+    return MihomoCloseConnections();
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_top_uwu_mikubox_core_MihomoCore_nativeCloseConnection(
+        JNIEnv* env, jobject /* thiz */, jstring id) {
+    const char* id_chars = env->GetStringUTFChars(id, nullptr);
+    const int result = MihomoCloseConnection(const_cast<char*>(id_chars));
+    env->ReleaseStringUTFChars(id, id_chars);
     return result;
 }

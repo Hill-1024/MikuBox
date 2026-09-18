@@ -19,7 +19,40 @@ object MihomoCore {
         val downloadPerSecond: Long,
         val uploadTotal: Long,
         val downloadTotal: Long,
+        /** Moved since this core was started, i.e. during the current connection. */
+        val uploadSession: Long,
+        val downloadSession: Long,
     )
+
+    /** Traffic one node or proxy group carried during the current session. */
+    data class ProxyTraffic(val upload: Long, val download: Long)
+
+    /**
+     * One live connection as the core reports it: what asked for what, the rule
+     * that matched, the proxy chain that carried it and how much moved.
+     */
+    data class Connection(
+        val id: String,
+        val network: String,
+        val source: String,
+        val destination: String,
+        val host: String,
+        val rule: String,
+        val rulePayload: String,
+        val chains: List<String>,
+        val upload: Long,
+        val download: Long,
+    ) {
+        /** What the row shows as the target: the hostname when one is known. */
+        val target: String get() = host.ifBlank { destination }
+
+        /** The rule that decided this connection, as a readable label. */
+        val matchedRule: String
+            get() = when {
+                rulePayload.isBlank() -> rule
+                else -> "$rule($rulePayload)"
+            }
+    }
 
     /**
      * A proxy or proxy-group exposed by the running core. Groups populate [all]
@@ -108,8 +141,32 @@ object MihomoCore {
             downloadPerSecond = it.optLong("download"),
             uploadTotal = it.optLong("uploadTotal"),
             downloadTotal = it.optLong("downloadTotal"),
+            uploadSession = it.optLong("uploadSession"),
+            downloadSession = it.optLong("downloadSession"),
         )
     }
+
+    /**
+     * Traffic each node and proxy group carried during this session, keyed by
+     * proxy name. A connection counts for every proxy it passed through, so a
+     * group carries the sum of the nodes it handed traffic to. Empty when the
+     * core is stopped.
+     */
+    fun trafficByProxy(): Map<String, ProxyTraffic> = runCatching {
+        val root = JSONObject(nativeTrafficByProxy())
+        buildMap {
+            root.keys().forEach { key ->
+                val entry = root.optJSONObject(key) ?: return@forEach
+                put(
+                    key,
+                    ProxyTraffic(
+                        upload = entry.optLong("upload"),
+                        download = entry.optLong("download"),
+                    ),
+                )
+            }
+        }
+    }.getOrDefault(emptyMap())
 
     /** Live proxies/groups from the running core, keyed by name. Empty when stopped. */
     fun proxies(): Map<String, Proxy> = runCatching {
@@ -156,6 +213,20 @@ object MihomoCore {
      */
     fun selectProxy(group: String, name: String): Boolean = nativeSelectProxy(group, name) == 0
 
+    /**
+     * The core's built-in selector whose members are every node and every proxy
+     * group of the running configuration. Global mode routes all traffic here,
+     * so picking one of its members chooses the exit for that mode.
+     */
+    fun globalGroup(): Proxy? = proxies()[GLOBAL_GROUP]
+
+    /**
+     * Switches the running core between "rule", "global" and "direct" without a
+     * restart. Returns true when the core accepted the new mode. Safe to call
+     * while the core is stopped: the next start applies the stored mode anyway.
+     */
+    fun setMode(mode: String): Boolean = nativeSetMode(mode) == 0
+
     /** URL-tests a proxy, returning its delay in ms, or -1 on failure/timeout. */
     fun delay(name: String, url: String = "https://cp.cloudflare.com", timeoutMs: Int = 5000): Int =
         runCatching { JSONObject(nativeProxyDelay(name, url, timeoutMs)).optInt("delay", -1) }
@@ -169,6 +240,51 @@ object MihomoCore {
      * gVisor availability, last error) as a JSON object, for log exports.
      */
     fun runtimeInfo(): String = runCatching { nativeRuntimeInfo() }.getOrDefault("{}")
+
+    /**
+     * The connections the core is carrying right now, newest first. Empty when
+     * the core is stopped or when nothing is connected.
+     */
+    fun connections(): List<Connection> = try {
+        val raw = nativeConnections()
+        val root = JSONObject(raw)
+        val array = root.optJSONArray("connections") ?: JSONArray()
+        val parsed = List(array.length()) { index ->
+            val entry = array.optJSONObject(index) ?: JSONObject()
+            val metadata = entry.optJSONObject("metadata") ?: JSONObject()
+            Connection(
+                id = entry.optString("id"),
+                network = metadata.optString("network"),
+                source = hostPort(metadata.optString("sourceIP"), metadata.optString("sourcePort")),
+                destination = hostPort(
+                    metadata.optString("destinationIP"),
+                    metadata.optString("destinationPort"),
+                ),
+                host = metadata.optString("host").ifBlank { metadata.optString("sniffHost") },
+                rule = entry.optString("rule"),
+                rulePayload = entry.optString("rulePayload"),
+                chains = entry.optJSONArray("chains").toStringList(),
+                upload = entry.optLong("upload"),
+                download = entry.optLong("download"),
+            )
+        }
+        Log.d(TAG, "connection snapshot: ${raw.length} chars, ${parsed.size} parsed")
+        parsed
+    } catch (error: Throwable) {
+        // A snapshot the app cannot read must not take the screen down, but it
+        // has to be visible: swallowing this once hid a missing JNI symbol.
+        Log.w(TAG, "connection list unavailable", error)
+        emptyList()
+    }
+
+    /** Drops one connection by id; the app offers this per row. */
+    fun closeConnection(id: String): Boolean = nativeCloseConnection(id) == 0
+
+    /** Drops every live connection, mirroring the controller's DELETE /connections. */
+    fun closeConnections(): Boolean = nativeCloseConnections() == 0
+
+    private fun hostPort(address: String, port: String): String =
+        if (port.isBlank() || port == "0") address else "$address:$port"
 
     private fun JSONArray?.toStringList(): List<String> =
         if (this == null) emptyList() else List(length()) { optString(it) }
@@ -192,4 +308,12 @@ object MihomoCore {
     private external fun nativeGroupOrder(): String
     private external fun nativeRules(): String
     private external fun nativeRuntimeInfo(): String
+    private external fun nativeSetMode(mode: String): Int
+    private external fun nativeTrafficByProxy(): String
+    private external fun nativeConnections(): String
+    private external fun nativeCloseConnections(): Int
+    private external fun nativeCloseConnection(id: String): Int
+
+    /** Name of the built-in all-proxies selector described by [globalGroup]. */
+    const val GLOBAL_GROUP = "GLOBAL"
 }

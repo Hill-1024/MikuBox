@@ -18,6 +18,7 @@ import (
 	"unsafe"
 
 	"github.com/sirupsen/logrus"
+	"golang.org/x/sys/unix"
 )
 
 const androidLogTag = "MikuBox"
@@ -73,4 +74,19 @@ func setCoreLogFile(path string) {
 // pointed logrus at stdout, so this override takes effect for every core log.
 func init() {
 	logrus.SetOutput(androidLogWriter{})
+}
+
+// setStderrFile redirects the process' stderr into [path].
+//
+// An Android app's stderr is /dev/null, so a Go panic or any other runtime
+// abort inside the core would take the whole app down without a single line in
+// logcat - the user just sees the app vanish. The runtime writes panics straight
+// to the descriptor rather than through os.Stderr, so the file has to be dup'd
+// over fd 2.
+func setStderrFile(path string) {
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
+	if err != nil {
+		return
+	}
+	unix.Dup2(int(file.Fd()), 2)
 }

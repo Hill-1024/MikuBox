@@ -157,8 +157,16 @@ val buildMihomoBridge by tasks.registering {
                 commandLine(
                     // with_gvisor matches Mihomo's own release build; without the
                     // tag the gvisor/mixed TUN stacks are unavailable at runtime.
+                    //
+                    // cmfa drops Mihomo's root-only Android paths. Its sing-tun
+                    // binding reads /data/system/packages.xml to build per-app
+                    // rules; an unprivileged app gets EACCES, that step fails, and
+                    // the TUN listener is never started while hub.Parse still
+                    // reports success - a VPN that is up with no traffic at all.
+                    // The tag is Mihomo's own switch for apps that embed the core
+                    // and own the VpnService themselves.
                     "go", "build", "-trimpath", "-buildmode=c-shared",
-                    "-tags", "with_gvisor",
+                    "-tags", "with_gvisor cmfa",
                     "-ldflags=-s -w", "-o", output.absolutePath, "."
                 )
             }

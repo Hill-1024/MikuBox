@@ -8,6 +8,7 @@ import "C"
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -21,6 +22,8 @@ import (
 	constant "github.com/metacubex/mihomo/constant"
 	"github.com/metacubex/mihomo/hub"
 	"github.com/metacubex/mihomo/hub/executor"
+	"github.com/metacubex/mihomo/listener"
+	"github.com/metacubex/mihomo/log"
 	"github.com/metacubex/mihomo/tunnel"
 	"github.com/metacubex/mihomo/tunnel/statistic"
 	tun "github.com/metacubex/sing-tun"
@@ -36,7 +39,7 @@ var core = struct {
 
 // bridgeRevision identifies the compiled bridge in exported diagnostics; bump
 // it whenever the native side changes so a log proves which build produced it.
-const bridgeRevision = "2026-09-17.3"
+const bridgeRevision = "2026-09-17.10"
 
 // MihomoStart initializes the Alpha core in-process. The Android app owns the
 // VPN interface and passes its already-open descriptor to Mihomo's TUN inbound.
@@ -48,6 +51,7 @@ func MihomoStart(configText *C.char, homeDir *C.char, tunFD C.int, dnsOverride *
 
 	if core.running {
 		executor.Shutdown()
+		stopTrafficSampler()
 		core.running = false
 	}
 
@@ -70,10 +74,14 @@ func MihomoStart(configText *C.char, homeDir *C.char, tunFD C.int, dnsOverride *
 func MihomoStop() {
 	core.Lock()
 	defer core.Unlock()
+	log.Infoln("[Stop] closing traffic sampler")
+	stopTrafficSampler()
 	if core.running {
+		log.Infoln("[Stop] shutting down core")
 		executor.Shutdown()
 		core.running = false
 	}
+	log.Infoln("[Stop] done")
 }
 
 // MihomoLastError returns the latest startup/configuration failure.
@@ -93,19 +101,74 @@ func MihomoVersion() *C.char {
 }
 
 // MihomoTraffic exposes the core's traffic accounting without requiring an
-// HTTP controller to be enabled in a user configuration.
+// HTTP controller to be enabled in a user configuration. The session fields
+// count from the moment this core was started, which is what the app shows for
+// the current connection; the totals keep growing for the life of the process.
 //
 //export MihomoTraffic
 func MihomoTraffic() *C.char {
 	uplink, downlink := statistic.DefaultManager.Now()
 	uploadTotal, downloadTotal := statistic.DefaultManager.Total()
+	uploadSession, downloadSession := trafficSession()
 	payload, _ := json.Marshal(struct {
-		Upload        int64 `json:"upload"`
-		Download      int64 `json:"download"`
-		UploadTotal   int64 `json:"uploadTotal"`
-		DownloadTotal int64 `json:"downloadTotal"`
-	}{uplink, downlink, uploadTotal, downloadTotal})
+		Upload          int64 `json:"upload"`
+		Download        int64 `json:"download"`
+		UploadTotal     int64 `json:"uploadTotal"`
+		DownloadTotal   int64 `json:"downloadTotal"`
+		UploadSession   int64 `json:"uploadSession"`
+		DownloadSession int64 `json:"downloadSession"`
+	}{uplink, downlink, uploadTotal, downloadTotal, uploadSession, downloadSession})
 	return C.CString(string(payload))
+}
+
+// MihomoTrafficByProxy reports the traffic each node and proxy group carried
+// during this session, including the groups a connection was routed through, as
+// a JSON object keyed by proxy name. Returns "{}" when the core is stopped.
+//
+//export MihomoTrafficByProxy
+func MihomoTrafficByProxy() *C.char {
+	return C.CString(trafficByProxy())
+}
+
+// MihomoConnections mirrors GET /connections: every connection the core is
+// currently carrying, with its source, destination, matched rule, proxy chain
+// and byte counters. The app shows this as a live list without having to open a
+// controller port. Returns "{}" when the core is stopped.
+//
+//export MihomoConnections
+func MihomoConnections() *C.char {
+	payload, err := json.Marshal(statistic.DefaultManager.Snapshot())
+	if err != nil {
+		return C.CString("{}")
+	}
+	return C.CString(string(payload))
+}
+
+// MihomoCloseConnections drops every live connection, mirroring
+// DELETE /connections. Returns 0 on success.
+//
+//export MihomoCloseConnections
+func MihomoCloseConnections() C.int {
+	statistic.DefaultManager.Range(func(tracker statistic.Tracker) bool {
+		_ = tracker.Close()
+		return true
+	})
+	return 0
+}
+
+// MihomoCloseConnection drops one connection by its id, mirroring
+// DELETE /connections/{id}. Returns 0 when the connection was found.
+//
+//export MihomoCloseConnection
+func MihomoCloseConnection(id *C.char) C.int {
+	tracker := statistic.DefaultManager.Get(C.GoString(id))
+	if tracker == nil {
+		return 1
+	}
+	if err := tracker.Close(); err != nil {
+		return 1
+	}
+	return 0
 }
 
 // MihomoProxies mirrors the RESTful controller's GET /proxies, returning every
@@ -174,6 +237,29 @@ func MihomoGroupOrder() *C.char {
 	return C.CString(string(order))
 }
 
+// MihomoSetMode switches the routing mode of the running core without a
+// restart, mirroring the controller's PATCH /configs. "global" sends every
+// connection to the GLOBAL selector (its members are all nodes and all proxy
+// groups, so an exit can be a node or a whole group), "direct" stops proxying
+// altogether and "rule" restores rule matching. Returns 0 on success, 1 on
+// failure.
+//
+// It deliberately takes no core lock: the app switches modes from a tap, and a
+// tap that lands while the core is still starting must not wait for it. A mode
+// set while the core is stopped is harmlessly overwritten by the next start,
+// which applies the configuration's own mode.
+//
+//export MihomoSetMode
+func MihomoSetMode(mode *C.char) C.int {
+	var parsed tunnel.TunnelMode
+	if err := parsed.UnmarshalText([]byte(strings.TrimSpace(C.GoString(mode)))); err != nil {
+		log.Warnln("[Mode] rejected: %s", err.Error())
+		return 1
+	}
+	tunnel.SetMode(parsed)
+	return 0
+}
+
 // MihomoRuntimeInfo reports the effective core configuration and build facts
 // (stack, MTU, DNS mode, whether gVisor is compiled in, last error) without
 // exposing node credentials, so a log export can prove how the core was
@@ -188,6 +274,9 @@ func MihomoRuntimeInfo() *C.char {
 		"with_gvisor":     tun.WithGVisor,
 		"running":         core.running,
 		"last_error":      core.lastErr,
+		// The live routing mode: the app's mode switch has to show what the core
+		// is actually doing, not only what the profile asked for.
+		"mode": tunnel.Mode().String(),
 	}
 	for key, value := range core.effective {
 		info[key] = value
@@ -273,6 +362,9 @@ func start(configText, homeDir string, tunFD int, dnsOverride, overridesJson str
 	}
 	// The persisted core log covers exactly one run and backs log exports.
 	setCoreLogFile(filepath.Join(homeDir, "core.log"))
+	// Anything the Go runtime writes on its way out - a panic, an abort - lands
+	// in this file instead of Android's /dev/null.
+	setStderrFile(filepath.Join(homeDir, "core-stderr.log"))
 
 	// Keep the user's Mihomo configuration intact, but Android owns these TUN
 	// fields because it created the interface and its descriptor.
@@ -305,6 +397,12 @@ func start(configText, homeDir string, tunFD int, dnsOverride, overridesJson str
 		delete(dns, "listen")
 	}
 	delete(raw, "external-controller-unix")
+	// The core calls os.Exit(2) when a profile asks for iptables together with
+	// the TUN ("when tun is enabled, iptables cannot be set automatically"),
+	// which an Android app cannot survive: the process would simply vanish with
+	// nothing in logcat. The VPN interface owns routing here, so the key is
+	// meaningless anyway.
+	delete(raw, "iptables")
 
 	// tunnel.Proxies() marshals alphabetically; remember the declared group
 	// order so the app can present groups as the config author wrote them.
@@ -319,6 +417,38 @@ func start(configText, homeDir string, tunFD int, dnsOverride, overridesJson str
 		}
 	}
 
+	if dnsOverride != "" {
+		dns := map[string]any{}
+		if err := yaml.Unmarshal([]byte(dnsOverride), &dns); err != nil {
+			return nil, err
+		}
+		raw["dns"] = dns
+	}
+
+	// App-level overrides. A flat key replaces a top-level setting; "tun" and
+	// "dns" carry objects that are merged into those sections, which is how the
+	// app offers the same structured knobs the desktop clients do (stack, MTU,
+	// fake-ip range, resolvers, filters) without rewriting the profile.
+	if overridesJson != "" {
+		overrides := map[string]any{}
+		if err := json.Unmarshal([]byte(overridesJson), &overrides); err == nil {
+			log.Debugln("[Overrides] applying %s", overridesJson)
+			for key, value := range overrides {
+				switch key {
+				case "tun", "dns", "sniffer":
+					mergeSection(raw, key, value)
+				default:
+					raw[key] = value
+				}
+			}
+		} else {
+			log.Warnln("[Overrides] ignored, not valid JSON: %s", err.Error())
+		}
+	}
+
+	// The app owns the interface itself, so these TUN fields are applied last:
+	// nothing a profile or an override says may move the descriptor or the
+	// routes Android installed.
 	if tunFD >= 0 {
 		tun, ok := raw["tun"].(map[string]any)
 		if !ok || tun == nil {
@@ -330,9 +460,29 @@ func start(configText, homeDir string, tunFD int, dnsOverride, overridesJson str
 		tun["auto-route"] = false
 		tun["auto-detect-interface"] = false
 		tun["strict-route"] = false
-		// The stack stays whatever the profile (or the app override below)
-		// selects; forcing one here silently discarded the profile's choice.
+		// Every resolver query an app makes lands in this interface, so the
+		// hijack has to cover any port-53 destination: a profile-supplied
+		// narrower list would leave queries to the app's own tunnel DNS
+		// address unrouted and black-hole name resolution.
+		tun["dns-hijack"] = []string{"any:53"}
 		raw["tun"] = tun
+
+		// A catch-all TUN captures every resolver query, so the core has to own
+		// DNS. With it disabled - a profile that turns it off, or none at all -
+		// those queries are still hijacked and then never answered, which
+		// reaches the user as a connection without internet.
+		dns, ok := raw["dns"].(map[string]any)
+		if !ok || dns == nil {
+			dns = map[string]any{}
+		}
+		dns["enable"] = true
+		// mihomo refuses to start when "respect-rules" is on but no resolver for
+		// node hostnames is set, which would otherwise leave the user with a VPN
+		// that cannot connect at all. Fill in the usual bootstrap resolvers.
+		if rules, _ := dns["respect-rules"].(bool); rules && emptyList(dns["proxy-server-nameserver"]) {
+			dns["proxy-server-nameserver"] = []any{"119.29.29.29", "1.1.1.1", "8.8.8.8", "9.9.9.9"}
+		}
+		raw["dns"] = dns
 	} else {
 		// Proxy mode is the non-VPN counterpart of UwU's ProxyService.
 		raw["tun"] = map[string]any{"enable": false}
@@ -341,49 +491,65 @@ func start(configText, homeDir string, tunFD int, dnsOverride, overridesJson str
 		}
 	}
 
-	if dnsOverride != "" {
-		dns := map[string]any{}
-		if err := yaml.Unmarshal([]byte(dnsOverride), &dns); err != nil {
-			return nil, err
-		}
-		raw["dns"] = dns
-	}
-
-	// App-level config overrides (log level, mode, allow-lan, tun stack). The
-	// "tun-stack" key nests under the tun map built above; everything else is a
-	// top-level replacement.
-	if overridesJson != "" {
-		overrides := map[string]any{}
-		if err := json.Unmarshal([]byte(overridesJson), &overrides); err == nil {
-			for key, value := range overrides {
-				if key == "tun-stack" {
-					if stack, ok := value.(string); ok && stack != "" {
-						if tun, ok := raw["tun"].(map[string]any); ok {
-							tun["stack"] = stack
-						}
-					}
-					continue
-				}
-				if key == "tun-mtu" {
-					if mtu, ok := value.(float64); ok && mtu > 0 {
-						if tun, ok := raw["tun"].(map[string]any); ok {
-							tun["mtu"] = int(mtu)
-						}
-					}
-					continue
-				}
-				raw[key] = value
-			}
-		}
-	}
-
 	core.effective = effectiveSummary(raw)
+	// One line per start so a log export proves what the core was actually given,
+	// including everything the app's settings overrode.
+	if summary, err := json.Marshal(core.effective); err == nil {
+		log.Infoln("[Config] effective: %s", string(summary))
+	}
 
 	configBytes, err := yaml.Marshal(raw)
 	if err != nil {
 		return nil, err
 	}
-	return order, hub.Parse(configBytes)
+	if err := hub.Parse(configBytes); err != nil {
+		return nil, err
+	}
+	// hub.Parse reports success even when an inbound never came up: the TUN
+	// listener logs its failure and disables itself instead of propagating the
+	// error, which left the app announcing a healthy connection over a tunnel
+	// nothing was reading. LastTunConf only keeps enable set when the listener
+	// really started.
+	if tunFD >= 0 && !listener.LastTunConf.Enable {
+		return nil, errors.New("TUN listener failed to start, see the core log")
+	}
+	// The sampler measures from here on, so the app can report what this
+	// connection consumed and how it was split across nodes and groups.
+	startTrafficSampler()
+	return order, nil
+}
+
+// mergeSection merges an app override object into one of the configuration's
+// mapping sections, creating the section when the profile does not define it.
+func mergeSection(raw map[string]any, name string, value any) {
+	incoming, ok := value.(map[string]any)
+	if !ok {
+		return
+	}
+	section, ok := raw[name].(map[string]any)
+	if !ok || section == nil {
+		section = map[string]any{}
+	}
+	for key, entry := range incoming {
+		section[key] = entry
+	}
+	raw[name] = section
+}
+
+// emptyList reports whether a config value is an absent or empty list.
+func emptyList(value any) bool {
+	switch typed := value.(type) {
+	case nil:
+		return true
+	case []any:
+		return len(typed) == 0
+	case []string:
+		return len(typed) == 0
+	case string:
+		return strings.TrimSpace(typed) == ""
+	default:
+		return false
+	}
 }
 
 // effectiveSummary extracts the non-sensitive runtime settings of the config
@@ -394,6 +560,10 @@ func effectiveSummary(raw map[string]any) map[string]any {
 		summary["tun_enable"] = tunCfg["enable"]
 		summary["tun_stack"] = tunCfg["stack"]
 		summary["tun_mtu"] = tunCfg["mtu"]
+		summary["tun_udp_timeout"] = tunCfg["udp-timeout"]
+		summary["tun_icmp_timeout"] = tunCfg["icmp-timeout"]
+		summary["tun_endpoint_nat"] = tunCfg["endpoint-independent-nat"]
+		summary["tun_disable_icmp"] = tunCfg["disable-icmp-forwarding"]
 		if _, set := tunCfg["dns-hijack"]; set {
 			summary["tun_dns_hijack"] = true
 		}
@@ -401,6 +571,19 @@ func effectiveSummary(raw map[string]any) map[string]any {
 	if dnsCfg, ok := raw["dns"].(map[string]any); ok {
 		summary["dns_enable"] = dnsCfg["enable"]
 		summary["dns_mode"] = dnsCfg["enhanced-mode"]
+		summary["dns_fake_ip_range"] = dnsCfg["fake-ip-range"]
+		summary["dns_prefer_h3"] = dnsCfg["prefer-h3"]
+		summary["dns_respect_rules"] = dnsCfg["respect-rules"]
+		summary["dns_use_hosts"] = dnsCfg["use-hosts"]
+		summary["dns_use_system_hosts"] = dnsCfg["use-system-hosts"]
+		summary["dns_ipv6"] = dnsCfg["ipv6"]
+		summary["dns_cache_algorithm"] = dnsCfg["cache-algorithm"]
+		summary["dns_direct_follow_policy"] = dnsCfg["direct-nameserver-follow-policy"]
+		for _, key := range []string{"nameserver", "default-nameserver", "proxy-server-nameserver", "direct-nameserver", "fallback", "fake-ip-filter"} {
+			if entries, ok := dnsCfg[key].([]any); ok {
+				summary["dns_"+strings.ReplaceAll(key, "-", "_")+"_count"] = len(entries)
+			}
+		}
 		if listen, set := dnsCfg["listen"]; set {
 			summary["dns_listen"] = listen
 		}
@@ -409,6 +592,19 @@ func effectiveSummary(raw map[string]any) map[string]any {
 	summary["mixed_port"] = raw["mixed-port"]
 	summary["ipv6"] = raw["ipv6"]
 	summary["allow_lan"] = raw["allow-lan"]
+	summary["find_process_mode"] = raw["find-process-mode"]
+	summary["geodata_loader"] = raw["geodata-loader"]
+	summary["geodata_mode"] = raw["geodata-mode"]
+	summary["client_fingerprint"] = raw["global-client-fingerprint"]
+	summary["keep_alive_interval"] = raw["keep-alive-interval"]
+	summary["disable_keep_alive"] = raw["disable-keep-alive"]
+	if sniffer, ok := raw["sniffer"].(map[string]any); ok {
+		summary["sniffer_enable"] = sniffer["enable"]
+		summary["sniffer_override_destination"] = sniffer["override-destination"]
+		if protocols, ok := sniffer["sniff"].(map[string]any); ok {
+			summary["sniffer_protocols"] = len(protocols)
+		}
+	}
 	if profile, ok := raw["profile"].(map[string]any); ok {
 		summary["store_selected"] = profile["store-selected"]
 		summary["store_fake_ip"] = profile["store-fake-ip"]

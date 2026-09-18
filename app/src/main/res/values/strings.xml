@@ -53,6 +53,13 @@
         <item>Every 3 days</item>
         <item>Every 7 days</item>
     </string-array>
+    <integer-array name="subscription_interval_minutes" translatable="false">
+        <item>360</item>
+        <item>720</item>
+        <item>1440</item>
+        <item>4320</item>
+        <item>10080</item>
+    </integer-array>
     <string name="action_add_profile">Add profile</string>
     <string name="action_add_subscription">Add &amp; fetch subscription</string>
     <string name="action_import_clipboard">Import config from clipboard</string>
@@ -95,6 +102,19 @@
     <string name="desc_menu_about">About this app</string>
     <string name="action_clear">Clear</string>
     <string name="logcat_export">Export logs</string>
+    <string name="logcat_search">Search logs</string>
+    <string name="logcat_copy">Copy logs</string>
+    <string name="logcat_copied">Logs copied to the clipboard</string>
+    <string name="logcat_cleared">Log buffer cleared</string>
+    <string name="logcat_empty">Nothing to copy</string>
+    <string name="logcat_line_copied">Line copied</string>
+    <string name="logcat_tag_line" translatable="false">%1$s %2$s  %3$s</string>
+    <string name="logcat_level_verbose" translatable="false">(verbose)</string>
+    <string name="logcat_level_debug" translatable="false">(debug)</string>
+    <string name="logcat_level_info" translatable="false">(info)</string>
+    <string name="logcat_level_warn" translatable="false">(warn)</string>
+    <string name="logcat_level_error" translatable="false">(error)</string>
+    <string name="logcat_level_default" translatable="false">(log)</string>
     <string name="logcat_export_failed">Could not export logs: %1$s</string>
     <string name="logcat_read_failed">Failed to read log: %1$s</string>
     <string name="toast_coming_soon">Coming soon</string>
@@ -110,6 +130,33 @@
     <string name="settings_theme_system">Follow system</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_auto">Auto (day / night)</string>
+    <string name="settings_theme_color">Theme colour</string>
+    <string name="settings_theme_color_summary">Pick one of the Material palettes</string>
+    <string name="theme_custom_color">Custom colour</string>
+    <string name="theme_custom_summary">Choose any seed colour (Android 12+)</string>
+    <string name="theme_hue">Hue</string>
+    <string name="theme_saturation">Saturation</string>
+    <string name="theme_lightness">Lightness</string>
+    <string name="theme_reset_preset">Reset</string>
+    <string name="settings_theme_dynamic_label">Dynamic</string>
+    <string name="settings_dynamic_color">Wallpaper colours</string>
+    <string name="settings_dynamic_color_summary">Use the Material You palette of your wallpaper</string>
+    <string name="settings_dynamic_banner">Colours from the banner</string>
+    <string name="settings_dynamic_banner_summary">Derive the palette from the home banner artwork</string>
+    <string name="settings_dynamic_unavailable">Requires Android 12 or newer</string>
+    <string name="settings_dark_mode">Dark mode</string>
+    <string name="settings_true_black">AMOLED black</string>
+    <string name="settings_true_black_summary">Pure black surfaces to save power on OLED screens</string>
+    <string name="settings_true_black_night_only">Available in dark mode only</string>
+    <string name="settings_font">Font</string>
+    <string name="settings_font_summary">Typeface used across the app</string>
+    <string name="settings_font_size">Font size</string>
+    <string name="settings_bold_text">Bold text</string>
+    <string name="settings_bold_text_summary">Use a heavier weight for titles and rows</string>
+    <string name="font_size_value">%1$d%%</string>
+    <string name="font_size_preview">The quick brown fox jumps over the lazy dog.</string>
+    <string name="font_picker_title">Font</string>
     <string name="settings_particles">Particle animation</string>
     <string name="settings_particles_summary">Animated banner in the menu</string>
     <string name="settings_boot">Start on boot</string>
@@ -119,6 +166,10 @@
     <string name="per_app_mode_all">All apps</string>
     <string name="per_app_mode_allow">Allow list</string>
     <string name="per_app_mode_disallow">Disallow list</string>
+    <string name="apps_search">Search apps</string>
+    <string name="apps_select_all">Select all</string>
+    <string name="apps_invert_selection">Invert selection</string>
+    <string name="apps_selection_updated">Saved %1$d apps</string>
 
     <!-- Tools -->
     <string name="tools_connection_test">Connection test</string>
@@ -222,6 +273,32 @@
     <string name="dialog_update_subscription_message">Update %1$s from its subscription URL?</string>
 
     <!-- Core / connection settings -->
+    <string name="settings_section_general">General</string>
+    <string name="settings_section_route">Route</string>
+    <string name="settings_section_inbound">Inbound</string>
+    <string name="settings_section_misc">Misc</string>
+    <string name="connections_title">Connections</string>
+    <string name="connections_close_all">Close all</string>
+    <string name="connections_empty">No active connections</string>
+    <string name="connections_offline">Connect to see live connections</string>
+    <string name="connections_summary">%1$d connections · ↑%2$s ↓%3$s</string>
+    <string name="connections_row_title">%1$s · %2$s</string>
+    <string name="connections_row_detail">%1$s · %2$s · ↑%3$s ↓%4$s</string>
+    <string name="connections_closed_all">Closed every connection</string>
+    <string name="menu_connections">Connections</string>
+    <string name="desc_connections">See and close live connections</string>
+    <string name="controller_title">External controller</string>
+    <string name="controller_summary">Let a dashboard or another tool drive the core</string>
+    <string name="controller_address">Listen address</string>
+    <string name="controller_address_summary">host:port — keep 127.0.0.1 unless another device has to reach it</string>
+    <string name="controller_secret">Secret</string>
+    <string name="controller_secret_summary">Every request must carry it; regenerate if it leaks</string>
+    <string name="controller_secret_regenerated">New secret generated</string>
+    <string name="controller_secret_new">Regenerate secret</string>
+    <string name="controller_secret_new_summary">Issue a new secret and invalidate the old one</string>
+    <string name="controller_address_invalid">Enter an address as host:port</string>
+    <string name="recents_title">Hide from recents</string>
+    <string name="recents_summary">Keep the app out of the recent-apps list</string>
     <string name="settings_section_core">Core</string>
     <string name="settings_mode">Outbound mode</string>
     <string name="settings_log">Log level</string>
@@ -236,9 +313,105 @@
     <string name="settings_test_timeout">Latency test timeout</string>
     <string name="settings_test_timeout_value" translatable="false">%1$d ms</string>
     <string name="mode_follow">Follow config</string>
-    <string name="mode_rule" translatable="false">Rule</string>
-    <string name="mode_global" translatable="false">Global</string>
-    <string name="mode_direct" translatable="false">Direct</string>
+    <string name="mode_rule">Rule</string>
+    <string name="mode_global">Global</string>
+    <string name="mode_direct">Direct</string>
+    <string name="mode_switch_failed">Could not switch the routing mode</string>
+    <string name="advanced_title">Advanced</string>
+    <string name="advanced_summary">DNS, fake-ip, core and TUN options</string>
+    <string name="advanced_hint">These options override the active profile and take effect on the next connection.</string>
+    <string name="advanced_hint_running">These options override the active profile. Reconnect to apply them to the running core.</string>
+    <string name="advanced_restarting">Reloading the core to apply the change…</string>
+    <string name="advanced_section_dns">DNS</string>
+    <string name="advanced_section_core">Core &amp; TUN</string>
+    <string name="advanced_section_network">Network</string>
+    <string name="core_sniffing">Domain sniffing</string>
+    <string name="core_sniffing_summary">Recover the hostname of tunnel connections so rules can match domains</string>
+    <string name="core_sniff_override">Sniff overrides destination</string>
+    <string name="core_sniff_override_summary">Use the sniffed hostname as the destination the rules matched</string>
+    <string name="core_wake_lock">Stay awake</string>
+    <string name="core_wake_lock_summary">Keep the CPU awake while connected; uses more battery</string>
+    <string name="opt_follow">Profile</string>
+    <string name="opt_on">On</string>
+    <string name="opt_off">Off</string>
+    <string name="error_number">Enter a number</string>
+    <string name="dns_enhanced_mode">Enhanced mode</string>
+    <string name="dns_enhanced_mode_summary">How the core answers queries: fake-ip, redir-host or normal</string>
+    <string name="dns_mode_fake_ip" translatable="false">fake-ip</string>
+    <string name="dns_mode_redir_host" translatable="false">redir-host</string>
+    <string name="dns_mode_normal" translatable="false">normal</string>
+    <string name="dns_fake_ip_range">Fake-ip range</string>
+    <string name="dns_fake_ip_range_summary">Address pool handed out for proxied domains, e.g. 198.18.0.1/16</string>
+    <string name="dns_fake_ip_filter">Fake-ip filter</string>
+    <string name="dns_fake_ip_filter_summary">Domains that must keep their real address, one per line</string>
+    <string name="dns_nameserver">Nameservers</string>
+    <string name="dns_nameserver_summary">Resolvers for normal lookups: IP, DoH or DoT URLs, one per line</string>
+    <string name="dns_default_nameserver">Bootstrap resolvers</string>
+    <string name="dns_default_nameserver_summary">Plain IPs used to resolve the encrypted resolvers above</string>
+    <string name="dns_proxy_nameserver">Proxy-server resolvers</string>
+    <string name="dns_proxy_nameserver_summary">How node hostnames are resolved, outside the proxy path</string>
+    <string name="dns_direct_nameserver">Direct resolvers</string>
+    <string name="dns_direct_nameserver_summary">Used for connections the rules send out directly</string>
+    <string name="dns_fallback">Fallback resolvers</string>
+    <string name="dns_fallback_summary">Queried together with the main servers; the fallback filter picks the answer</string>
+    <string name="dns_fallback_cidr">Fallback ip-cidr</string>
+    <string name="dns_fallback_cidr_summary">Answers inside these ranges are replaced by the fallback result</string>
+    <string name="dns_fallback_geoip">Fallback geoip</string>
+    <string name="dns_fallback_geoip_summary">Use the fallback result when the main answer is outside the country of the profile</string>
+    <string name="dns_respect_rules">Respect rules</string>
+    <string name="dns_respect_rules_summary">Resolve through the proxy group the rules would pick</string>
+    <string name="dns_use_hosts">Use hosts</string>
+    <string name="dns_use_hosts_summary">Honour the hosts entries of the profile</string>
+    <string name="dns_use_system_hosts">Use system hosts</string>
+    <string name="dns_use_system_hosts_summary">Honour the hosts file of the device</string>
+    <string name="dns_prefer_h3">Prefer HTTP/3</string>
+    <string name="dns_prefer_h3_summary">Try DNS over HTTP/3 for DoH resolvers</string>
+    <string name="dns_ipv6">Resolve IPv6</string>
+    <string name="dns_ipv6_summary">Ask for AAAA records and hand them to apps</string>
+    <string name="dns_direct_policy">Direct follows policy</string>
+    <string name="dns_direct_policy_summary">Apply nameserver-policy to direct lookups as well</string>
+    <string name="dns_cache_algorithm">Cache algorithm</string>
+    <string name="dns_cache_algorithm_summary">Eviction policy of the DNS cache</string>
+    <string name="dns_cache_arc" translatable="false">arc</string>
+    <string name="dns_cache_lru" translatable="false">lru</string>
+    <string name="core_find_process">Process matching</string>
+    <string name="core_find_process_summary">How the core looks up which app owns a connection</string>
+    <string name="core_find_process_always">Always</string>
+    <string name="core_find_process_strict">Strict</string>
+    <string name="core_find_process_off">Off</string>
+    <string name="core_geodata_loader">Geodata loader</string>
+    <string name="core_geodata_loader_summary">Memory conservative loads slower but uses less RAM</string>
+    <string name="core_geodata_standard">Standard</string>
+    <string name="core_geodata_memory">Memory conservative</string>
+    <string name="core_geodata_mode">Geodata mode</string>
+    <string name="core_geodata_mode_summary">Read the .dat databases instead of rule-set files</string>
+    <string name="core_fingerprint">TLS fingerprint</string>
+    <string name="core_fingerprint_summary">Client fingerprint used for outgoing TLS handshakes</string>
+    <string name="fp_chrome" translatable="false">Chrome</string>
+    <string name="fp_firefox" translatable="false">Firefox</string>
+    <string name="fp_safari" translatable="false">Safari</string>
+    <string name="fp_ios" translatable="false">iOS</string>
+    <string name="fp_android" translatable="false">Android</string>
+    <string name="fp_random" translatable="false">Random</string>
+    <string name="fp_none" translatable="false">None</string>
+    <string name="core_keep_alive">Keep-alive interval</string>
+    <string name="core_keep_alive_summary">Seconds between keep-alive probes; empty keeps the value from the profile</string>
+    <string name="core_disable_keep_alive">Disable keep-alive</string>
+    <string name="core_disable_keep_alive_summary">Stop probing idle connections</string>
+    <string name="core_mixed_port">Mixed port</string>
+    <string name="core_mixed_port_summary">HTTP/SOCKS port of the app local proxy mode</string>
+    <string name="tun_udp_timeout">UDP timeout</string>
+    <string name="tun_udp_timeout_summary">Seconds a UDP association stays open in the tunnel</string>
+    <string name="tun_icmp_timeout">ICMP timeout</string>
+    <string name="tun_icmp_timeout_summary">Seconds an ICMP session stays open in the tunnel</string>
+    <string name="tun_endpoint_nat">Endpoint independent NAT</string>
+    <string name="tun_endpoint_nat_summary">Keep one NAT mapping per source port (helps games and calls)</string>
+    <string name="tun_disable_icmp">Disable ICMP forwarding</string>
+    <string name="tun_disable_icmp_summary">Stop forwarding pings through the tunnel</string>
+    <string name="mode_global_exit">Global exit</string>
+    <string name="mode_global_exit_row">Global exit · %1$s ▾</string>
+    <string name="mode_global_exit_default">Profile default</string>
+    <string name="mode_global_exit_unavailable">Connect first to choose the global exit</string>
     <string name="log_silent" translatable="false">Silent</string>
     <string name="log_warning" translatable="false">Warning</string>
     <string name="log_info" translatable="false">Info</string>
@@ -267,4 +440,119 @@
     <string name="settings_tcp_concurrent_summary">Connect to multiple IP addresses concurrently</string>
     <string name="proxies_offline_hint">Offline preview from the active profile. Connect to switch or test nodes.</string>
     <string name="rules_offline_hint">Offline preview from the profile · %1$d rules</string>
+
+    <!-- Feedback titles (top snackbar) -->
+    <string name="title_alerter_success">Success</string>
+    <string name="title_alerter_error">Error</string>
+    <string name="title_alerter_info">Info</string>
+
+    <!-- Home: presence row -->
+    <string name="uwu_profile_banner_title">Hi, master</string>
+    <string name="uwu_profile_banner_title_custom">Hi, %1$s</string>
+    <string name="uwu_profile_name_dialog">What should we call you?</string>
+    <string name="settings_profile_name">Profile name</string>
+    <string name="settings_profile_name_summary">Shown next to the greeting on the home screen</string>
+
+    <!-- Home: connection card -->
+    <string name="connection_test_pending">Check connection</string>
+    <string name="connection_connected">Connected. Tap to test</string>
+    <string name="connection_not_connected">Disconnected</string>
+    <string name="connection_test_testing">Testing…</string>
+    <string name="connection_test_fail">No Internet</string>
+    <string name="connection_test_no_node">No node to test</string>
+    <string name="ip_connected" translatable="false">IP: %1$s</string>
+    <string name="ip_unknown">IP: unknown</string>
+    <string name="action_start_service">Start service</string>
+    <string name="action_stop_service">Stop service</string>
+    <string name="traffic_up_down" translatable="false">↑ %1$s  ↓ %2$s</string>
+    <string name="traffic_speed_suffix" translatable="false">%1$s/s</string>
+    <string name="traffic_session">This session ↑ %1$s  ↓ %2$s</string>
+    <string name="traffic_group">This group ↑ %1$s  ↓ %2$s</string>
+    <string name="del_config_comfirm">Delete this profile?</string>
+    <string name="del_config_dialog_comfirm_message">%1$s will be removed for good. This cannot be undone.</string>
+    <string name="del_all_dialog_comfirm_message">All %1$d profiles will be removed for good. This cannot be undone.</string>
+    <string name="toast_deleted">Deleted</string>
+    <string name="service_restart_started">Service restarting…</string>
+
+    <!-- Home: tabs, list and empty state -->
+    <string name="filter_config_all">All</string>
+    <string name="filter_config_subscription">Subscriptions</string>
+    <string name="filter_config_local">Local</string>
+    <string name="profile_updated_never">Never updated</string>
+    <string name="profile_updated_at">Updated %1$s</string>
+    <string name="profile_local_config">Local configuration</string>
+    <string name="profile_nodes_count">%1$d nodes</string>
+    <string name="profile_selected_dot">Active profile</string>
+    <string name="time_just_now">just now</string>
+    <string name="time_minutes_ago">%1$d minutes ago</string>
+    <string name="time_hours_ago">%1$d hours ago</string>
+    <string name="time_days_ago">%1$d days ago</string>
+
+    <!-- Home: more menu -->
+    <string name="title_more_menu">More Menu</string>
+    <string name="title_category_quick_actions">Quick Actions</string>
+    <string name="title_management">Management</string>
+    <string name="title_service_restart">Service restart</string>
+    <string name="desc_service_restart">Reconnect the tunnel to apply the current profile</string>
+    <string name="desc_sub_update">Fetch every subscription again</string>
+    <string name="title_sub_update">Update subscription</string>
+    <string name="title_ping_all_server">Test all configs</string>
+    <string name="title_real_ping_all_server">Real delay test</string>
+    <string name="title_export_all">Export configs to clipboard</string>
+    <string name="title_del_all_config">Delete all configs</string>
+    <string name="title_pin_server">Pin profile</string>
+    <string name="action_pin_server">Pin to top</string>
+    <string name="action_unpin_server">Unpin</string>
+    <string name="toast_server_pinned">Profile pinned to top</string>
+    <string name="toast_server_unpinned">Profile unpinned</string>
+    <string name="group_order">Order</string>
+    <string name="order_selected_mark" translatable="false">✓</string>
+    <string name="group_order_origin">Origin</string>
+    <string name="group_order_by_name">By Name</string>
+    <string name="group_order_by_updated">By Update</string>
+    <string name="toast_action_not_allowed">Action not allowed</string>
+    <string name="toast_pinned_server_delete_blocked">Unpin the profile first before deleting it</string>
+    <string name="toast_export_all_empty">Nothing to export</string>
+    <string name="toast_configs_exported">Configs copied to the clipboard</string>
+    <string name="toast_delete_all_done">Deleted %1$d configs</string>
+
+    <!-- Home: main menu sheet -->
+    <string name="title_main_menu">Menu</string>
+    <string name="title_oss_license">Open-source licenses</string>
+    <string name="desc_logcat">View connection and app error logs</string>
+    <string name="desc_backup_restore">Export or import your configurations</string>
+    <string name="desc_about">Version info and open-source licenses</string>
+    <string name="desc_proxies">Browse and pin every node of the active profile</string>
+    <string name="desc_rules">Inspect the routing rules of the active profile</string>
+    <string name="desc_apps">Choose which apps go through the tunnel</string>
+    <string name="desc_tools">Latency, DNS and network diagnostics</string>
+
+    <!-- Home: import sheet -->
+    <string name="import_configuration">Import configuration</string>
+    <string name="menu_item_import_config_clipboard">Import from Clipboard</string>
+    <string name="desc_import_clipboard">Paste a Clash YAML or share link</string>
+    <string name="menu_item_import_config_local">Import from locally</string>
+    <string name="menu_item_import_config_url">Add subscription URL</string>
+    <string name="add_subscription_section">Add subscription</string>
+    <string name="menu_item_import_config_qrcode">Import from QRcode</string>
+    <string name="import_qr_unavailable">Scanning QR codes is not supported yet — use a subscription URL instead.</string>
+
+    <!-- Home: share sheet -->
+    <string name="share_configuration">Share Configuration</string>
+    <string name="share_qrcode">QRcode</string>
+    <string name="share_subscription_url">Subscription URL</string>
+    <string name="export_to_clipboard">Export to clipboard</string>
+    <string name="desc_copy_config">Copy the whole Mihomo YAML</string>
+    <string name="share_as_file">Share as file</string>
+    <string name="toast_exported">Copied to the clipboard</string>
+    <string name="qrcode_title">QR code</string>
+
+    <!-- Home: quick actions -->
+    <string name="settings_quick_actions">Quick actions</string>
+    <string name="settings_quick_actions_summary">Show the shortcut row above the connect card</string>
+    <string name="settings_fab_extended">Extended connect button</string>
+    <string name="settings_fab_extended_summary">Show the session timer inside the connect button</string>
+    <string name="settings_compact_actions">Collapse list actions</string>
+    <string name="settings_compact_actions_summary">Move share, update and delete into a per-row overflow menu</string>
+    <string name="quick_actions_updated">Updated %1$d/%2$d subscriptions</string>
 </resources>

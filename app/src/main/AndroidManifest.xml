@@ -76,6 +76,16 @@
             android:parentActivityName=".ui.SettingsActivity" />
 
         <activity
+            android:name=".ui.AdvancedActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.SettingsActivity" />
+
+        <activity
+            android:name=".ui.ConnectionsActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.MainActivity" />
+
+        <activity
             android:name=".ui.AppListActivity"
             android:exported="false"
             android:parentActivityName=".ui.SettingsActivity" />

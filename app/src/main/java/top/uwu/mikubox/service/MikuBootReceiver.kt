@@ -11,22 +11,28 @@ import top.uwu.mikubox.profile.MihomoSubscriptionUpdater
 class MikuBootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        val appContext = context.applicationContext
+        val action = intent.action
         val pending = goAsync()
         Thread {
             try {
-                MihomoSubscriptionUpdater.reconfigure(context)
                 if (
-                    intent.action != Intent.ACTION_LOCKED_BOOT_COMPLETED &&
-                    MihomoProfileStore.autoStart(context) &&
-                    MihomoProfileStore.selected(context) != null
+                    action != Intent.ACTION_LOCKED_BOOT_COMPLETED &&
+                    MihomoProfileStore.autoStart(appContext) &&
+                    MihomoProfileStore.selected(appContext) != null
                 ) {
                     // Android forbids a background receiver from showing the
                     // consent activity. Reconnect only when consent survived.
-                    if (VpnService.prepare(context) == null) MikuVpnService.start(context)
+                    if (VpnService.prepare(appContext) == null) MikuVpnService.start(appContext)
                 }
             } finally {
                 pending.finish()
             }
-        }
+            // Scheduling the updater opens WorkManager's database on first use,
+            // which can outlast the broadcast timeout and showed up as an ANR
+            // on boot and right after an app update. It is idempotent, so it
+            // runs once the broadcast has already been answered.
+            runCatching { MihomoSubscriptionUpdater.reconfigure(appContext) }
+        }.start()
     }
 }
