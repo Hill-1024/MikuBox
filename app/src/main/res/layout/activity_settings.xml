@@ -104,7 +104,7 @@
                         android:layout_marginStart="12dp"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_account_cog_outline"
-                        android:tint="?attr/colorOnPrimary" />
+                        app:tint="?attr/colorOnPrimary" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

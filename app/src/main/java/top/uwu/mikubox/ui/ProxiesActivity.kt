@@ -38,7 +38,8 @@ class ProxiesActivity : EdgeToEdgeActivity() {
     private var allProxies: Map<String, MihomoCore.Proxy> = emptyMap()
     private var groups: List<MihomoCore.Proxy> = emptyList()
     private var groupOrder: List<String> = emptyList()
-    private val delayCache = mutableMapOf<String, Int>()
+    // Probes write from Dispatchers.IO while the UI thread reads the same map.
+    private val delayCache = java.util.concurrent.ConcurrentHashMap<String, Int>()
     private var sortByDelay = false
 
     /** Bytes each node and group carried for the active profile, persisted plus the running session. */

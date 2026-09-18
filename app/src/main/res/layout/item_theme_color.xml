@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- One palette swatch: a rounded square that morphs into a squircle when selected. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_columnWeight="1"
@@ -22,6 +23,6 @@
         android:layout_gravity="center"
         android:contentDescription="@null"
         android:src="@drawable/ic_check"
-        android:tint="@android:color/white"
+        app:tint="@android:color/white"
         android:visibility="gone" />
 </FrameLayout>

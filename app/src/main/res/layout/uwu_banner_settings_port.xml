@@ -26,7 +26,7 @@
             android:adjustViewBounds="true"
             android:contentDescription="@null"
             android:src="@drawable/uwu_addon_logo"
-            android:tint="?attr/colorPrimary" />
+            app:tint="?attr/colorPrimary" />
 
         <ImageView
             android:layout_width="wrap_content"

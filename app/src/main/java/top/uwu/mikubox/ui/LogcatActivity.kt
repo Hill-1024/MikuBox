@@ -96,9 +96,15 @@ class LogcatActivity : EdgeToEdgeActivity() {
     }
 
     private fun clearLog() {
-        runCatching { Runtime.getRuntime().exec(arrayOf("logcat", "-c")).waitFor() }
-        adapter.submit(emptyList())
-        UwuSnackbar.success(this, getString(R.string.logcat_cleared))
+        lifecycleScope.launch {
+            // logcat -c blocks until the child process exits; keep that off the
+            // main thread.
+            withContext(Dispatchers.IO) {
+                runCatching { Runtime.getRuntime().exec(arrayOf("logcat", "-c")).waitFor() }
+            }
+            adapter.submit(emptyList())
+            UwuSnackbar.success(this@LogcatActivity, getString(R.string.logcat_cleared))
+        }
     }
 
     private fun copyLog() {

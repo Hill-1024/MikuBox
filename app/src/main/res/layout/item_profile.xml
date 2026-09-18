@@ -60,7 +60,7 @@
                         android:layout_gravity="center"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_subscriptions_24dp"
-                        android:tint="?attr/colorOnPrimary" />
+                        app:tint="?attr/colorOnPrimary" />
                 </FrameLayout>
 
                 <LinearLayout
@@ -94,7 +94,7 @@
                             android:layout_marginStart="6dp"
                             android:contentDescription="@string/proxies_pinned"
                             android:src="@drawable/ic_map_marker_outline"
-                            android:tint="?attr/colorPrimary"
+                            app:tint="?attr/colorPrimary"
                             android:visibility="gone"
                             tools:visibility="visible" />
 
@@ -117,28 +117,28 @@
                             style="@style/UwuRowAction"
                             android:contentDescription="@string/action_share"
                             android:src="@drawable/ic_share_24dp"
-                            android:tint="?attr/colorOnSurfaceVariant" />
+                            app:tint="?attr/colorOnSurfaceVariant" />
 
                         <ImageView
                             android:id="@+id/layout_update"
                             style="@style/UwuRowAction"
                             android:contentDescription="@string/action_update"
                             android:src="@drawable/ic_cloud_download_24dp"
-                            android:tint="?attr/colorOnSurfaceVariant" />
+                            app:tint="?attr/colorOnSurfaceVariant" />
 
                         <ImageView
                             android:id="@+id/layout_remove"
                             style="@style/UwuRowAction"
                             android:contentDescription="@string/action_delete"
                             android:src="@drawable/ic_delete_empty"
-                            android:tint="?attr/colorError" />
+                            app:tint="?attr/colorError" />
 
                         <ImageView
                             android:id="@+id/layout_more"
                             style="@style/UwuRowAction"
                             android:contentDescription="@string/action_more"
                             android:src="@drawable/ic_baseline_more_vert_24"
-                            android:tint="?attr/colorOnSurfaceVariant"
+                            app:tint="?attr/colorOnSurfaceVariant"
                             android:visibility="gone"
                             tools:visibility="visible" />
                     </LinearLayout>

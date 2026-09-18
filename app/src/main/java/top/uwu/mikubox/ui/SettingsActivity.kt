@@ -6,8 +6,12 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import top.uwu.mikubox.R
 import top.uwu.mikubox.core.AppSettings
 import top.uwu.mikubox.core.BackupManager
@@ -16,6 +20,7 @@ import top.uwu.mikubox.core.ThemeManager
 import top.uwu.mikubox.core.RoutingMode
 import top.uwu.mikubox.databinding.ActivitySettingsBinding
 import top.uwu.mikubox.profile.MihomoProfileStore
+import top.uwu.mikubox.profile.MihomoSubscriptionUpdater
 import top.uwu.mikubox.service.MihomoVpnSettings
 import top.uwu.mikubox.service.MihomoVpnSettings.AppMode
 import top.uwu.mikubox.service.VpnController
@@ -716,31 +721,43 @@ class SettingsActivity : EdgeToEdgeActivity() {
     }
 
     private fun writeBackup(uri: Uri) {
-        val ok = runCatching {
-            contentResolver.openOutputStream(uri)?.use {
-                it.write(BackupManager.export(this).toByteArray())
-            } ?: error("no stream")
-        }.isSuccess
-        if (ok) {
-            UwuSnackbar.success(this, getString(R.string.toast_backup_exported))
-        } else {
-            UwuSnackbar.error(this, getString(R.string.toast_backup_failed))
+        lifecycleScope.launch {
+            val ok = runCatching {
+                withContext(Dispatchers.IO) {
+                    contentResolver.openOutputStream(uri)?.use {
+                        it.write(BackupManager.export(this@SettingsActivity).toByteArray())
+                    } ?: error("no stream")
+                }
+            }.isSuccess
+            if (ok) {
+                UwuSnackbar.success(this@SettingsActivity, getString(R.string.toast_backup_exported))
+            } else {
+                UwuSnackbar.error(this@SettingsActivity, getString(R.string.toast_backup_failed))
+            }
         }
     }
 
     private fun readBackup(uri: Uri) {
-        val ok = runCatching {
-            val json = contentResolver.openInputStream(uri)?.use {
-                it.readBytes().decodeToString()
-            } ?: error("no stream")
-            BackupManager.import(this, json)
-        }.isSuccess
-        if (ok) {
-            AppSettings.applyNightMode(this)
-            render()
-            UwuSnackbar.success(this, getString(R.string.toast_backup_imported))
-        } else {
-            UwuSnackbar.error(this, getString(R.string.toast_backup_failed))
+        lifecycleScope.launch {
+            val ok = runCatching {
+                withContext(Dispatchers.IO) {
+                    val json = contentResolver.openInputStream(uri)?.use {
+                        it.readBytes().decodeToString()
+                    } ?: error("no stream")
+                    BackupManager.import(this@SettingsActivity, json)
+                    // A backup can carry subscriptions this install did not
+                    // have; the periodic update work has to be rebuilt around
+                    // the restored set.
+                    MihomoSubscriptionUpdater.reconfigure(this@SettingsActivity)
+                }
+            }.isSuccess
+            if (ok) {
+                AppSettings.applyNightMode(this@SettingsActivity)
+                render()
+                UwuSnackbar.success(this@SettingsActivity, getString(R.string.toast_backup_imported))
+            } else {
+                UwuSnackbar.error(this@SettingsActivity, getString(R.string.toast_backup_failed))
+            }
         }
     }
 }

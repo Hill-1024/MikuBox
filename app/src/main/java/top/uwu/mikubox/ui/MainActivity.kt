@@ -110,13 +110,22 @@ class MainActivity : EdgeToEdgeActivity(), AddConfigBottomSheet.Listener {
     private val importFile =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             uri ?: return@registerForActivityResult
-            try {
-                val profile = MihomoProfileImporter.importUri(this, uri)
-                UwuSnackbar.success(this, getString(R.string.toast_config_imported))
-                refresh()
-                selectProfile(profile)
-            } catch (error: Exception) {
-                UwuSnackbar.error(this, getString(R.string.toast_import_failed, error.message.orEmpty()))
+            // Reading the document and parsing its YAML happen off the main
+            // thread; a multi-megabyte subscription must not freeze the screen.
+            lifecycleScope.launch {
+                val result = runCatching {
+                    withContext(Dispatchers.IO) { MihomoProfileImporter.importUri(this@MainActivity, uri) }
+                }
+                result.onSuccess { profile ->
+                    UwuSnackbar.success(this@MainActivity, getString(R.string.toast_config_imported))
+                    refresh()
+                    selectProfile(profile)
+                }.onFailure { error ->
+                    UwuSnackbar.error(
+                        this@MainActivity,
+                        getString(R.string.toast_import_failed, error.message.orEmpty()),
+                    )
+                }
             }
         }
 
@@ -647,6 +656,12 @@ class MainActivity : EdgeToEdgeActivity(), AddConfigBottomSheet.Listener {
         handler.removeCallbacks(trafficTick)
     }
 
+    override fun onDestroy() {
+        // Delayed restart/refresh callbacks must not fire against a dead activity.
+        handler.removeCallbacksAndMessages(null)
+        super.onDestroy()
+    }
+
     // ---------------------------------------------------------------- state
 
     private fun refresh() {
@@ -979,15 +994,31 @@ class MainActivity : EdgeToEdgeActivity(), AddConfigBottomSheet.Listener {
             UwuSnackbar.error(this, getString(R.string.error_subscription_url_blank))
             return
         }
-        val profile = try {
-            MihomoProfileImporter.importSubscription(this, name, url, intervalMinutes, connectedOnly)
-        } catch (e: Exception) {
-            UwuSnackbar.error(this, getString(R.string.toast_import_failed, e.message.orEmpty()))
-            return
+        lifecycleScope.launch {
+            val result = runCatching {
+                withContext(Dispatchers.IO) {
+                    MihomoProfileImporter.importSubscription(
+                        this@MainActivity,
+                        name,
+                        url,
+                        intervalMinutes,
+                        connectedOnly,
+                    )
+                }
+            }
+            result
+                .onSuccess { profile ->
+                    UwuSnackbar.success(this@MainActivity, getString(R.string.toast_subscription_added))
+                    refresh()
+                    pull(profile)
+                }
+                .onFailure { error ->
+                    UwuSnackbar.error(
+                        this@MainActivity,
+                        getString(R.string.toast_import_failed, error.message.orEmpty()),
+                    )
+                }
         }
-        UwuSnackbar.success(this, getString(R.string.toast_subscription_added))
-        refresh()
-        pull(profile)
     }
 
     override fun onImportClipboard(name: String) {
@@ -997,12 +1028,23 @@ class MainActivity : EdgeToEdgeActivity(), AddConfigBottomSheet.Listener {
             UwuSnackbar.error(this, getString(R.string.toast_clipboard_empty))
             return
         }
-        try {
-            MihomoProfileImporter.importConfig(this, name, clip)
-            UwuSnackbar.success(this, getString(R.string.toast_config_imported))
-            refresh()
-        } catch (e: Exception) {
-            UwuSnackbar.error(this, getString(R.string.toast_import_failed, e.message.orEmpty()))
+        lifecycleScope.launch {
+            val result = runCatching {
+                withContext(Dispatchers.IO) {
+                    MihomoProfileImporter.importConfig(this@MainActivity, name, clip)
+                }
+            }
+            result
+                .onSuccess {
+                    UwuSnackbar.success(this@MainActivity, getString(R.string.toast_config_imported))
+                    refresh()
+                }
+                .onFailure { error ->
+                    UwuSnackbar.error(
+                        this@MainActivity,
+                        getString(R.string.toast_import_failed, error.message.orEmpty()),
+                    )
+                }
         }
     }
 

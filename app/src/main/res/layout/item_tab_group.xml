@@ -5,6 +5,7 @@
     this file switch colour with the selection.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
@@ -21,7 +22,7 @@
         android:layout_marginEnd="5dp"
         android:contentDescription="@null"
         android:duplicateParentState="true"
-        android:tint="@color/uwu_tab_content_tint" />
+        app:tint="@color/uwu_tab_content_tint" />
 
     <TextView
         android:id="@+id/tab_label"

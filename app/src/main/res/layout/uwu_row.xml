@@ -40,7 +40,7 @@
                 android:layout_height="25dp"
                 android:layout_gravity="center"
                 android:contentDescription="@null"
-                android:tint="?attr/colorOnPrimary"
+                app:tint="?attr/colorOnPrimary"
                 tools:src="@drawable/ic_settings_24dp" />
         </FrameLayout>
 

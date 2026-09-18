@@ -54,6 +54,9 @@ object UwuSnackbar {
         com.google.android.material.R.attr.colorOnTertiary,
     )
 
+    // The custom card is built on Material's Snackbar internals on purpose;
+    // those surface types are not public API.
+    @android.annotation.SuppressLint("RestrictedApi")
     private fun show(
         activity: Activity,
         message: CharSequence,

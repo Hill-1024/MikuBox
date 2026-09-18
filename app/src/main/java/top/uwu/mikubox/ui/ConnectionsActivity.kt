@@ -6,8 +6,12 @@ import android.os.Looper
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.color.MaterialColors
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import top.uwu.mikubox.R
 import top.uwu.mikubox.core.MihomoCore
 import top.uwu.mikubox.databinding.ActivityConnectionsBinding
@@ -18,7 +22,8 @@ import top.uwu.mikubox.service.VpnController
  *
  * Rows are built in code and refreshed once a second while the screen is open;
  * tapping a row closes that connection and the header closes all of them, which
- * is what the desktop clients offer for a stuck transfer.
+ * is what the desktop clients offer for a stuck transfer. The snapshot and the
+ * close calls round-trip through the core, so they run off the main thread.
  */
 class ConnectionsActivity : EdgeToEdgeActivity() {
 
@@ -26,7 +31,7 @@ class ConnectionsActivity : EdgeToEdgeActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private val tick = object : Runnable {
         override fun run() {
-            render()
+            refresh()
             handler.postDelayed(this, REFRESH_MS)
         }
     }
@@ -38,12 +43,15 @@ class ConnectionsActivity : EdgeToEdgeActivity() {
         applySystemBarInsets(binding.root)
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.btnCloseAll.setOnClickListener {
-            if (MihomoCore.closeConnections()) {
-                UwuSnackbar.info(this, getString(R.string.connections_closed_all))
+            lifecycleScope.launch {
+                val closed = withContext(Dispatchers.IO) { MihomoCore.closeConnections() }
+                if (closed) {
+                    UwuSnackbar.info(this@ConnectionsActivity, getString(R.string.connections_closed_all))
+                }
+                refresh()
             }
-            render()
         }
-        render()
+        refresh()
     }
 
     override fun onResume() {
@@ -56,13 +64,23 @@ class ConnectionsActivity : EdgeToEdgeActivity() {
         handler.removeCallbacks(tick)
     }
 
-    private fun render() {
+    /** Fetches the snapshot off the main thread, then paints it. */
+    private fun refresh() {
         val running = VpnController.isRunning
-        val connections = if (running) MihomoCore.connections() else emptyList()
-        android.util.Log.d("MikuBox", "connections render: running=$running list=${connections.size}")
+        lifecycleScope.launch {
+            val connections = if (running) {
+                withContext(Dispatchers.IO) { MihomoCore.connections() }
+            } else {
+                emptyList()
+            }
+            render(running, connections)
+        }
+    }
+
+    private fun render(running: Boolean, connections: List<MihomoCore.Connection>) {
         binding.tvEmpty.visibility = if (connections.isEmpty()) View.VISIBLE else View.GONE
         binding.tvEmpty.setText(
-            if (VpnController.isRunning) R.string.connections_empty else R.string.connections_offline,
+            if (running) R.string.connections_empty else R.string.connections_offline,
         )
         binding.btnCloseAll.isEnabled = connections.isNotEmpty()
 
@@ -135,8 +153,9 @@ class ConnectionsActivity : EdgeToEdgeActivity() {
         )
         card.addView(column)
         card.setOnClickListener {
-            if (MihomoCore.closeConnection(connection.id)) {
-                render()
+            lifecycleScope.launch {
+                val closed = withContext(Dispatchers.IO) { MihomoCore.closeConnection(connection.id) }
+                if (closed) refresh()
             }
         }
         return card

@@ -34,8 +34,8 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
-        <item name="android:enforceNavigationBarContrast">false</item>
+        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:ignore="NewApi">false</item>
         <item name="alertDialogTheme">@style/ThemeOverlay.Miku.TrueBlack.Dialog</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.Miku.TrueBlack.Dialog</item>
     </style>

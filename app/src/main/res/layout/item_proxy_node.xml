@@ -47,7 +47,7 @@
                     android:layout_height="42dp"
                     android:contentDescription="@null"
                     android:src="@drawable/uwu_bg_icon"
-                    android:tint="?attr/colorPrimary" />
+                    app:tint="?attr/colorPrimary" />
 
                 <ImageView
                     android:layout_width="22dp"
@@ -55,7 +55,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@null"
                     android:src="@drawable/ic_lan"
-                    android:tint="?attr/colorOnPrimary" />
+                    app:tint="?attr/colorOnPrimary" />
             </FrameLayout>
 
             <LinearLayout
@@ -116,7 +116,7 @@
                 android:layout_marginStart="10dp"
                 android:contentDescription="@string/badge_selected"
                 android:src="@drawable/ic_check"
-                android:tint="?attr/colorPrimary"
+                app:tint="?attr/colorPrimary"
                 android:visibility="invisible"
                 tools:visibility="visible" />
         </LinearLayout>
