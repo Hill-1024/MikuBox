@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Main menu sheet, opened from the home button: the settings rows the release
+    design keeps in its home sheet, then a horizontal rail of tool cards.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/uwu_background_bottom_sheet"
+    android:orientation="vertical"
+    android:paddingBottom="8dp">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="ifContentScrolls">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/header"
+                layout="@layout/uwu_sheet_header" />
+
+            <LinearLayout style="@style/UwuGroupHeader">
+                <ImageView
+                    style="@style/UwuGroupHeaderIcon"
+                    android:src="@drawable/ic_settings_24dp" />
+
+                <TextView
+                    style="@style/UwuGroupHeaderLabel"
+                    android:text="@string/app_settings" />
+            </LinearLayout>
+
+            <include
+                android:id="@+id/menu_settings"
+                layout="@layout/uwu_row" />
+
+            <include
+                android:id="@+id/menu_dns"
+                layout="@layout/uwu_row" />
+
+            <include
+                android:id="@+id/menu_rules"
+                layout="@layout/uwu_row" />
+
+            <include
+                android:id="@+id/menu_proxies"
+                layout="@layout/uwu_row" />
+
+            <include
+                android:id="@+id/menu_connections"
+                layout="@layout/uwu_row" />
+
+            <LinearLayout style="@style/UwuGroupHeader">
+                <ImageView
+                    style="@style/UwuGroupHeaderIcon"
+                    android:src="@drawable/ic_baseline_info_24" />
+
+                <TextView
+                    style="@style/UwuGroupHeaderLabel"
+                    android:text="@string/tools_and_info" />
+            </LinearLayout>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <include
+                        android:id="@+id/card_logcat"
+                        layout="@layout/uwu_tool_card" />
+
+                    <include
+                        android:id="@+id/card_apps"
+                        layout="@layout/uwu_tool_card" />
+
+                    <include
+                        android:id="@+id/card_tools"
+                        layout="@layout/uwu_tool_card" />
+
+                    <include
+                        android:id="@+id/card_about"
+                        layout="@layout/uwu_tool_card" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="8dp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

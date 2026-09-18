@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Body of the MikuRay-style top snackbar. The Snackbar itself is only the
+    container: its own text view is hidden and the corner radius / fill are
+    applied to the SnackbarLayout so this body keeps the margins.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingTop="22dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="22dp">
+
+    <ImageView
+        android:id="@+id/snackbar_icon"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="12dp"
+        android:contentDescription="@null"
+        tools:src="@drawable/ic_check_circle" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/snackbar_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            tools:text="Success" />
+
+        <TextView
+            android:id="@+id/snackbar_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="0.85"
+            android:maxLines="4"
+            android:textSize="14sp"
+            tools:text="Subscription updated" />
+    </LinearLayout>
+</LinearLayout>

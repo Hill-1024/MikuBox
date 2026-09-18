@@ -6,6 +6,7 @@
     android:background="?attr/colorBg">
 
     <com.google.android.material.appbar.AppBarLayout
+        app:liftOnScroll="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
@@ -22,7 +23,7 @@
             app:expandedTitleMarginEnd="24dp"
             app:expandedTitleMarginStart="24dp"
             app:expandedTitleTextColor="?attr/colorOnPrimary"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:statusBarScrim="?attr/colorPrimary"
             app:title="@string/about_title"
             app:titleCollapseMode="scale">

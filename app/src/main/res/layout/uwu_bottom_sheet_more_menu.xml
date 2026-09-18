@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    More menu sheet: quick service actions, list management and the order radio
+    group, mirroring the sections of the release build's more menu.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/uwu_background_bottom_sheet"
+    android:orientation="vertical"
+    android:paddingBottom="8dp">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="ifContentScrolls">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/header"
+                layout="@layout/uwu_sheet_header" />
+
+            <LinearLayout style="@style/UwuGroupHeader">
+                <ImageView
+                    style="@style/UwuGroupHeaderIcon"
+                    android:src="@drawable/ic_lightbulb_outline" />
+
+                <TextView
+                    style="@style/UwuGroupHeaderLabel"
+                    android:text="@string/title_category_quick_actions" />
+            </LinearLayout>
+
+            <include
+                android:id="@+id/action_restart"
+                layout="@layout/uwu_row" />
+
+            <include
+                android:id="@+id/action_update_subs"
+                layout="@layout/uwu_row" />
+
+            <include
+                android:id="@+id/action_test_all"
+                layout="@layout/uwu_row" />
+
+            <include
+                android:id="@+id/action_add_config"
+                layout="@layout/uwu_row" />
+
+            <LinearLayout style="@style/UwuGroupHeader">
+                <ImageView
+                    style="@style/UwuGroupHeaderIcon"
+                    android:src="@drawable/ic_subscriptions_24dp" />
+
+                <TextView
+                    style="@style/UwuGroupHeaderLabel"
+                    android:text="@string/title_management" />
+            </LinearLayout>
+
+            <include
+                android:id="@+id/action_export_all"
+                layout="@layout/uwu_row" />
+
+            <include
+                android:id="@+id/action_delete_all"
+                layout="@layout/uwu_row" />
+
+            <LinearLayout style="@style/UwuGroupHeader">
+                <ImageView
+                    style="@style/UwuGroupHeaderIcon"
+                    android:src="@drawable/ic_order_alphabetical_ascending" />
+
+                <TextView
+                    style="@style/UwuGroupHeaderLabel"
+                    android:text="@string/group_order" />
+            </LinearLayout>
+
+            <include
+                android:id="@+id/order_origin"
+                layout="@layout/uwu_row" />
+
+            <include
+                android:id="@+id/order_by_name"
+                layout="@layout/uwu_row" />
+
+            <include
+                android:id="@+id/order_by_updated"
+                layout="@layout/uwu_row" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="8dp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Typography overlays: one per bundled font plus the bold variant. The app
+    applies the selected one with theme.applyStyle(overlay, true) before the
+    first view is inflated. Generated file.
+-->
+<resources>
+
+    <style name="Miku.Font.UwuFontTitle" parent="">
+        <item name="android:fontFamily">@font/uwu_font_title</item>
+        <item name="titleTextAppearance">@style/Miku.Title.UwuFontTitle</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.UwuFontTitle</item>
+    </style>
+
+    <style name="Miku.Title.UwuFontTitle" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/uwu_font_title</item>
+        <item name="android:fontFamily">@font/uwu_font_title</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.UwuFontTitle" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.UwuFontTitle</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.UwuFontTitle</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.UwuFontTitle" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/uwu_font_title</item>
+        <item name="android:fontFamily">@font/uwu_font_title</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.UwuFontTitle" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/uwu_font_title</item>
+        <item name="android:fontFamily">@font/uwu_font_title</item>
+    </style>
+
+    <style name="Miku.Font.UwuFontSummary" parent="">
+        <item name="android:fontFamily">@font/uwu_font_summary</item>
+        <item name="titleTextAppearance">@style/Miku.Title.UwuFontSummary</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.UwuFontSummary</item>
+    </style>
+
+    <style name="Miku.Title.UwuFontSummary" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/uwu_font_summary</item>
+        <item name="android:fontFamily">@font/uwu_font_summary</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.UwuFontSummary" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.UwuFontSummary</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.UwuFontSummary</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.UwuFontSummary" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/uwu_font_summary</item>
+        <item name="android:fontFamily">@font/uwu_font_summary</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.UwuFontSummary" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/uwu_font_summary</item>
+        <item name="android:fontFamily">@font/uwu_font_summary</item>
+    </style>
+
+    <style name="Miku.Font.UwuFontTypography" parent="">
+        <item name="android:fontFamily">@font/uwu_font_typography</item>
+        <item name="titleTextAppearance">@style/Miku.Title.UwuFontTypography</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.UwuFontTypography</item>
+    </style>
+
+    <style name="Miku.Title.UwuFontTypography" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/uwu_font_typography</item>
+        <item name="android:fontFamily">@font/uwu_font_typography</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.UwuFontTypography" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.UwuFontTypography</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.UwuFontTypography</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.UwuFontTypography" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/uwu_font_typography</item>
+        <item name="android:fontFamily">@font/uwu_font_typography</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.UwuFontTypography" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/uwu_font_typography</item>
+        <item name="android:fontFamily">@font/uwu_font_typography</item>
+    </style>
+
+    <style name="Miku.Font.Googlesansregular" parent="">
+        <item name="android:fontFamily">@font/googlesansregular</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Googlesansregular</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Googlesansregular</item>
+    </style>
+
+    <style name="Miku.Title.Googlesansregular" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/googlesansregular</item>
+        <item name="android:fontFamily">@font/googlesansregular</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Googlesansregular" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Googlesansregular</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Googlesansregular</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Googlesansregular" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/googlesansregular</item>
+        <item name="android:fontFamily">@font/googlesansregular</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Googlesansregular" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/googlesansregular</item>
+        <item name="android:fontFamily">@font/googlesansregular</item>
+    </style>
+
+    <style name="Miku.Font.Robotoregular" parent="">
+        <item name="android:fontFamily">@font/robotoregular</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Robotoregular</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Robotoregular</item>
+    </style>
+
+    <style name="Miku.Title.Robotoregular" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/robotoregular</item>
+        <item name="android:fontFamily">@font/robotoregular</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Robotoregular" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Robotoregular</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Robotoregular</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Robotoregular" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/robotoregular</item>
+        <item name="android:fontFamily">@font/robotoregular</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Robotoregular" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/robotoregular</item>
+        <item name="android:fontFamily">@font/robotoregular</item>
+    </style>
+
+    <style name="Miku.Font.Poppinsregular" parent="">
+        <item name="android:fontFamily">@font/poppinsregular</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Poppinsregular</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Poppinsregular</item>
+    </style>
+
+    <style name="Miku.Title.Poppinsregular" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/poppinsregular</item>
+        <item name="android:fontFamily">@font/poppinsregular</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Poppinsregular" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Poppinsregular</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Poppinsregular</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Poppinsregular" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/poppinsregular</item>
+        <item name="android:fontFamily">@font/poppinsregular</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Poppinsregular" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/poppinsregular</item>
+        <item name="android:fontFamily">@font/poppinsregular</item>
+    </style>
+
+    <style name="Miku.Font.Sfprodisplay" parent="">
+        <item name="android:fontFamily">@font/sfprodisplay</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Sfprodisplay</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Sfprodisplay</item>
+    </style>
+
+    <style name="Miku.Title.Sfprodisplay" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/sfprodisplay</item>
+        <item name="android:fontFamily">@font/sfprodisplay</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Sfprodisplay" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Sfprodisplay</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Sfprodisplay</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Sfprodisplay" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/sfprodisplay</item>
+        <item name="android:fontFamily">@font/sfprodisplay</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Sfprodisplay" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/sfprodisplay</item>
+        <item name="android:fontFamily">@font/sfprodisplay</item>
+    </style>
+
+    <style name="Miku.Font.Oneui" parent="">
+        <item name="android:fontFamily">@font/oneui</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Oneui</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Oneui</item>
+    </style>
+
+    <style name="Miku.Title.Oneui" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/oneui</item>
+        <item name="android:fontFamily">@font/oneui</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Oneui" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Oneui</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Oneui</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Oneui" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/oneui</item>
+        <item name="android:fontFamily">@font/oneui</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Oneui" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/oneui</item>
+        <item name="android:fontFamily">@font/oneui</item>
+    </style>
+
+    <style name="Miku.Font.Rine" parent="">
+        <item name="android:fontFamily">@font/rine</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Rine</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Rine</item>
+    </style>
+
+    <style name="Miku.Title.Rine" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/rine</item>
+        <item name="android:fontFamily">@font/rine</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Rine" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Rine</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Rine</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Rine" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/rine</item>
+        <item name="android:fontFamily">@font/rine</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Rine" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/rine</item>
+        <item name="android:fontFamily">@font/rine</item>
+    </style>
+
+    <style name="Miku.Font.Chococookyregular" parent="">
+        <item name="android:fontFamily">@font/chococookyregular</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Chococookyregular</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Chococookyregular</item>
+    </style>
+
+    <style name="Miku.Title.Chococookyregular" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/chococookyregular</item>
+        <item name="android:fontFamily">@font/chococookyregular</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Chococookyregular" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Chococookyregular</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Chococookyregular</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Chococookyregular" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/chococookyregular</item>
+        <item name="android:fontFamily">@font/chococookyregular</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Chococookyregular" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/chococookyregular</item>
+        <item name="android:fontFamily">@font/chococookyregular</item>
+    </style>
+
+    <style name="Miku.Font.Simpleday" parent="">
+        <item name="android:fontFamily">@font/simpleday</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Simpleday</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Simpleday</item>
+    </style>
+
+    <style name="Miku.Title.Simpleday" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/simpleday</item>
+        <item name="android:fontFamily">@font/simpleday</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Simpleday" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Simpleday</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Simpleday</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Simpleday" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/simpleday</item>
+        <item name="android:fontFamily">@font/simpleday</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Simpleday" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/simpleday</item>
+        <item name="android:fontFamily">@font/simpleday</item>
+    </style>
+
+    <style name="Miku.Font.Fucek" parent="">
+        <item name="android:fontFamily">@font/fucek</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Fucek</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Fucek</item>
+    </style>
+
+    <style name="Miku.Title.Fucek" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/fucek</item>
+        <item name="android:fontFamily">@font/fucek</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Fucek" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Fucek</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Fucek</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Fucek" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/fucek</item>
+        <item name="android:fontFamily">@font/fucek</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Fucek" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/fucek</item>
+        <item name="android:fontFamily">@font/fucek</item>
+    </style>
+
+    <style name="Miku.Font.Dancingscript" parent="">
+        <item name="android:fontFamily">@font/dancingscript</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Dancingscript</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Dancingscript</item>
+    </style>
+
+    <style name="Miku.Title.Dancingscript" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/dancingscript</item>
+        <item name="android:fontFamily">@font/dancingscript</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Dancingscript" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Dancingscript</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Dancingscript</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Dancingscript" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/dancingscript</item>
+        <item name="android:fontFamily">@font/dancingscript</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Dancingscript" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/dancingscript</item>
+        <item name="android:fontFamily">@font/dancingscript</item>
+    </style>
+
+    <style name="Miku.Font.Cream" parent="">
+        <item name="android:fontFamily">@font/cream</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Cream</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Cream</item>
+    </style>
+
+    <style name="Miku.Title.Cream" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/cream</item>
+        <item name="android:fontFamily">@font/cream</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Cream" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Cream</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Cream</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Cream" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/cream</item>
+        <item name="android:fontFamily">@font/cream</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Cream" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/cream</item>
+        <item name="android:fontFamily">@font/cream</item>
+    </style>
+
+    <style name="Miku.Font.Emilyscandy" parent="">
+        <item name="android:fontFamily">@font/emilyscandy</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Emilyscandy</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Emilyscandy</item>
+    </style>
+
+    <style name="Miku.Title.Emilyscandy" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/emilyscandy</item>
+        <item name="android:fontFamily">@font/emilyscandy</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Emilyscandy" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Emilyscandy</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Emilyscandy</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Emilyscandy" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/emilyscandy</item>
+        <item name="android:fontFamily">@font/emilyscandy</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Emilyscandy" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/emilyscandy</item>
+        <item name="android:fontFamily">@font/emilyscandy</item>
+    </style>
+
+    <style name="Miku.Font.Summerdream" parent="">
+        <item name="android:fontFamily">@font/summerdream</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Summerdream</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Summerdream</item>
+    </style>
+
+    <style name="Miku.Title.Summerdream" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/summerdream</item>
+        <item name="android:fontFamily">@font/summerdream</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Summerdream" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Summerdream</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Summerdream</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Summerdream" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/summerdream</item>
+        <item name="android:fontFamily">@font/summerdream</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Summerdream" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/summerdream</item>
+        <item name="android:fontFamily">@font/summerdream</item>
+    </style>
+
+    <style name="Miku.Font.Incosolata" parent="">
+        <item name="android:fontFamily">@font/incosolata</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Incosolata</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Incosolata</item>
+    </style>
+
+    <style name="Miku.Title.Incosolata" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/incosolata</item>
+        <item name="android:fontFamily">@font/incosolata</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Incosolata" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Incosolata</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Incosolata</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Incosolata" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/incosolata</item>
+        <item name="android:fontFamily">@font/incosolata</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Incosolata" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/incosolata</item>
+        <item name="android:fontFamily">@font/incosolata</item>
+    </style>
+
+    <style name="Miku.Font.JetbrainsMono" parent="">
+        <item name="android:fontFamily">@font/jetbrains_mono</item>
+        <item name="titleTextAppearance">@style/Miku.Title.JetbrainsMono</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.JetbrainsMono</item>
+    </style>
+
+    <style name="Miku.Title.JetbrainsMono" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/jetbrains_mono</item>
+        <item name="android:fontFamily">@font/jetbrains_mono</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.JetbrainsMono" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.JetbrainsMono</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.JetbrainsMono</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.JetbrainsMono" parent="@style/TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/jetbrains_mono</item>
+        <item name="android:fontFamily">@font/jetbrains_mono</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.JetbrainsMono" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/jetbrains_mono</item>
+        <item name="android:fontFamily">@font/jetbrains_mono</item>
+    </style>
+
+    <style name="Miku.BoldText" parent="">
+        <item name="android:textStyle">bold</item>
+        <item name="titleTextAppearance">@style/Miku.Title.Bold</item>
+        <item name="collapsingToolbarLayoutStyle">@style/Miku.CollapsingToolbar.Bold</item>
+    </style>
+
+    <style name="Miku.Title.Bold" parent="@style/TextAppearance.Material3.TitleLarge">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Miku.CollapsingToolbar.Bold" parent="@style/Miku.CollapsingToolbar.Large">
+        <item name="expandedTitleTextAppearance">@style/Miku.CollapsingExpanded.Bold</item>
+        <item name="collapsedTitleTextAppearance">@style/Miku.CollapsingCollapsed.Bold</item>
+    </style>
+
+    <style name="Miku.CollapsingExpanded.Bold" parent="@style/TextAppearance.Miku.CollapsingExpanded">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Miku.CollapsingCollapsed.Bold" parent="@style/TextAppearance.Miku.CollapsingCollapsed">
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>

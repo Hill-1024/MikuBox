@@ -30,6 +30,8 @@ import java.util.Locale
 class LogcatActivity : EdgeToEdgeActivity() {
 
     private lateinit var binding: ActivityLogcatBinding
+    private lateinit var adapter: LogcatAdapter
+    private var searchItem: android.view.MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,20 +39,47 @@ class LogcatActivity : EdgeToEdgeActivity() {
         setContentView(binding.root)
         applySystemBarInsets(binding.root)
 
+        adapter = LogcatAdapter()
+        binding.recyclerLog.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        binding.recyclerLog.adapter = adapter
+
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.toolbar.inflateMenu(R.menu.menu_logcat)
+        searchItem = binding.toolbar.menu.findItem(R.id.action_search_log)
+        val search = searchItem?.actionView as? androidx.appcompat.widget.SearchView
+        search?.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(text: String?): Boolean = false
+
+            override fun onQueryTextChange(text: String?): Boolean {
+                adapter.filter(text.orEmpty())
+                return true
+            }
+        })
+        search?.setOnCloseListener {
+            adapter.filter("")
+            false
+        }
         binding.toolbar.setOnMenuItemClickListener { item ->
-            if (item.itemId == R.id.action_export_log) {
-                exportLogs()
-                true
-            } else {
-                false
+            when (item.itemId) {
+                R.id.action_export_log -> {
+                    exportLogs()
+                    true
+                }
+
+                R.id.action_copy_log -> {
+                    copyLog()
+                    true
+                }
+
+                R.id.action_clear_log -> {
+                    clearLog()
+                    true
+                }
+
+                else -> false
             }
         }
-        binding.fabClear.setOnClickListener {
-            runCatching { Runtime.getRuntime().exec(arrayOf("logcat", "-c")).waitFor() }
-            reload()
-        }
+        binding.fabClear.setOnClickListener { clearLog() }
     }
 
     override fun onResume() {
@@ -61,11 +90,27 @@ class LogcatActivity : EdgeToEdgeActivity() {
     private fun reload() {
         lifecycleScope.launch {
             val log = withContext(Dispatchers.IO) { readLogcat(600) }
-            binding.logcatText.text = log
-            binding.logcatScroll.post {
-                binding.logcatScroll.fullScroll(android.view.View.FOCUS_DOWN)
-            }
+            // Newest first, the way the release build lists its log lines.
+            adapter.submit(LogcatAdapter.parse(log).reversed())
         }
+    }
+
+    private fun clearLog() {
+        runCatching { Runtime.getRuntime().exec(arrayOf("logcat", "-c")).waitFor() }
+        adapter.submit(emptyList())
+        UwuSnackbar.success(this, getString(R.string.logcat_cleared))
+    }
+
+    private fun copyLog() {
+        val text = adapter.visibleText()
+        if (text.isEmpty()) {
+            UwuSnackbar.error(this, getString(R.string.logcat_empty))
+            return
+        }
+        val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+            as android.content.ClipboardManager
+        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("MikuBox", text))
+        UwuSnackbar.success(this, getString(R.string.logcat_copied))
     }
 
     /**

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Custom home tab: optional glyph, label and a count badge. State trickles
+    down from the TabLayout through duplicateParentState so the selectors in
+    this file switch colour with the selection.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:duplicateParentState="true"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp">
+
+    <ImageView
+        android:id="@+id/tab_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="5dp"
+        android:contentDescription="@null"
+        android:duplicateParentState="true"
+        android:tint="@color/uwu_tab_content_tint" />
+
+    <TextView
+        android:id="@+id/tab_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:duplicateParentState="true"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/uwu_tab_content_tint"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        tools:text="Subscriptions" />
+
+    <TextView
+        android:id="@+id/tab_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:background="@drawable/uwu_tab_badge_bg"
+        android:backgroundTint="@color/uwu_badge_bg_tint"
+        android:duplicateParentState="true"
+        android:paddingStart="7dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="7dp"
+        android:paddingBottom="2dp"
+        android:textColor="@color/uwu_badge_text_color"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:text="12"
+        tools:visibility="visible" />
+</LinearLayout>

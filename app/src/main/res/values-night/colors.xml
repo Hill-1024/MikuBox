@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- State layer used by card ripples: a light film in the dark theme. -->
+    <color name="uwu_state_layer">#33FFFFFF</color>
+</resources>

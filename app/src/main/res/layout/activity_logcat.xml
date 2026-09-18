@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Log screen: one card row per log line, filtered from the toolbar search and
+    shared from the toolbar menu, like the release build's logcat screen.
+-->
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -6,6 +10,7 @@
     android:background="?attr/colorBg">
 
     <com.google.android.material.appbar.AppBarLayout
+        app:liftOnScroll="true"
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,19 +29,9 @@
             app:expandedTitleMarginEnd="24dp"
             app:expandedTitleMarginStart="24dp"
             app:expandedTitleTextColor="?attr/colorOnPrimary"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:title="@string/menu_log"
             app:titleCollapseMode="scale">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:alpha="0.7"
-                android:contentDescription="@null"
-                android:src="@drawable/uwu_banner_image_2"
-                android:visibility="gone"
-                app:layout_collapseMode="parallax" />
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
@@ -54,39 +49,16 @@
         android:background="@drawable/uwu_background_collapse"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.google.android.material.card.MaterialCardView
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_log"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="16dp"
-            android:padding="8dp"
-            app:cardBackgroundColor="?attr/colorCard"
-            app:cardCornerRadius="28dp"
-            app:cardElevation="0dp">
-
-            <androidx.core.widget.NestedScrollView
-                android:id="@+id/logcat_scroll"
-                android:scrollbars="none"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scrollbars="none">
-
-                    <TextView
-                        android:id="@+id/logcat_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="monospace"
-                        android:padding="12dp"
-                        android:paddingBottom="96dp"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textIsSelectable="true"
-                        android:textSize="11sp" />
-                </HorizontalScrollView>
-            </androidx.core.widget.NestedScrollView>
-        </com.google.android.material.card.MaterialCardView>
+            android:clipToPadding="false"
+            android:paddingStart="8dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="104dp"
+            android:scrollbars="none" />
     </FrameLayout>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -96,10 +68,9 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="20dp"
         android:text="@string/action_clear"
-        android:textColor="?attr/colorOnSurface"
-        app:backgroundTint="?attr/colorCard"
+        android:textColor="?attr/colorOnPrimary"
+        app:backgroundTint="?attr/colorPrimary"
+        app:elevation="0dp"
         app:icon="@drawable/ic_action_delete"
-        app:iconTint="?attr/colorOnSurface"
-        app:strokeColor="?attr/colorOutline"
-        app:strokeWidth="1dp" />
+        app:iconTint="?attr/colorOnPrimary" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -8,9 +8,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.checkbox.MaterialCheckBox
+import com.google.android.material.materialswitch.MaterialSwitch
 import top.uwu.mikubox.R
 
+/**
+ * Per-app proxy list. Rows are cards with the package icon, its label and a
+ * switch; the whole row toggles, matching the release design's bypass list.
+ */
 class AppListAdapter(
     private val pm: PackageManager,
     private val onToggle: (String, Boolean) -> Unit,
@@ -18,22 +22,46 @@ class AppListAdapter(
 
     data class AppItem(val packageName: String, val label: String, val info: ApplicationInfo)
 
+    private var all: List<AppItem> = emptyList()
     private var apps: List<AppItem> = emptyList()
     private val checked = mutableSetOf<String>()
     private var enabled = true
+    private var query: String = ""
 
     @SuppressWarnings("NotifyDataSetChanged")
     fun submit(list: List<AppItem>, selected: Set<String>, listEnabled: Boolean) {
-        apps = list
+        all = list
         checked.clear()
         checked.addAll(selected)
         enabled = listEnabled
-        notifyDataSetChanged()
+        applyFilter()
     }
 
     @SuppressWarnings("NotifyDataSetChanged")
     fun setEnabled(listEnabled: Boolean) {
         enabled = listEnabled
+        notifyDataSetChanged()
+    }
+
+    @SuppressWarnings("NotifyDataSetChanged")
+    fun filter(text: String) {
+        query = text.trim()
+        applyFilter()
+    }
+
+    /** Packages of the rows currently on screen, for select-all/invert. */
+    fun visiblePackages(): List<String> = apps.map { it.packageName }
+
+    @SuppressWarnings("NotifyDataSetChanged")
+    private fun applyFilter() {
+        apps = if (query.isEmpty()) {
+            all
+        } else {
+            all.filter {
+                it.label.contains(query, ignoreCase = true) ||
+                    it.packageName.contains(query, ignoreCase = true)
+            }
+        }
         notifyDataSetChanged()
     }
 
@@ -48,7 +76,7 @@ class AppListAdapter(
         private val icon: ImageView = itemView.findViewById(R.id.app_icon)
         private val name: TextView = itemView.findViewById(R.id.app_name)
         private val pkg: TextView = itemView.findViewById(R.id.app_package)
-        private val check: MaterialCheckBox = itemView.findViewById(R.id.app_check)
+        private val check: MaterialSwitch = itemView.findViewById(R.id.app_check)
 
         fun bind(item: AppItem) {
             icon.setImageDrawable(item.info.loadIcon(pm))

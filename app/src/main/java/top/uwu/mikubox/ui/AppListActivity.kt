@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import top.uwu.mikubox.R
 import top.uwu.mikubox.databinding.ActivityAppListBinding
 import top.uwu.mikubox.service.MihomoVpnSettings
 import top.uwu.mikubox.service.MihomoVpnSettings.AppMode
@@ -25,6 +26,36 @@ class AppListActivity : EdgeToEdgeActivity() {
         setContentView(binding.root)
         applySystemBarInsets(binding.root)
         binding.toolbar.setNavigationOnClickListener { finish() }
+        binding.toolbar.inflateMenu(R.menu.menu_app_list)
+        val search = binding.toolbar.menu.findItem(R.id.action_search_apps)?.actionView
+            as? androidx.appcompat.widget.SearchView
+        search?.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(text: String?): Boolean = false
+
+            override fun onQueryTextChange(text: String?): Boolean {
+                adapter.filter(text.orEmpty())
+                return true
+            }
+        })
+        search?.setOnCloseListener {
+            adapter.filter("")
+            false
+        }
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_select_all -> {
+                    toggleSelectAll()
+                    true
+                }
+
+                R.id.action_invert_selection -> {
+                    invertSelection()
+                    true
+                }
+
+                else -> false
+            }
+        }
 
         selected.addAll(MihomoVpnSettings.packages(this))
 
@@ -62,9 +93,43 @@ class AppListActivity : EdgeToEdgeActivity() {
         }
     }
 
+    /** Select every row currently on screen, or clear them when all are on. */
+    private fun toggleSelectAll() {
+        val visible = adapter.visiblePackages()
+        if (visible.isEmpty()) return
+        val allSelected = visible.all { it in selected }
+        if (allSelected) {
+            selected.removeAll(visible.toSet())
+        } else {
+            selected.addAll(visible)
+        }
+        persistSelection()
+    }
+
+    private fun invertSelection() {
+        val visible = adapter.visiblePackages()
+        if (visible.isEmpty()) return
+        visible.forEach { pkg ->
+            if (pkg in selected) selected.remove(pkg) else selected.add(pkg)
+        }
+        persistSelection()
+    }
+
+    private fun persistSelection() {
+        MihomoVpnSettings.setPackages(this, selected)
+        adapter.submit(
+            adapterItems,
+            selected,
+            MihomoVpnSettings.appMode(this) != AppMode.ALL,
+        )
+        UwuSnackbar.success(this, getString(R.string.apps_selection_updated, selected.size))
+    }
+
+    private var adapterItems: List<AppListAdapter.AppItem> = emptyList()
+
     private fun installedApps(): List<AppListAdapter.AppItem> {
         val self = packageName
-        return packageManager.getInstalledPackages(PackageManager.GET_PERMISSIONS)
+        val items = packageManager.getInstalledPackages(PackageManager.GET_PERMISSIONS)
             .asSequence()
             .filter { it.packageName != self }
             .filter { it.requestedPermissions?.contains(android.Manifest.permission.INTERNET) == true }
@@ -78,5 +143,7 @@ class AppListActivity : EdgeToEdgeActivity() {
             }
             .sortedBy { it.label.lowercase() }
             .toList()
+        adapterItems = items
+        return items
     }
 }

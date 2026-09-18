@@ -5,6 +5,13 @@
     <color name="ping_green">#009966</color>
     <color name="ping_magenta">#FF0099</color>
 
+    <!-- log level accents: debug is blue, verbose/unknown stays neutral. -->
+    <color name="logcat_debug">#29B6F6</color>
+    <color name="logcat_verbose">#9E9E9E</color>
+
+    <!-- State layer used by card ripples: a dark film in the light theme. -->
+    <color name="uwu_state_layer">#1F000000</color>
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 

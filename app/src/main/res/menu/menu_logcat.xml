@@ -2,6 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_search_log"
+        android:icon="@drawable/ic_search_icon"
+        android:title="@string/logcat_search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
+    <item
+        android:id="@+id/action_copy_log"
+        android:icon="@drawable/ic_copy"
+        android:title="@string/logcat_copy"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_clear_log"
+        android:icon="@drawable/ic_action_delete"
+        android:title="@string/action_clear"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_export_log"
         android:icon="@drawable/ic_share_24dp"
         android:title="@string/logcat_export"

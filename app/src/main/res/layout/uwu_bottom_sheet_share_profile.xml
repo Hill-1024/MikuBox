@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Share sheet for a single profile, mirroring the release share sheet. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/uwu_background_bottom_sheet"
+    android:orientation="vertical"
+    android:paddingBottom="8dp">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="ifContentScrolls">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/header"
+                layout="@layout/uwu_sheet_header" />
+
+            <LinearLayout style="@style/UwuGroupHeader">
+                <ImageView
+                    style="@style/UwuGroupHeaderIcon"
+                    android:src="@drawable/ic_share_24dp" />
+
+                <TextView
+                    style="@style/UwuGroupHeaderLabel"
+                    android:text="@string/share_configuration" />
+            </LinearLayout>
+
+            <include
+                android:id="@+id/share_qrcode"
+                layout="@layout/uwu_row" />
+
+            <include
+                android:id="@+id/share_clipboard"
+                layout="@layout/uwu_row" />
+
+            <include
+                android:id="@+id/share_url"
+                layout="@layout/uwu_row" />
+
+            <include
+                android:id="@+id/share_file"
+                layout="@layout/uwu_row" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="8dp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

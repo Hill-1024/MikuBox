@@ -1,22 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<!-- Empty home list: the release design pairs a watermark glyph with a line. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="16dp"
-    android:layout_marginTop="12dp"
-    android:layout_marginEnd="16dp"
-    app:cardBackgroundColor="?attr/colorCard"
-    app:cardCornerRadius="28dp"
-    app:cardElevation="0dp"
-    app:strokeWidth="0dp">
+    android:layout_marginBottom="40dp"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="40dp">
+
+    <FrameLayout
+        android:layout_width="152dp"
+        android:layout_height="152dp">
+
+        <ImageView
+            android:layout_width="152dp"
+            android:layout_height="152dp"
+            android:alpha="0.3"
+            android:contentDescription="@null"
+            android:src="@drawable/uwu_bg_icon"
+            android:tint="?attr/colorPrimary" />
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_file_24dp"
+            android:tint="?attr/colorPrimary" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tv_empty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:gravity="center"
-        android:padding="28dp"
         android:text="@string/profiles_empty"
-        android:textColor="?attr/colorOnSurfaceVariant" />
-</com.google.android.material.card.MaterialCardView>
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="17sp"
+        tools:text="No profile yet, tap + to import one." />
+</LinearLayout>

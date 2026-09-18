@@ -4,6 +4,12 @@
         android:id="@+id/action_select"
         android:title="@string/action_select" />
     <item
+        android:id="@+id/action_pin"
+        android:title="@string/action_pin_server" />
+    <item
+        android:id="@+id/action_update"
+        android:title="@string/action_update" />
+    <item
         android:id="@+id/action_share"
         android:title="@string/action_share" />
     <item

@@ -23,6 +23,7 @@ object MihomoProfileStore {
         val updateIntervalMinutes: Long = 0,
         val updateWhenConnectedOnly: Boolean = false,
         val updatedAtMillis: Long = 0,
+        val pinned: Boolean = false,
     ) {
         val isSubscription: Boolean get() = !subscriptionUrl.isNullOrBlank()
     }
@@ -109,6 +110,22 @@ object MihomoProfileStore {
         MihomoSubscriptionUpdater.reconfigure(context)
     }
 
+    /**
+     * Reorders profiles so [orderedIds] lead the list in that order; anything
+     * not mentioned keeps its previous relative position behind them. Called
+     * after a drag on the home list.
+     */
+    fun reorder(context: Context, orderedIds: List<String>) {
+        val current = profiles(context)
+        val byId = current.associateBy { it.id }
+        val moved = orderedIds.mapNotNull { byId[it] }
+        if (moved.isEmpty()) return
+        val movedIds = moved.map { it.id }.toSet()
+        val rest = current.filterNot { it.id in movedIds }
+        replaceProfiles(context, moved + rest)
+        MihomoSubscriptionUpdater.reconfigure(context)
+    }
+
     fun replaceActiveConfig(context: Context, config: String) {
         val active = selected(context)
         if (active == null) {
@@ -162,6 +179,7 @@ object MihomoProfileStore {
         put("updateIntervalMinutes", updateIntervalMinutes)
         put("updateWhenConnectedOnly", updateWhenConnectedOnly)
         put("updatedAtMillis", updatedAtMillis)
+        put("pinned", pinned)
     }
 
     private fun JSONObject.toProfile(context: Context) = Profile(
@@ -172,6 +190,7 @@ object MihomoProfileStore {
         updateIntervalMinutes = optLong("updateIntervalMinutes"),
         updateWhenConnectedOnly = optBoolean("updateWhenConnectedOnly"),
         updatedAtMillis = optLong("updatedAtMillis"),
+        pinned = optBoolean("pinned"),
     )
 
     private val DEFAULT_CONFIG = """
