@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_tab_appearance">Appearance</string>
+    <string name="settings_tab_network">Network &amp; core</string>
+</resources>

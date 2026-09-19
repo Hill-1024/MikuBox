@@ -61,6 +61,36 @@
             android:parentActivityName=".ui.MainActivity" />
 
         <activity
+            android:name=".ui.tools.PingActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.ToolsActivity" />
+
+        <activity
+            android:name=".ui.tools.SpeedTestActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.ToolsActivity" />
+
+        <activity
+            android:name=".ui.tools.HostToIpActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.ToolsActivity" />
+
+        <activity
+            android:name=".ui.tools.HostnameFinderActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.ToolsActivity" />
+
+        <activity
+            android:name=".ui.tools.StunActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.ToolsActivity" />
+
+        <activity
+            android:name=".ui.tools.HotspotShareActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.ToolsActivity" />
+
+        <activity
             android:name=".ui.ProxiesActivity"
             android:exported="false"
             android:parentActivityName=".ui.MainActivity" />
