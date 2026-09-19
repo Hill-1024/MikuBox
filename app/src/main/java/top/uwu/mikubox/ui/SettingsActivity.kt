@@ -48,7 +48,42 @@ class SettingsActivity : EdgeToEdgeActivity() {
         setContentView(binding.root)
         applySystemBarInsets(binding.root)
         binding.toolbar.setNavigationOnClickListener { finish() }
+        setupTabs()
         setupRows()
+    }
+
+    /**
+     * Two pinned categories. Every row stays one tap away — the tab only decides
+     * which half of the page is shown, so there is no second navigation level.
+     */
+    private fun setupTabs() {
+        binding.settingsTab.addTab(
+            binding.settingsTab.newTab().setText(R.string.settings_tab_appearance)
+        )
+        binding.settingsTab.addTab(
+            binding.settingsTab.newTab().setText(R.string.settings_tab_network)
+        )
+        binding.settingsTab.addOnTabSelectedListener(
+            object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab) {
+                    showSection(tab.position == 0)
+                }
+
+                override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab) = Unit
+
+                override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab) {
+                    binding.settingsScroll.smoothScrollTo(0, 0)
+                }
+            }
+        )
+    }
+
+    private fun showSection(appearance: Boolean) {
+        binding.sectionAppearance.visibility =
+            if (appearance) android.view.View.VISIBLE else android.view.View.GONE
+        binding.sectionNetwork.visibility =
+            if (appearance) android.view.View.GONE else android.view.View.VISIBLE
+        binding.settingsScroll.smoothScrollTo(0, 0)
     }
 
     override fun onResume() {
@@ -121,6 +156,20 @@ class SettingsActivity : EdgeToEdgeActivity() {
             R.drawable.ic_format_font,
             getString(R.string.settings_font_size),
         ) { editFontScale() }
+        UwuRow.bind(
+            binding.rowIconShape,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_image_24dp,
+            getString(R.string.settings_icon_shape),
+            getString(R.string.settings_icon_shape_summary),
+        ) { ThemeDialogs.showIconShape(this) { render() } }
+        UwuRow.bind(
+            binding.rowBannerShape,
+            UwuRow.Slot.MIDDLE,
+            R.drawable.ic_image_24dp,
+            getString(R.string.settings_banner_shape),
+            getString(R.string.settings_banner_shape_summary),
+        ) { ThemeDialogs.showBannerShape(this) { render() } }
         UwuRow.bind(
             binding.rowBoldText,
             UwuRow.Slot.BOTTOM,
@@ -316,6 +365,8 @@ class SettingsActivity : EdgeToEdgeActivity() {
             binding.rowFontSize,
             getString(R.string.font_size_value, AppSettings.fontScale(this)),
         )
+        setValue(binding.rowIconShape, ThemeDialogs.iconShapeLabel(AppSettings.iconShape(this)))
+        setValue(binding.rowBannerShape, ThemeDialogs.iconShapeLabel(AppSettings.bannerShape(this)))
         setValue(binding.rowLanguage, getString(languageLabel(AppSettings.language(this))))
         setValue(
             binding.rowProfileName,

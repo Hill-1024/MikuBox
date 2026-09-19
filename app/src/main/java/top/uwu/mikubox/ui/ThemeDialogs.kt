@@ -18,6 +18,7 @@ import top.uwu.mikubox.R
 import top.uwu.mikubox.core.AppSettings
 import top.uwu.mikubox.core.ThemeManager
 import top.uwu.mikubox.databinding.DialogCustomColorBinding
+import top.uwu.mikubox.databinding.DialogIconShapeBinding
 import top.uwu.mikubox.databinding.DialogThemeColorBinding
 import top.uwu.mikubox.databinding.DialogUwuSliderBinding
 import top.uwu.mikubox.databinding.ItemThemeColorBinding
@@ -213,9 +214,14 @@ object ThemeDialogs {
             setColor(color)
         }
 
+    /**
+     * Applies the pick and rebuilds the screen. The recreate waits for the
+     * dialog's exit animation: tearing the activity down while the dialog is
+     * still fading out is what reads as a stutter.
+     */
     private fun dismissAndRecreate(activity: android.app.Activity, onChanged: () -> Unit) {
         onChanged()
-        activity.recreate()
+        activity.window.decorView.postDelayed({ activity.recreate() }, 220)
     }
 
     /** Font label lookup shared by the settings row and the picker sheet. */
@@ -231,5 +237,90 @@ object ThemeDialogs {
         val values = context.resources.getStringArray(R.array.font_family_values)
         val labels = context.resources.getStringArray(R.array.font_family_labels)
         return values.mapIndexed { index, key -> key to labels.getOrElse(index) { key } }
+    }
+
+    /** Badge shape keys (raw resources) with display names, in release order. */
+    fun iconShapeOptions(): List<Pair<String, String>> = listOf(
+        "uwu_shape_cookie" to "Cookie",
+        "uwu_shape_clover" to "Clover",
+        "uwu_shape_circle" to "Circle",
+        "uwu_shape_diamond" to "Diamond",
+        "uwu_shape_pentagon" to "Pentagon",
+        "uwu_shape_hexagon" to "Hexagon",
+        "uwu_shape_octagon" to "Octagon",
+        "uwu_shape_rounded_square" to "Rounded Square",
+        "uwu_shape_squircle" to "Squircle",
+        "uwu_shape_heart" to "Heart",
+    )
+
+    fun iconShapeLabel(key: String): String =
+        iconShapeOptions().firstOrNull { it.first == key }?.second ?: key
+
+    /** Icon-shape picker (the badge tiles across the app). */
+    fun showIconShape(activity: android.app.Activity, onChanged: () -> Unit) {
+        showShapePicker(
+            activity = activity,
+            titleRes = R.string.settings_icon_shape,
+            current = AppSettings::iconShape,
+            apply = AppSettings::setIconShape,
+            onChanged = onChanged,
+        )
+    }
+
+    /** Banner-shape picker; the release build keeps it apart from the icons. */
+    fun showBannerShape(activity: android.app.Activity, onChanged: () -> Unit) {
+        showShapePicker(
+            activity = activity,
+            titleRes = R.string.settings_banner_shape,
+            current = AppSettings::bannerShape,
+            apply = AppSettings::setBannerShape,
+            onChanged = onChanged,
+        )
+    }
+
+    /**
+     * Badge shape grid. Every cell previews through the real shape-clipped
+     * view, and picking applies instantly — the views listen for the
+     * preference change and re-clip themselves without a screen recreation.
+     */
+    private fun showShapePicker(
+        activity: android.app.Activity,
+        titleRes: Int,
+        current: (android.content.Context) -> String,
+        apply: (android.content.Context, String) -> Unit,
+        onChanged: () -> Unit,
+    ) {
+        val binding = DialogIconShapeBinding.inflate(LayoutInflater.from(activity))
+        val grid = binding.gridIconShapes
+        val selectedKey = current(activity)
+        val density = activity.resources.displayMetrics.density
+        val cells = mutableListOf<Pair<String, com.neko.widget.DynamicShapeImageView>>()
+
+        iconShapeOptions().forEach { (key, label) ->
+            val cell = com.neko.widget.DynamicShapeImageView(activity)
+            cell.contentDescription = label
+            cell.overrideShapeId = activity.resources.getIdentifier(key, "raw", activity.packageName)
+            cell.post { cell.reloadShape() }
+            cell.alpha = if (key == selectedKey) 1f else 0.45f
+            val params = android.widget.GridLayout.LayoutParams()
+            params.width = (48 * density).toInt()
+            params.height = (48 * density).toInt()
+            val margin = (6 * density).toInt()
+            params.setMargins(margin, margin, margin, margin)
+            cell.layoutParams = params
+            cell.setOnClickListener {
+                apply(activity, key)
+                cells.forEach { (cellKey, cellView) -> cellView.alpha = if (cellKey == key) 1f else 0.45f }
+                onChanged()
+            }
+            grid.addView(cell)
+            cells.add(key to cell)
+        }
+
+        MaterialAlertDialogBuilder(activity)
+            .setTitle(titleRes)
+            .setView(binding.root)
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 }

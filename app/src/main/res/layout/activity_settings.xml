@@ -37,9 +37,41 @@
                 app:navigationIcon="@drawable/uwu_circle_back"
                 app:titleTextColor="?attr/colorOnPrimary" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        <!--
+            Pinned category tabs: the page keeps every row one tap away without a
+            second level of navigation, the tab only decides which half is shown.
+        -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="?attr/colorCard"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/settings_tab"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@android:color/transparent"
+                app:tabIndicator="@drawable/uwu_tabs_rounded_indicator"
+                app:tabIndicatorAnimationMode="elastic"
+                app:tabIndicatorColor="?attr/colorPrimary"
+                app:tabIndicatorFullWidth="true"
+                app:tabIndicatorHeight="40dp"
+                app:tabMode="fixed"
+                app:tabRippleColor="@android:color/transparent"
+                app:tabSelectedTextColor="?attr/colorOnPrimary"
+                app:tabTextColor="?attr/colorOnSurfaceVariant" />
+        </com.google.android.material.card.MaterialCardView>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/settings_scroll"
         android:scrollbars="none"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -108,195 +140,219 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ===== Appearance ===== -->
-            <LinearLayout style="@style/UwuGroupHeader">
-                <ImageView
-                    style="@style/UwuGroupHeaderIcon"
-                    android:src="@drawable/ic_palette_24" />
+            <!-- ===== Appearance tab ===== -->
+            <LinearLayout
+                android:id="@+id/section_appearance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <TextView
-                    style="@style/UwuGroupHeaderLabel"
-                    android:text="@string/settings_section_appearance" />
+                <LinearLayout style="@style/UwuGroupHeader">
+                    <ImageView
+                        style="@style/UwuGroupHeaderIcon"
+                        android:src="@drawable/ic_palette_24" />
+
+                    <TextView
+                        style="@style/UwuGroupHeaderLabel"
+                        android:text="@string/settings_section_appearance" />
+                </LinearLayout>
+
+                <include
+                    android:id="@+id/row_theme_color"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_dynamic_color"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_dynamic_banner"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_dark_mode"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_true_black"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_font"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_font_size"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_icon_shape"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_banner_shape"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_bold_text"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_language"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_profile_name"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_particles"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_quick_actions"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_fab_extended"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_compact_actions"
+                    layout="@layout/uwu_row" />
             </LinearLayout>
 
-            <include
-                android:id="@+id/row_theme_color"
-                layout="@layout/uwu_row" />
+            <!-- ===== Network tab ===== -->
+            <LinearLayout
+                android:id="@+id/section_network"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
 
-            <include
-                android:id="@+id/row_dynamic_color"
-                layout="@layout/uwu_row" />
+                <!-- ===== General ===== -->
+                <LinearLayout style="@style/UwuGroupHeader">
+                    <ImageView
+                        style="@style/UwuGroupHeaderIcon"
+                        android:src="@drawable/ic_wan" />
 
-            <include
-                android:id="@+id/row_dynamic_banner"
-                layout="@layout/uwu_row" />
+                    <TextView
+                        style="@style/UwuGroupHeaderLabel"
+                        android:text="@string/settings_section_general" />
+                </LinearLayout>
 
-            <include
-                android:id="@+id/row_dark_mode"
-                layout="@layout/uwu_row" />
+                <include
+                    android:id="@+id/row_boot"
+                    layout="@layout/uwu_row" />
 
-            <include
-                android:id="@+id/row_true_black"
-                layout="@layout/uwu_row" />
+                <include
+                    android:id="@+id/row_autoconnect"
+                    layout="@layout/uwu_row" />
 
-            <include
-                android:id="@+id/row_font"
-                layout="@layout/uwu_row" />
+                <include
+                    android:id="@+id/row_mode"
+                    layout="@layout/uwu_row" />
 
-            <include
-                android:id="@+id/row_font_size"
-                layout="@layout/uwu_row" />
+                <include
+                    android:id="@+id/row_log"
+                    layout="@layout/uwu_row" />
 
-            <include
-                android:id="@+id/row_bold_text"
-                layout="@layout/uwu_row" />
+                <include
+                    android:id="@+id/row_tun_stack"
+                    layout="@layout/uwu_row" />
 
-            <include
-                android:id="@+id/row_language"
-                layout="@layout/uwu_row" />
+                <include
+                    android:id="@+id/row_mtu"
+                    layout="@layout/uwu_row" />
 
-            <include
-                android:id="@+id/row_profile_name"
-                layout="@layout/uwu_row" />
+                <include
+                    android:id="@+id/row_unified_delay"
+                    layout="@layout/uwu_row" />
 
-            <include
-                android:id="@+id/row_particles"
-                layout="@layout/uwu_row" />
+                <include
+                    android:id="@+id/row_tcp_concurrent"
+                    layout="@layout/uwu_row" />
 
-            <include
-                android:id="@+id/row_quick_actions"
-                layout="@layout/uwu_row" />
+                <!-- ===== Route ===== -->
+                <LinearLayout style="@style/UwuGroupHeader">
+                    <ImageView
+                        style="@style/UwuGroupHeaderIcon"
+                        android:src="@drawable/ic_lan" />
 
-            <include
-                android:id="@+id/row_fab_extended"
-                layout="@layout/uwu_row" />
+                    <TextView
+                        style="@style/UwuGroupHeaderLabel"
+                        android:text="@string/settings_section_route" />
+                </LinearLayout>
 
-            <include
-                android:id="@+id/row_compact_actions"
-                layout="@layout/uwu_row" />
+                <include
+                    android:id="@+id/row_apps"
+                    layout="@layout/uwu_row" />
 
-            <!-- ===== General ===== -->
-            <LinearLayout style="@style/UwuGroupHeader">
-                <ImageView
-                    style="@style/UwuGroupHeaderIcon"
-                    android:src="@drawable/ic_wan" />
+                <include
+                    android:id="@+id/row_ipv6"
+                    layout="@layout/uwu_row" />
 
-                <TextView
-                    style="@style/UwuGroupHeaderLabel"
-                    android:text="@string/settings_section_general" />
+                <!-- ===== Inbound ===== -->
+                <LinearLayout style="@style/UwuGroupHeader">
+                    <ImageView
+                        style="@style/UwuGroupHeaderIcon"
+                        android:src="@drawable/ic_wan" />
+
+                    <TextView
+                        style="@style/UwuGroupHeaderLabel"
+                        android:text="@string/settings_section_inbound" />
+                </LinearLayout>
+
+                <include
+                    android:id="@+id/row_allow_lan"
+                    layout="@layout/uwu_row" />
+
+                <!-- ===== DNS ===== -->
+                <LinearLayout style="@style/UwuGroupHeader">
+                    <ImageView
+                        style="@style/UwuGroupHeaderIcon"
+                        android:src="@drawable/ic_dns" />
+
+                    <TextView
+                        style="@style/UwuGroupHeaderLabel"
+                        android:text="@string/dns_title" />
+                </LinearLayout>
+
+                <include
+                    android:id="@+id/row_dns"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_advanced"
+                    layout="@layout/uwu_row" />
+
+                <!-- ===== Miscellaneous ===== -->
+                <LinearLayout style="@style/UwuGroupHeader">
+                    <ImageView
+                        style="@style/UwuGroupHeaderIcon"
+                        android:src="@drawable/ic_backup_24dp" />
+
+                    <TextView
+                        style="@style/UwuGroupHeaderLabel"
+                        android:text="@string/settings_section_misc" />
+                </LinearLayout>
+
+                <include
+                    android:id="@+id/row_test_url"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_test_timeout"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_export"
+                    layout="@layout/uwu_row" />
+
+                <include
+                    android:id="@+id/row_import"
+                    layout="@layout/uwu_row" />
             </LinearLayout>
-
-            <include
-                android:id="@+id/row_boot"
-                layout="@layout/uwu_row" />
-
-            <include
-                android:id="@+id/row_autoconnect"
-                layout="@layout/uwu_row" />
-
-            <include
-                android:id="@+id/row_mode"
-                layout="@layout/uwu_row" />
-
-            <include
-                android:id="@+id/row_log"
-                layout="@layout/uwu_row" />
-
-            <include
-                android:id="@+id/row_tun_stack"
-                layout="@layout/uwu_row" />
-
-            <include
-                android:id="@+id/row_mtu"
-                layout="@layout/uwu_row" />
-
-            <include
-                android:id="@+id/row_unified_delay"
-                layout="@layout/uwu_row" />
-
-            <include
-                android:id="@+id/row_tcp_concurrent"
-                layout="@layout/uwu_row" />
-
-            <!-- ===== Route ===== -->
-            <LinearLayout style="@style/UwuGroupHeader">
-                <ImageView
-                    style="@style/UwuGroupHeaderIcon"
-                    android:src="@drawable/ic_lan" />
-
-                <TextView
-                    style="@style/UwuGroupHeaderLabel"
-                    android:text="@string/settings_section_route" />
-            </LinearLayout>
-
-            <include
-                android:id="@+id/row_apps"
-                layout="@layout/uwu_row" />
-
-            <include
-                android:id="@+id/row_ipv6"
-                layout="@layout/uwu_row" />
-
-            <!-- ===== Inbound ===== -->
-            <LinearLayout style="@style/UwuGroupHeader">
-                <ImageView
-                    style="@style/UwuGroupHeaderIcon"
-                    android:src="@drawable/ic_wan" />
-
-                <TextView
-                    style="@style/UwuGroupHeaderLabel"
-                    android:text="@string/settings_section_inbound" />
-            </LinearLayout>
-
-            <include
-                android:id="@+id/row_allow_lan"
-                layout="@layout/uwu_row" />
-
-            <!-- ===== DNS ===== -->
-            <LinearLayout style="@style/UwuGroupHeader">
-                <ImageView
-                    style="@style/UwuGroupHeaderIcon"
-                    android:src="@drawable/ic_dns" />
-
-                <TextView
-                    style="@style/UwuGroupHeaderLabel"
-                    android:text="@string/dns_title" />
-            </LinearLayout>
-
-            <include
-                android:id="@+id/row_dns"
-                layout="@layout/uwu_row" />
-
-            <include
-                android:id="@+id/row_advanced"
-                layout="@layout/uwu_row" />
-
-            <!-- ===== Miscellaneous ===== -->
-            <LinearLayout style="@style/UwuGroupHeader">
-                <ImageView
-                    style="@style/UwuGroupHeaderIcon"
-                    android:src="@drawable/ic_backup_24dp" />
-
-                <TextView
-                    style="@style/UwuGroupHeaderLabel"
-                    android:text="@string/settings_section_misc" />
-            </LinearLayout>
-
-            <include
-                android:id="@+id/row_test_url"
-                layout="@layout/uwu_row" />
-
-            <include
-                android:id="@+id/row_test_timeout"
-                layout="@layout/uwu_row" />
-
-            <include
-                android:id="@+id/row_export"
-                layout="@layout/uwu_row" />
-
-            <include
-                android:id="@+id/row_import"
-                layout="@layout/uwu_row" />
 
             <Space
                 android:layout_width="match_parent"

@@ -27,6 +27,14 @@ object AppSettings {
     private const val KEY_BOLD_TEXT = "bold_text"
     private const val KEY_HIDE_FROM_RECENTS = "hide_from_recents"
 
+    /** Badge shape key for the shape-clipped image views, e.g. "uwu_shape_cookie". */
+    const val KEY_ICON_SHAPE = "icon_shape"
+
+    /** Banner shape key; the release build keeps this separate from the icons. */
+    const val KEY_BANNER_SHAPE = "banner_shape"
+
+    const val ICON_SHAPE_DEFAULT = "uwu_shape_cookie"
+
     /** Night mode values; [NIGHT_AUTO] follows the clock (day 6:00-18:00). */
     const val NIGHT_SYSTEM = "system"
     const val NIGHT_LIGHT = "light"
@@ -252,5 +260,23 @@ object AppSettings {
         ThemeManager.notifyThemeChanged()
     }
 
-    private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    /** One of the uwu_shape_* raw keys; drives every shape-clipped badge. */
+    fun iconShape(context: Context): String =
+        prefs(context).getString(KEY_ICON_SHAPE, ICON_SHAPE_DEFAULT).orEmpty()
+            .takeIf { it.startsWith("uwu_shape_") } ?: ICON_SHAPE_DEFAULT
+
+    fun setIconShape(context: Context, shape: String) {
+        prefs(context).edit().putString(KEY_ICON_SHAPE, shape).commit()
+    }
+
+    /** One of the uwu_shape_* raw keys; drives the banner avatar's clip. */
+    fun bannerShape(context: Context): String =
+        prefs(context).getString(KEY_BANNER_SHAPE, ICON_SHAPE_DEFAULT).orEmpty()
+            .takeIf { it.startsWith("uwu_shape_") } ?: ICON_SHAPE_DEFAULT
+
+    fun setBannerShape(context: Context, shape: String) {
+        prefs(context).edit().putString(KEY_BANNER_SHAPE, shape).commit()
+    }
+
+    fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 }
