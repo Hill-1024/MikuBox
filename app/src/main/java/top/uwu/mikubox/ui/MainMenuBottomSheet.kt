@@ -33,14 +33,6 @@ class MainMenuBottomSheet : BaseUwuSheet() {
             arrow = true,
         ) { open(SettingsActivity::class.java) }
         UwuRow.bind(
-            binding.menuDns,
-            UwuRow.Slot.MIDDLE,
-            R.drawable.ic_dns,
-            getString(R.string.dns_title),
-            getString(R.string.settings_dns_summary),
-            arrow = true,
-        ) { open(DnsActivity::class.java) }
-        UwuRow.bind(
             binding.menuRules,
             UwuRow.Slot.MIDDLE,
             R.drawable.ic_rules_24dp,

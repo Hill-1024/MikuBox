@@ -41,10 +41,6 @@
                 layout="@layout/uwu_row" />
 
             <include
-                android:id="@+id/menu_dns"
-                layout="@layout/uwu_row" />
-
-            <include
                 android:id="@+id/menu_rules"
                 layout="@layout/uwu_row" />
 

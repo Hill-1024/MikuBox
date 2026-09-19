@@ -38,22 +38,21 @@
             android:paddingEnd="18dp"
             android:paddingBottom="14dp">
 
-            <TextView
+            <com.neko.marquee.text.Greetings
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/uwu_font_title"
-                android:text="@string/drawer_greeting"
                 android:textColor="@android:color/white"
                 android:textSize="17sp"
                 android:textStyle="bold" />
 
-            <TextView
+            <com.neko.marquee.text.RandomText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/uwu_font_summary"
-                android:text="@string/drawer_subtitle"
                 android:textColor="@android:color/white"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                uwu_runnable="true" />
         </LinearLayout>
     </FrameLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -93,4 +93,5 @@
     <color name="qsb_icon_tint_quaternary">#1B6A67</color>
     <color name="color_fab_active">#F97910</color>
     <color name="color_fab_inactive">#9C9C9C</color>
+    <color name="startColor">#59FFFFFF</color>
 </resources>

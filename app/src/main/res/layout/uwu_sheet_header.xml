@@ -52,16 +52,13 @@
             android:orientation="horizontal"
             android:padding="12dp">
 
-            <com.google.android.material.imageview.ShapeableImageView
+            <com.neko.widget.ProfileBannerImageView
                 android:id="@+id/iv_sheet_profile"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:contentDescription="@null"
-                android:scaleType="centerCrop"
-                android:src="@drawable/uwu_banner_profile"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.Miku.Circle"
-                app:strokeColor="?attr/colorPrimary"
-                app:strokeWidth="3dp" />
+                app:siBorderColor="?attr/colorPrimary"
+                app:siBorderWidth="3dp" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -70,27 +67,30 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <TextView
+                <com.neko.marquee.text.UserNameTextView
                     android:id="@+id/sheet_username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
                     android:singleLine="true"
                     android:textColor="@android:color/white"
                     android:textSize="17sp"
                     android:textStyle="bold"
                     tools:text="Hi, master" />
 
-                <TextView
+                <com.neko.marquee.text.RandomText
                     android:id="@+id/sheet_subtitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:alpha="0.85"
                     android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
                     android:singleLine="true"
                     android:textColor="@android:color/white"
                     android:textSize="14sp"
                     android:textStyle="bold"
+                    uwu_runnable="true"
                     tools:text="Let's do our best!" />
             </LinearLayout>
         </LinearLayout>

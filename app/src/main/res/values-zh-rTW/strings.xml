@@ -572,4 +572,27 @@
     <string name="theme_custom_summary">選擇任意種子色（Android 12 以上）</string>
     <string name="font_picker_title">字型</string>
     <string name="ip_connected">IP：%1$s</string>
+
+    <string name="uwu_greeting_morning"> 早安…</string>
+    <string name="uwu_greeting_afternoon"> 午安…</string>
+    <string name="uwu_greeting_evening"> 暮安…</string>
+    <string name="uwu_greeting_night"> 晚安…</string>
+    <string name="uwu_greeting_late_night"> 該睡覺啦…</string>
+
+    <string name="uwu_banner_summary">來和我一起唱歌吧！</string>
+    <string name="uwu_banner_summary_1">美好的一天。</string>
+    <string name="uwu_banner_summary_2">祝你有美好的一天。</string>
+    <string name="uwu_banner_summary_3">讓我們努力工作！</string>
+    <string name="uwu_banner_summary_4">在找什麼嗎？</string>
+    <string name="uwu_banner_summary_5">讓我們專注於今天！</string>
+    <string name="uwu_banner_summary_6">祝你有個愉快的一天！</string>
+    <string name="uwu_banner_summary_7">歡迎回來。</string>
+    <string name="uwu_banner_summary_8">打開你的心靈吧..!</string>
+    <string name="uwu_banner_summary_9">突破.. 限制！</string>
+    <string name="uwu_banner_summary_10">你在做什麼呢？</string>
+
+    <string name="settings_icon_shape">圖示形狀</string>
+    <string name="settings_icon_shape_summary">應用內徽章磁貼的形狀</string>
+    <string name="settings_banner_shape">橫幅形狀</string>
+    <string name="settings_banner_shape_summary">彈層頭部頭像的形狀</string>
 </resources>

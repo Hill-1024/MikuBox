@@ -216,6 +216,56 @@
     <string name="toast_backup_imported">Backup imported</string>
     <string name="toast_backup_failed">Backup failed</string>
 
+    <!-- Tools: small utilities ported from the release build -->
+    <string name="tools_section_small">Small tools</string>
+    <string name="tools_tab_small">Small tools</string>
+    <string name="tool_ping">Ping</string>
+    <string name="tool_ping_summary">Send ICMP echo to a host</string>
+    <string name="tool_ping_hint">Host or IP</string>
+    <string name="tool_ping_failed">Ping failed or blocked</string>
+    <string name="tool_speed">Speed test</string>
+    <string name="tool_speed_summary">Measure download goodput</string>
+    <string name="tool_speed_desc">Streams a fixed payload over the current tunnel or network and reports the goodput.</string>
+    <string name="tool_speed_start">Start test</string>
+    <string name="tool_speed_idle">Tap “Start test” to begin.</string>
+    <string name="tool_speed_no_data">No data received</string>
+    <string name="tool_speed_result">%1$s Mbps · %2$s downloaded</string>
+    <string name="tool_host_to_ip">Host → IP</string>
+    <string name="tool_host_to_ip_summary">Resolve a domain to its addresses</string>
+    <string name="tool_host_to_ip_result">“%1$s” resolves to:</string>
+    <string name="tool_hostname_finder">Hostname finder</string>
+    <string name="tool_hostname_summary">Reverse-DNS an address</string>
+    <string name="tool_ip_hint">IP address</string>
+    <string name="tool_hostname_result">%1$s → %2$s</string>
+    <string name="tool_hostname_none">No reverse record for %1$s</string>
+    <string name="tool_stun">STUN / NAT test</string>
+    <string name="tool_stun_summary">Detect NAT and the public endpoint</string>
+    <string name="tool_stun_server">STUN server (host:port)</string>
+    <string name="tool_stun_start">Run STUN test</string>
+    <string name="tool_stun_result">Public endpoint: %1$s (port %2$d)</string>
+    <string name="tool_stun_via">via %1$s</string>
+    <string name="tool_stun_cone">Same mapping from both servers — endpoint-independent NAT.</string>
+    <string name="tool_stun_symmetric">Different mapping per server — symmetric NAT: %1$s</string>
+    <string name="tool_stun_local">Local address: %1$s</string>
+    <string name="tool_stun_unreachable">No answer from %1$s</string>
+    <string name="tool_hotspot">LAN sharing</string>
+    <string name="tool_hotspot_summary">Share the tunnel with other devices</string>
+    <string name="tool_hotspot_allow_lan">Allow LAN clients</string>
+    <string name="tool_hotspot_warn">Allow LAN is off — other devices cannot reach the proxy yet.</string>
+    <string name="tool_hotspot_port">Proxy port: %1$d (HTTP + SOCKS)</string>
+    <string name="tool_hotspot_no_lan">No LAN address found.</string>
+    <string name="tool_hotspot_hint">Point other devices at one of the addresses above with this port while the tunnel is running.</string>
+    <string name="tool_host_hint">Host or IP</string>
+    <string name="tool_run">Run</string>
+    <string name="tool_running">Running…</string>
+    <string name="tool_failed">Failed: %1$s</string>
+    <string name="tool_no_result">No result</string>
+    <string name="tool_error_empty">Enter a host first</string>
+    <string name="tool_error_invalid_host">That host does not look valid</string>
+    <string name="tool_error_unresolved">Could not resolve the host</string>
+    <string name="tool_error_private">Private and reserved addresses are not allowed here</string>
+    <string name="tool_lookup_hint_geo">Tip: resolving follows the system DNS, so lookups go through the tunnel while the VPN is up.</string>
+
     <!-- Proxies / node list -->
     <string name="menu_proxies">Proxies</string>
     <string name="proxies_title">Proxies</string>
@@ -556,4 +606,41 @@
     <string name="settings_compact_actions">Collapse list actions</string>
     <string name="settings_compact_actions_summary">Move share, update and delete into a per-row overflow menu</string>
     <string name="quick_actions_updated">Updated %1$d/%2$d subscriptions</string>
+
+    <string name="settings_icon_shape">Icon shape</string>
+    <string name="settings_icon_shape_summary">Shape of the badge tiles across the app</string>
+    <string name="settings_banner_shape">Banner shape</string>
+    <string name="settings_banner_shape_summary">Shape of the avatar in the sheet header</string>
+
+    <string name="uwu_greeting_morning">Good morning...</string>
+    <string name="uwu_greeting_afternoon">Good afternoon...</string>
+    <string name="uwu_greeting_evening">Good evening...</string>
+    <string name="uwu_greeting_night">Good night...</string>
+    <string name="uwu_greeting_late_night">"It's time to go to sleep..."</string>
+
+    <string name="uwu_banner_summary">"Let's sing with me!"</string>
+    <string name="uwu_banner_summary_1">Beautiful day.</string>
+    <string name="uwu_banner_summary_2">Have a wonderful day.</string>
+    <string name="uwu_banner_summary_3">"Let's work hard!"</string>
+    <string name="uwu_banner_summary_4">Looking for something?</string>
+    <string name="uwu_banner_summary_5">"Let's focus on today!"</string>
+    <string name="uwu_banner_summary_6">Have a nice day!</string>
+    <string name="uwu_banner_summary_7">Welcome Back.</string>
+    <string name="uwu_banner_summary_8">Open your mind..!</string>
+    <string name="uwu_banner_summary_9">Break.. the limit!</string>
+    <string name="uwu_banner_summary_10">What are U doing?</string>
+
+    <string-array name="uwu_random_text">
+        <item>@string/uwu_banner_summary</item>
+        <item>@string/uwu_banner_summary_1</item>
+        <item>@string/uwu_banner_summary_2</item>
+        <item>@string/uwu_banner_summary_3</item>
+        <item>@string/uwu_banner_summary_4</item>
+        <item>@string/uwu_banner_summary_5</item>
+        <item>@string/uwu_banner_summary_6</item>
+        <item>@string/uwu_banner_summary_7</item>
+        <item>@string/uwu_banner_summary_8</item>
+        <item>@string/uwu_banner_summary_9</item>
+        <item>@string/uwu_banner_summary_10</item>
+    </string-array>
 </resources>

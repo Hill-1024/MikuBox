@@ -52,6 +52,13 @@
         <attr name="shapeBackgroundColor" format="color|reference" />
     </declare-styleable>
 
+    <declare-styleable name="ElasticView">
+        <attr name="flexibility" format="float" />
+    </declare-styleable>
+
+    <!-- UwU badge glyph tint; not exposed by the Material library, so declared here. -->
+    <attr name="colorIcon" format="color|reference" />
+
     <declare-styleable name="UwuHeaderIconView">
         <attr name="sectionIcon" format="reference" />
     </declare-styleable>

@@ -574,4 +574,27 @@
     <string name="theme_custom_summary">Любой исходный цвет (Android 12+)</string>
     <string name="font_picker_title">Шрифт</string>
     <string name="ip_connected">IP: %1$s</string>
+
+    <string name="uwu_greeting_morning"> Доброе утро…</string>
+    <string name="uwu_greeting_afternoon"> Добрый день…</string>
+    <string name="uwu_greeting_evening"> Добрый вечер…</string>
+    <string name="uwu_greeting_night"> Спокойной ночи…</string>
+    <string name="uwu_greeting_late_night"> Пора спать…</string>
+
+    <string name="uwu_banner_summary">Спой со мной!</string>
+    <string name="uwu_banner_summary_1">Прекрасный день.</string>
+    <string name="uwu_banner_summary_2">Хорошего тебе дня.</string>
+    <string name="uwu_banner_summary_3">Давай работать усерднее!</string>
+    <string name="uwu_banner_summary_4">Ищешь что-то?</string>
+    <string name="uwu_banner_summary_5">Сосредоточимся на сегодня!</string>
+    <string name="uwu_banner_summary_6">Хорошего дня!</string>
+    <string name="uwu_banner_summary_7">С возвращением.</string>
+    <string name="uwu_banner_summary_8">Открой свой разум..!</string>
+    <string name="uwu_banner_summary_9">Прорвём.. эти пределы!</string>
+    <string name="uwu_banner_summary_10">Чем занимаешься?</string>
+
+    <string name="settings_icon_shape">Форма значков</string>
+    <string name="settings_icon_shape_summary">Форма плиток-значков в приложении</string>
+    <string name="settings_banner_shape">Форма баннера</string>
+    <string name="settings_banner_shape_summary">Форма аватара в шапке панели</string>
 </resources>

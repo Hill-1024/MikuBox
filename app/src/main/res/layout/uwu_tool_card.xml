@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Wide card in the "Tools & Info" rail of the main menu sheet. -->
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.neko.elasticview.ElasticView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="250dp"
@@ -24,8 +24,12 @@
 
         <FrameLayout
             android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:background="@drawable/uwu_bg_circle_primary">
+            android:layout_height="45dp">
+
+            <com.neko.widget.DynamicShapeImageView
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:contentDescription="@null" />
 
             <ImageView
                 android:id="@+id/tool_icon"
@@ -33,7 +37,7 @@
                 android:layout_height="25dp"
                 android:layout_gravity="center"
                 android:contentDescription="@null"
-                app:tint="?attr/colorOnPrimary"
+                app:tint="?attr/colorIcon"
                 tools:src="@drawable/ic_logcat_24dp" />
         </FrameLayout>
 
@@ -67,4 +71,4 @@
                 tools:text="View connection and app error logs" />
         </LinearLayout>
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+</com.neko.elasticview.ElasticView>

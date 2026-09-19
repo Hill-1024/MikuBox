@@ -572,4 +572,27 @@
     <string name="theme_custom_summary">Pilih warna sumber mana pun (Android 12+)</string>
     <string name="font_picker_title">Font</string>
     <string name="ip_connected">IP: %1$s</string>
+
+    <string name="uwu_greeting_morning">Met Pagi...</string>
+    <string name="uwu_greeting_afternoon">Met Siang...</string>
+    <string name="uwu_greeting_evening">Met Sore...</string>
+    <string name="uwu_greeting_night">Met Malem...</string>
+    <string name="uwu_greeting_late_night">Waktunya bobo...</string>
+
+    <string name="uwu_banner_summary">Yuk, nyanyi bareng aku!</string>
+    <string name="uwu_banner_summary_1">Hari yang indah.</string>
+    <string name="uwu_banner_summary_2">Semoga harimu luar biasa.</string>
+    <string name="uwu_banner_summary_3">Ayo kerja keras!</string>
+    <string name="uwu_banner_summary_4">Lagi nyari sesuatu?</string>
+    <string name="uwu_banner_summary_5">Ayo fokus hari ini!</string>
+    <string name="uwu_banner_summary_6">Semoga harimu asik!</string>
+    <string name="uwu_banner_summary_7">Met dateng kembali.</string>
+    <string name="uwu_banner_summary_8">Buka pikiranmu..!</string>
+    <string name="uwu_banner_summary_9">Tembus..batasnya!</string>
+    <string name="uwu_banner_summary_10">Lagi ngapain?</string>
+
+    <string name="settings_icon_shape">Bentuk ikon</string>
+    <string name="settings_icon_shape_summary">Bentuk lencana di seluruh aplikasi</string>
+    <string name="settings_banner_shape">Bentuk banner</string>
+    <string name="settings_banner_shape_summary">Bentuk avatar di kepala panel</string>
 </resources>

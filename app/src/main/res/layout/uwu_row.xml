@@ -31,8 +31,12 @@
         <FrameLayout
             android:id="@+id/row_badge"
             android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:background="@drawable/uwu_bg_circle_primary">
+            android:layout_height="45dp">
+
+            <com.neko.widget.DynamicShapeImageView
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:contentDescription="@null" />
 
             <ImageView
                 android:id="@+id/row_icon"
@@ -40,7 +44,7 @@
                 android:layout_height="25dp"
                 android:layout_gravity="center"
                 android:contentDescription="@null"
-                app:tint="?attr/colorOnPrimary"
+                app:tint="?attr/colorIcon"
                 tools:src="@drawable/ic_settings_24dp" />
         </FrameLayout>
 

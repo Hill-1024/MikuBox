@@ -43,8 +43,8 @@ abstract class BaseUwuSheet : BottomSheetDialogFragment() {
 
     /** Fills the banner header shared by every sheet. */
     protected fun bindHeader(binding: UwuSheetHeaderBinding) {
-        binding.sheetUsername.text = profileName()
-        binding.sheetSubtitle.text = getString(R.string.scaffold_subtitle)
+        // The username and subtitle views fill themselves (marquee views ported
+        // from the UwU design); only the particles toggle is bound here.
         binding.particlesView.visibility = if (AppSettings.particlesEnabled(requireContext())) {
             View.VISIBLE
         } else {
