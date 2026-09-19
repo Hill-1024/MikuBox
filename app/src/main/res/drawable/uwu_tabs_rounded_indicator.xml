@@ -2,8 +2,10 @@
 <shape
     android:shape="rectangle"
     xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Below the 20dp card corner on purpose: the card clips the indicator's
+         corners, so the pill and its frame share one rounding. -->
     <corners
-        android:radius="23.0dip" />
+        android:radius="14.0dip" />
     <solid
         android:color="?attr/colorPrimary" />
 </shape>

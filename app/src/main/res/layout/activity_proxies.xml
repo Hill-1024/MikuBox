@@ -79,19 +79,18 @@
                 android:layout_height="60dp"
                 app:cardBackgroundColor="?attr/colorCard"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="0dp"
-                app:contentPadding="4dp">
+                app:cardElevation="0dp">
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/group_tab"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="match_parent"
                     android:background="@android:color/transparent"
                     app:tabIndicator="@drawable/uwu_tabs_rounded_indicator"
                     app:tabIndicatorAnimationMode="elastic"
                     app:tabIndicatorColor="?attr/colorPrimary"
                     app:tabIndicatorFullWidth="true"
-                    app:tabIndicatorHeight="52dp"
+                    app:tabIndicatorHeight="60dp"
                     app:tabMode="scrollable"
                     app:tabRippleColor="@android:color/transparent"
                     app:tabSelectedTextColor="?attr/colorSurface"
