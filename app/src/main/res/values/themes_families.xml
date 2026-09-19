@@ -53,8 +53,6 @@
         <item name="colorOnTertiaryFixed">@color/t_teal_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_teal_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_teal_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.Cyan" parent="Theme.MikuBoxCla">
@@ -103,8 +101,6 @@
         <item name="colorOnTertiaryFixed">@color/t_cyan_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_cyan_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_cyan_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.LightBlue" parent="Theme.MikuBoxCla">
@@ -153,8 +149,6 @@
         <item name="colorOnTertiaryFixed">@color/t_light_blue_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_light_blue_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_light_blue_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.Blue" parent="Theme.MikuBoxCla">
@@ -203,8 +197,6 @@
         <item name="colorOnTertiaryFixed">@color/t_blue_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_blue_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_blue_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.Indigo" parent="Theme.MikuBoxCla">
@@ -253,8 +245,6 @@
         <item name="colorOnTertiaryFixed">@color/t_indigo_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_indigo_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_indigo_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.DeepPurple" parent="Theme.MikuBoxCla">
@@ -303,8 +293,6 @@
         <item name="colorOnTertiaryFixed">@color/t_deep_purple_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_deep_purple_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_deep_purple_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.Purple" parent="Theme.MikuBoxCla">
@@ -353,8 +341,6 @@
         <item name="colorOnTertiaryFixed">@color/t_purple_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_purple_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_purple_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.Magenta" parent="Theme.MikuBoxCla">
@@ -403,8 +389,6 @@
         <item name="colorOnTertiaryFixed">@color/t_magenta_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_magenta_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_magenta_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.Pink" parent="Theme.MikuBoxCla">
@@ -453,8 +437,6 @@
         <item name="colorOnTertiaryFixed">@color/t_pink_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_pink_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_pink_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.Red" parent="Theme.MikuBoxCla">
@@ -503,8 +485,6 @@
         <item name="colorOnTertiaryFixed">@color/t_red_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_red_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_red_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.DeepOrange" parent="Theme.MikuBoxCla">
@@ -553,8 +533,6 @@
         <item name="colorOnTertiaryFixed">@color/t_deep_orange_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_deep_orange_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_deep_orange_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.Orange" parent="Theme.MikuBoxCla">
@@ -603,8 +581,6 @@
         <item name="colorOnTertiaryFixed">@color/t_orange_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_orange_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_orange_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.Amber" parent="Theme.MikuBoxCla">
@@ -653,8 +629,6 @@
         <item name="colorOnTertiaryFixed">@color/t_amber_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_amber_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_amber_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.Yellow" parent="Theme.MikuBoxCla">
@@ -703,8 +677,6 @@
         <item name="colorOnTertiaryFixed">@color/t_yellow_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_yellow_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_yellow_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.LightGreen" parent="Theme.MikuBoxCla">
@@ -753,8 +725,6 @@
         <item name="colorOnTertiaryFixed">@color/t_light_green_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_light_green_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_light_green_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.Green" parent="Theme.MikuBoxCla">
@@ -803,8 +773,6 @@
         <item name="colorOnTertiaryFixed">@color/t_green_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_green_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_green_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 
     <style name="Theme.MikuBoxCla.BlueGrey" parent="Theme.MikuBoxCla">
@@ -853,7 +821,5 @@
         <item name="colorOnTertiaryFixed">@color/t_blue_grey_onTertiaryFixed</item>
         <item name="colorTertiaryFixedDim">@color/t_blue_grey_tertiaryFixedDim</item>
         <item name="colorOnTertiaryFixedVariant">@color/t_blue_grey_onTertiaryFixedVariant</item>
-        <item name="colorBg">?attr/colorSurfaceVariant</item>
-        <item name="colorCard">?attr/colorSurfaceContainerLow</item>
     </style>
 </resources>

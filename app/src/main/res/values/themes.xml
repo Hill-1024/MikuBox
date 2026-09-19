@@ -26,6 +26,13 @@
         <item name="android:listDivider">@null</item>
         <item name="android:colorEdgeEffect">@null</item>
         <item name="elevation">0.0dip</item>
+        <!--
+            The chrome is colourPrimary in both modes: dark teal in light, bright
+            mint at night. The system-bar icon flags must therefore flip with the
+            mode, which a literal cannot do — hence the bool resource.
+        -->
+        <item name="android:windowLightStatusBar">@bool/uwu_light_system_bars</item>
+        <item name="android:windowLightNavigationBar">@bool/uwu_light_system_bars</item>
 
         <item name="colorMaterial100">?attr/colorPrimaryContainer</item>
         <item name="colorMaterial300">?attr/colorSecondaryContainer</item>
@@ -36,6 +43,7 @@
         <item name="fabColorBackground">?attr/colorPrimary</item>
         <item name="selectedColorPrimary">?attr/colorPrimary</item>
         <item name="whiteOrTextPrimary">?attr/colorOnPrimary</item>
+        <item name="colorIcon">@color/white</item>
         <item name="itemShapeFillColor">?attr/colorSecondaryContainer</item>
         <item name="tabTextColor">?attr/colorOnSurfaceVariant</item>
         <item name="tabSelectedTextColor">?attr/colorPrimary</item>
@@ -48,6 +56,7 @@
         <item name="itemShapeAppearance">@style/ShapeAppearance.App.MediumComponent</item>
         <item name="collapsingToolbarLayoutLargeStyle">@style/Miku.CollapsingToolbar.Large</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.Miku.MaterialAlertDialog</item>
+        <item name="toolbarStyle">@style/Widget.Miku.Toolbar</item>
         <!-- Screen transitions run as activity transitions on the content: the
              previous window animations moved and faded the whole window, which
              dragged the status-bar strip along and showed a seam between the two
@@ -87,6 +96,34 @@
     </style>
 
     <style name="Widget.Miku.Dialog.Button.Text" parent="@style/Widget.Material3.Button.TextButton.Dialog" />
+
+    <!--
+        Every toolbar in this app sits on the colourPrimary chrome, so its
+        navigation, menu and overflow icons must be on-primary. AppCompat's
+        default colorControlNormal is a grey, which is what washed out the
+        menu icons on the proxies, log, connections and per-app screens.
+    -->
+    <style name="Widget.Miku.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="titleTextColor">?attr/colorOnPrimary</item>
+        <item name="subtitleTextColor">?attr/colorOnPrimary</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Miku.Toolbar</item>
+    </style>
+
+    <style name="ThemeOverlay.Miku.Toolbar" parent="">
+        <item name="colorControlNormal">?attr/colorOnPrimary</item>
+    </style>
+
+    <!--
+        Shadows the Material3 toolbar theme overlay, which pins
+        colorControlNormal to a grey onSurfaceVariant — the reason toolbar
+        menu, search and overflow icons washed out on our colourPrimary
+        chrome. Everything a toolbar hosts (menu icons, the SearchView's own
+        magnifier, the overflow glyph) resolves through this overlay.
+    -->
+    <style name="ThemeOverlay.Material3.Toolbar" parent="">
+        <item name="colorControlNormal">?attr/colorOnPrimary</item>
+    </style>
+
 
     <!-- MikuRay display font on the large collapsing page titles. -->
     <style name="Miku.CollapsingToolbar.Large" parent="@style/Widget.Material3.CollapsingToolbar.Large">

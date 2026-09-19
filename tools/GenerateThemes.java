@@ -169,10 +169,9 @@ public final class GenerateThemes {
                         .append(role.getKey())
                         .append("</item>\n");
             }
-            // colorCard / colorBg follow the M3 roles the release design binds
-            // them to, so the page and card split stays identical across families.
-            xml.append("        <item name=\"colorBg\">?attr/colorSurfaceVariant</item>\n");
-            xml.append("        <item name=\"colorCard\">?attr/colorSurfaceContainerLow</item>\n");
+            // colorBg / colorCard deliberately stay at the base theme's day/night
+            // bindings (?colorSurfaceVariant light, ?colorSurface night); adding
+            // them here would pin the page colour and break the night contrast.
             xml.append("    </style>\n");
         }
         xml.append("</resources>\n");

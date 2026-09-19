@@ -5,9 +5,11 @@
         android:id="@+id/action_test_delay"
         android:icon="@drawable/ic_baseline_speed_24"
         android:title="@string/proxies_test"
+        app:iconTint="?attr/colorOnPrimary"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_sort"
         android:title="@string/proxies_sort_delay"
+        app:iconTint="?attr/colorOnPrimary"
         app:showAsAction="never" />
 </menu>

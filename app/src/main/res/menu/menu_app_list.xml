@@ -11,10 +11,12 @@
         android:id="@+id/action_select_all"
         android:icon="@drawable/ic_select_all_24dp"
         android:title="@string/apps_select_all"
+        app:iconTint="?attr/colorOnPrimary"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_invert_selection"
         android:icon="@drawable/ic_toggle_switch"
         android:title="@string/apps_invert_selection"
+        app:iconTint="?attr/colorOnPrimary"
         app:showAsAction="ifRoom" />
 </menu>
