@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -73,6 +74,22 @@ class MainActivity : EdgeToEdgeActivity(), AddConfigBottomSheet.Listener {
 
     /** Set while the mode switch is rendered, so showing it never counts as a tap. */
     private var suppressModeCallback = false
+
+    /** Tab the mode pill currently rests on, tracked to replay slide sequences. */
+    private var modeTabPosition = 0
+
+    /** Open/close animation of the global-exit row. */
+    private var modeExitAnimator: android.animation.ValueAnimator? = null
+
+    /** Deferred indicator slide of a running enter/leave-global sequence. */
+    private var pendingModeSlide: Runnable? = null
+
+    private companion object {
+        /** The mode pill's indicator takes this long to glide between tabs. */
+        const val MODE_SLIDE_MS = 300L
+        const val MODE_ROW_EXPAND_MS = 240L
+        const val MODE_ROW_COLLAPSE_MS = 220L
+    }
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -470,10 +487,13 @@ class MainActivity : EdgeToEdgeActivity(), AddConfigBottomSheet.Listener {
         modes.forEach { mode ->
             binding.modeTab.addTab(binding.modeTab.newTab().setText(modeLabel(mode)))
         }
+        // The tab's own click is left alone: tapping it selects and glides the
+        // pill exactly as TabLayout does, and the reveal animations hook onto
+        // that selection instead of fighting it.
         binding.modeTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 if (suppressModeCallback) return
-                applyMode(modes[tab.position])
+                onModeSelected(tab.position, modes[tab.position])
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) = Unit
@@ -481,7 +501,12 @@ class MainActivity : EdgeToEdgeActivity(), AddConfigBottomSheet.Listener {
             /** Tapping the active tab again re-opens the global exit picker. */
             override fun onTabReselected(tab: TabLayout.Tab) {
                 if (suppressModeCallback) return
-                if (modes[tab.position] == MihomoCoreSettings.ProxyMode.GLOBAL) showGlobalExitPicker()
+                if (modes[tab.position] == MihomoCoreSettings.ProxyMode.GLOBAL) {
+                    // A re-tap while the reveal runs restores the row first.
+                    cancelModeAnimations()
+                    refreshModeExitRow(MihomoCoreSettings.ProxyMode.GLOBAL)
+                    showGlobalExitPicker()
+                }
             }
         })
         binding.modeExit.setOnClickListener { showGlobalExitPicker() }
@@ -496,41 +521,190 @@ class MainActivity : EdgeToEdgeActivity(), AddConfigBottomSheet.Listener {
     /** Shows the mode the core is actually using, and the exit while in global mode. */
     private fun refreshModeSwitch() {
         val mode = RoutingMode.effective(this, MihomoConfigStore.activeConfig(this))
-        val position = RoutingMode.SELECTABLE.indexOf(mode).coerceAtLeast(0)
+        modeTabPosition = RoutingMode.SELECTABLE.indexOf(mode).coerceAtLeast(0)
+        // A tap reveal owns the visuals while it runs; a resync here would yank
+        // the pill mid-sequence and bury the exit row instantly.
+        if (modeExitAnimator != null || pendingModeSlide != null) return
+        // A sync is a state read, not a user gesture: settle instantly.
         suppressModeCallback = true
-        binding.modeTab.getTabAt(position)?.select()
+        binding.modeTab.getTabAt(modeTabPosition)?.select()
         suppressModeCallback = false
+        cancelModeAnimations()
         refreshModeExitRow(mode)
     }
 
     private fun refreshModeExitRow(mode: MihomoCoreSettings.ProxyMode) {
         val global = mode == MihomoCoreSettings.ProxyMode.GLOBAL
-        binding.modeExit.visibility = if (global) View.VISIBLE else View.GONE
+        val row = binding.modeExit
         if (global) {
-            val exit = RoutingMode.globalExit()
-            binding.modeExit.text = getString(
-                R.string.mode_global_exit_row,
-                exit ?: getString(R.string.mode_global_exit_default),
-            )
+            row.text = globalExitText()
+            row.visibility = View.VISIBLE
+            row.alpha = 1f
+            row.updateLayoutParams { height = ViewGroup.LayoutParams.WRAP_CONTENT }
+        } else {
+            row.visibility = View.GONE
+            row.alpha = 1f
+            row.updateLayoutParams { height = 0 }
         }
         // The card changes height with the row, which moves everything below it.
         binding.cardMode.post { layoutBottomStack() }
     }
 
-    private fun applyMode(mode: MihomoCoreSettings.ProxyMode) {
-        if (!RoutingMode.select(this, mode)) {
+    /**
+     * Applies the routing change straight away — the tunnel should follow the
+     * tap without waiting on pixels — and chains the reveal after the pill,
+     * which TabLayout has already sent gliding on tap:
+     *
+     * - entering global: the pill glides to 全局, then the exit row grows open;
+     * - leaving global: the pill glides to the picked mode, then the row
+     *   collapses;
+     * - rule ↔ direct: the pill passes across 全局 and nothing changes height,
+     *   so there is nothing to chain.
+     */
+    private fun onModeSelected(position: Int, target: MihomoCoreSettings.ProxyMode) {
+        if (!RoutingMode.select(this, target)) {
             UwuSnackbar.error(this, getString(R.string.mode_switch_failed))
             refreshModeSwitch()
             return
         }
-        refreshModeExitRow(mode)
-        // Global mode is only meaningful once it knows where to leave the device.
-        if (mode == MihomoCoreSettings.ProxyMode.GLOBAL) showGlobalExitPicker()
+        val leavingGlobal = binding.modeExit.visibility == View.VISIBLE
+        modeTabPosition = position
+        cancelModeAnimations()
+        when {
+            target == MihomoCoreSettings.ProxyMode.GLOBAL -> {
+                postModeSlide(MODE_SLIDE_MS) {
+                    animateModeExitRow(visible = true, text = globalExitText()) {
+                        layoutBottomStack()
+                    }
+                }
+            }
+
+            leavingGlobal -> {
+                postModeSlide(MODE_SLIDE_MS) {
+                    animateModeExitRow(visible = false) { layoutBottomStack() }
+                }
+            }
+        }
+    }
+
+    private fun postModeSlide(delay: Long, action: () -> Unit) {
+        pendingModeSlide?.let { handler.removeCallbacks(it) }
+        val runnable = Runnable {
+            pendingModeSlide = null
+            action()
+        }
+        pendingModeSlide = runnable
+        handler.postDelayed(runnable, delay)
+    }
+
+    private fun cancelModeAnimations() {
+        modeExitAnimator?.cancel()
+        pendingModeSlide?.let { handler.removeCallbacks(it) }
+        pendingModeSlide = null
+    }
+
+    private fun globalExitText(): CharSequence {
+        val exit = RoutingMode.globalExit()
+        return getString(
+            R.string.mode_global_exit_row,
+            exit ?: getString(R.string.mode_global_exit_default),
+        )
+    }
+
+    /**
+     * Grows or shrinks the global-exit row inside the mode card. The row is
+     * measured once at full height, then its layout height and alpha are driven
+     * together, so the card appears to breathe rather than snap.
+     */
+    private fun animateModeExitRow(
+        visible: Boolean,
+        text: CharSequence? = null,
+        onEnd: (() -> Unit)? = null,
+    ) {
+        modeExitAnimator?.cancel()
+        val row = binding.modeExit
+        val params = row.layoutParams as ViewGroup.MarginLayoutParams
+
+        if (!visible) {
+            if (row.visibility != View.VISIBLE) {
+                onEnd?.invoke()
+                return
+            }
+            modeExitAnimator = android.animation.ValueAnimator.ofInt(params.height, 0).apply {
+                duration = MODE_ROW_COLLAPSE_MS
+                interpolator = android.view.animation.AccelerateInterpolator(1.2f)
+                addUpdateListener { animator ->
+                    params.height = animator.animatedValue as Int
+                    row.layoutParams = params
+                    row.alpha = 1f - animator.animatedFraction
+                }
+                addListener(object : android.animation.AnimatorListenerAdapter() {
+                    private var cancelled = false
+
+                    override fun onAnimationCancel(animation: android.animation.Animator) {
+                        cancelled = true
+                    }
+
+                    override fun onAnimationEnd(animation: android.animation.Animator) {
+                        if (cancelled) return
+                        row.visibility = View.GONE
+                        params.height = 0
+                        row.layoutParams = params
+                        row.alpha = 1f
+                        onEnd?.invoke()
+                    }
+                })
+                start()
+            }
+            return
+        }
+
+        if (text != null) row.text = text
+        row.visibility = View.VISIBLE
+        params.height = if (params.height > 0) params.height else 0
+        row.layoutParams = params
+        row.measure(
+            View.MeasureSpec.makeMeasureSpec(measuredExitWidth(), View.MeasureSpec.AT_MOST),
+            View.MeasureSpec.UNSPECIFIED,
+        )
+        val target = row.measuredHeight.coerceAtLeast(1)
+        modeExitAnimator = android.animation.ValueAnimator.ofInt(params.height, target).apply {
+            duration = MODE_ROW_EXPAND_MS
+            interpolator = android.view.animation.DecelerateInterpolator(1.4f)
+            addUpdateListener { animator ->
+                params.height = animator.animatedValue as Int
+                row.layoutParams = params
+                row.alpha = animator.animatedFraction
+            }
+            addListener(object : android.animation.AnimatorListenerAdapter() {
+                private var cancelled = false
+
+                override fun onAnimationCancel(animation: android.animation.Animator) {
+                    cancelled = true
+                }
+
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    if (cancelled) return
+                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                    row.layoutParams = params
+                    row.alpha = 1f
+                    onEnd?.invoke()
+                }
+            })
+            start()
+        }
+    }
+
+    private fun measuredExitWidth(): Int {
+        val card = binding.cardMode
+        val padding = card.contentPaddingLeft + card.contentPaddingRight
+        return (card.width - padding).coerceAtLeast(1)
     }
 
     /**
      * Picker for the exit global mode uses: every member of the core's `GLOBAL`
-     * selector, which lists the profile's groups and its nodes.
+     * selector, which lists the profile's groups and its nodes. Only opened on
+     * request — the exit row itself or a re-tap on 全局.
      */
     private fun showGlobalExitPicker() {
         val options = RoutingMode.globalExitOptions()
