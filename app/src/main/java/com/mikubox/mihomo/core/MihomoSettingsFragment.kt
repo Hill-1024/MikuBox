@@ -28,10 +28,32 @@ class MihomoVpnSettingsFragment : com.miku.ray.ui.preference.activity.VpnSetting
     override fun onResume() {
         super.onResume()
         AutomationPreferences.refreshNetwork(this)
+        val power = requireContext().getSystemService(android.os.PowerManager::class.java)
+        findPreference<Preference>("background_battery_status")?.summary =
+            if (power.isIgnoringBatteryOptimizations(requireContext().packageName)) "已允许后台运行"
+            else "当前受电池优化限制；可在系统设置中允许后台运行，减少待机时的连接中断。"
     }
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         super.onCreatePreferences(bundle, rootKey)
         MihomoPreferenceBindings(this).apply { bindVpn(); styleTitles() }
+        val category = PreferenceCategory(requireContext()).apply { title = "后台连接保护" }
+        preferenceScreen.addPreference(category)
+        category.addPreference(Preference(requireContext()).apply {
+            title = "系统 VPN · 始终开启"
+            summary = "连接使用前台服务，无需锁定最近任务。建议在系统中开启始终开启 VPN，由系统管理连接恢复。强制停止或撤销 VPN 权限会停止连接。"
+            setOnPreferenceClickListener {
+                runCatching { startActivity(android.content.Intent(android.provider.Settings.ACTION_VPN_SETTINGS)) }
+                true
+            }
+        })
+        category.addPreference(Preference(requireContext()).apply {
+            key = "background_battery_status"
+            title = "电池优化设置"
+            setOnPreferenceClickListener {
+                runCatching { startActivity(android.content.Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)) }
+                true
+            }
+        })
     }
 }
 

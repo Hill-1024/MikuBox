@@ -157,7 +157,7 @@ object AngConfigManager {
         append: Boolean,
         requestSubscriptionName: (suspend (String?, Set<String>) -> SubscriptionImportChoice?)? = null
     ): Pair<Int, Int> {
-        com.miku.ray.MikuProfiles.impl?.let { return it.importContent(server.orEmpty()) }
+        com.miku.ray.MikuProfiles.impl?.let { return it.importContent(server.orEmpty(), subid) }
         return try {
             val decodedServer = Utils.decode(server)
 

@@ -1,0 +1,11 @@
+<resources>
+    <string name="profile_editor_title">Config editor</string>
+    <string name="profile_editor_hint">Save changes, then reconnect to apply. Use the menu to switch between structured editing and the complete YAML document.</string>
+    <string name="profile_visual_summary">Settings, proxies, groups, rules and DNS. Long press a row to remove or reorder it. Structured changes reformat YAML and remove comments; unknown fields are preserved.</string>
+    <string name="profile_section_proxies">Proxies</string>
+    <string name="profile_section_groups">Proxy groups</string>
+    <string name="profile_section_rules">Routing rules</string>
+    <string name="profile_section_dns">DNS</string>
+    <string name="profile_section_providers">Proxy providers</string>
+    <string name="profile_section_rule_providers">Rule providers</string>
+</resources>

@@ -26,7 +26,7 @@
             android:layout_height="24dp"
             android:layout_gravity="center"
             android:src="@drawable/rmx_arrows_arrow_right_line"
-            android:tint="?attr/colorOnPrimary" />
+            android:tint="?attr/colorOnPrimaryContainer" />
 
     </FrameLayout>
 

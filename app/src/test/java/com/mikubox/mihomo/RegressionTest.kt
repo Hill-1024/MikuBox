@@ -31,6 +31,56 @@ class RegressionTest {
         context = RuntimeEnvironment.getApplication()
     }
 
+    @Test fun profileGroupsSurviveSubscriptionRefreshAndBackup() {
+        val groups = com.mikubox.mihomo.profile.ProfileGroups
+        val group = groups.create(context, "Work")
+        assertThrows(IllegalArgumentException::class.java) { groups.create(context, " work ") }
+        val profile = MihomoProfileStore.createSubscription(context, "Office", "https://example.com/profile", 0)
+        MihomoProfileStore.update(context, profile.copy(groupId = group.id))
+        val source = MihomoProfileStore.profiles(context).first { it.id == profile.id }
+        MihomoProfileStore.updateSubscription(context, source, "rules: ['MATCH,DIRECT']")
+        assertEquals(group.id, MihomoProfileStore.selected(context)?.groupId)
+        val backup = BackupManager.export(context)
+        context.getSharedPreferences("mihomo_profiles", 0).edit().clear().commit()
+        BackupManager.import(context, backup)
+        assertEquals(group, groups.list(context).last())
+        assertEquals(group.id, MihomoProfileStore.selected(context)?.groupId)
+    }
+
+    @Test fun routeFiltersParseFlowYamlAndPreserveOrderAndUnknownFields() {
+        val source = """
+            custom-extension: {enabled: true}
+            rules: ['DOMAIN,example.com,Proxy', 'AND,((NETWORK,TCP),(DST-PORT,443)),Proxy', 'IP-CIDR,10.0.0.0/8,DIRECT,no-resolve', 'MATCH,Proxy']
+        """.trimIndent()
+        val doc = com.miku.ray.ui.server.ConfigDocument
+        val routing = com.mikubox.mihomo.profile.ProfileRouting
+        assertEquals(source, routing.filter(source, true, emptySet()))
+        val filtered = doc.parse(routing.filter(source, true, setOf("Proxy")))
+        assertEquals(listOf("IP-CIDR,10.0.0.0/8,DIRECT,no-resolve", "MATCH,DIRECT"), doc.rules(filtered))
+        assertEquals(mapOf("enabled" to true), filtered["custom-extension"])
+        assertEquals(listOf("MATCH,DIRECT"), doc.rules(doc.parse(routing.filter(source, false, emptySet()))))
+        assertEquals("Proxy", doc.policy("AND,((NETWORK,TCP),(DST-PORT,443)),Proxy"))
+    }
+
+    @Test fun structuredEditorRetainsTypesAndRejectsDuplicateFields() {
+        val doc = com.miku.ray.ui.server.ConfigDocument
+        val source = "mixed-port: 7890\nallow-lan: false\nproxies: [{name: 'true', type: socks5, port: 1080}]\nx-extra: {keep: [1, 2]}"
+        val parsed = doc.parse(source)
+        assertEquals(parsed, doc.parse(doc.dump(parsed)))
+        assertEquals(false, parsed["allow-lan"])
+        assertThrows(Exception::class.java) { doc.parse("mode: rule\nmode: global") }
+    }
+
+    @Test fun exitSnapshotRejectsObsoleteProbesAndSharesLatestSample() = kotlinx.coroutines.runBlocking {
+        val snapshot = com.miku.ray.handler.ExitIpSnapshot
+        snapshot.invalidate()
+        assertNull(snapshot.get { snapshot.invalidate(); "old exit" })
+        assertEquals("new exit", snapshot.get { "new exit" })
+        assertEquals("new exit", snapshot.get { error("duplicate probe") })
+        snapshot.invalidate()
+        assertNull(snapshot.current())
+    }
+
     @Test fun countryNameDoesNotHideValidCountryCode() {
         val info = com.miku.ray.dto.IPAPIInfo(country = "Hong Kong", countryCode = "hk")
         assertEquals("HK", com.miku.ray.handler.SpeedtestManager.countryCode(info))

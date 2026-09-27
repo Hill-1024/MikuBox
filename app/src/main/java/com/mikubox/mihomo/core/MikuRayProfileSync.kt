@@ -28,6 +28,10 @@ object MikuRayProfileSync {
     @Synchronized
     fun sync(context: Context) {
         val profiles = MihomoProfileStore.profiles(context)
+        com.mikubox.mihomo.profile.ProfileGroups.list(context).forEach { group ->
+            val previous = MmkvManager.decodeSubscription(group.id)
+            MmkvManager.encodeSubscription(group.id, (previous ?: com.miku.ray.dto.entities.SubscriptionItem()).copy(remarks = group.name))
+        }
         val known = profiles.map { it.id }.toSet()
 
         profiles.forEach { profile ->
@@ -38,7 +42,7 @@ object MikuRayProfileSync {
             val node = MikuRayProfileDescription.singleNode(profile.config)
             val entry = (existing ?: ProfileItem(configType = EConfigType.CUSTOM)).copy(
                 remarks = profile.name,
-                subscriptionId = AppConfig.DEFAULT_SUBSCRIPTION_ID,
+                subscriptionId = profile.groupId,
                 configType = node?.configType ?: EConfigType.CUSTOM,
                 server = node?.server,
                 serverPort = node?.port,
@@ -56,6 +60,10 @@ object MikuRayProfileSync {
                 existing.subscriptionId != entry.subscriptionId ||
                 existing.insecure != entry.insecure
             ) {
+                if (existing != null && existing.subscriptionId != entry.subscriptionId) {
+                    val oldGroup = existing.subscriptionId ?: AppConfig.DEFAULT_SUBSCRIPTION_ID
+                    MmkvManager.encodeServerList(MmkvManager.decodeServerList(oldGroup).filterNot { it == profile.id }.toMutableList(), oldGroup)
+                }
                 MmkvManager.encodeServerConfig(profile.id, entry)
             }
             MmkvManager.encodeServerRaw(profile.id, profile.config)

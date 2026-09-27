@@ -926,8 +926,16 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
             .show(supportFragmentManager, MoreMenuBottomSheet.TAG)
         }
 
+        binding.btnAddSub.contentDescription = "添加订阅或配置组"
         binding.btnAddSub.setOnClickListener {
-            requestActivityLauncher.launch(Intent(this, SubEditActivity::class.java))
+            MaterialAlertDialogBuilder(this).setTitle("添加")
+                .setItems(arrayOf("添加订阅", "创建配置组")) { _, choice ->
+                    if (choice == 0) requestActivityLauncher.launch(Intent(this, SubEditActivity::class.java).putExtra("groupId", mainViewModel.subscriptionId))
+                    else com.miku.ray.ui.server.ProfileGroupPicker.create(this) {
+                        SettingsChangeManager.makeSetupGroupTab()
+                        setupGroupTab()
+                    }
+                }.show()
         }
 
         binding.btnQuickSubUpdate.setOnClickListener {
@@ -1374,8 +1382,12 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
                     return@withContext
                 }
 
+                val selectedGroup = com.miku.ray.MikuProfiles.impl
+                    ?.get(MmkvManager.getSelectServer().orEmpty())?.groupId
                 val targetIndex = groups.indexOfFirst { it.id == mainViewModel.subscriptionId }
-                .takeIf { it >= 0 } ?: (groups.size - 1)
+                    .takeIf { it >= 0 }
+                    ?: groups.indexOfFirst { it.id == selectedGroup }.takeIf { it >= 0 }
+                    ?: 0
 
                 tabMediator?.detach()
 
@@ -1393,6 +1405,13 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
                         setBadgeVisibility(tabBadge, tabLabel, group.serverCount)
 
                         tab.customView = tabView
+                        tab.view.setOnLongClickListener {
+                            com.miku.ray.ui.server.ProfileGroupPicker.create(this@MainActivity) {
+                                SettingsChangeManager.makeSetupGroupTab()
+                                setupGroupTab()
+                            }
+                            true
+                        }
                     }
                 }.also { it.attach() }
 
@@ -1569,7 +1588,7 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
 
     private fun importManually(createConfigType: Int) {
         if (com.miku.ray.MikuProfiles.impl != null) {
-            startActivity(Intent(this, com.miku.ray.ui.server.ServerCustomConfigActivity::class.java))
+            startActivity(Intent(this, com.miku.ray.ui.server.ServerCustomConfigActivity::class.java).putExtra("groupId", mainViewModel.subscriptionId))
             return
         }
         if (createConfigType == EConfigType.POLICYGROUP.value) {

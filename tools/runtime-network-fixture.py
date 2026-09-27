@@ -58,8 +58,10 @@ class Relay(socketserver.StreamRequestHandler):
     # 18091 is the open relay QuickActionsSmoke's QA-HK/QA-JP proxies use.
     open_relay = False
 
-    def pipe(self, remote):
-        self.wfile.write(b'HTTP/1.1 200 Connection Established\r\n\r\n'); self.wfile.flush()
+    def pipe(self, remote, connect_response=True):
+        if connect_response:
+            self.wfile.write(b'HTTP/1.1 200 Connection Established\r\n\r\n')
+            self.wfile.flush()
         peers = [self.connection, remote]
         while True:
             ready, _, _ = select.select(peers, [], [], 15)
@@ -93,7 +95,7 @@ class Relay(socketserver.StreamRequestHandler):
         try:
             with socket.create_connection(self.open_target(parts.hostname, parts.port or 80)) as remote:
                 remote.sendall(b''.join(head) + b'\r\n')
-                self.pipe(remote)
+                self.pipe(remote, connect_response=False)
         except OSError:
             pass
 

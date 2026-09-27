@@ -107,10 +107,10 @@ class MikuVpnService : VpnService(), ServiceControl {
     @Volatile
     private var exitIpDisplay: String? = null
 
-    private var exitIpFetchedAt = 0L
+    @Volatile private var exitIpFetchedAt = 0L
 
     /** Consecutive failed probes; drives the retry backoff while IP is unknown. */
-    private var exitIpFailures = 0
+    @Volatile private var exitIpFailures = 0
 
     /**
      * Bumped whenever the reading is invalidated (a restart or a live switch):
@@ -233,8 +233,8 @@ class MikuVpnService : VpnService(), ServiceControl {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        if (running) {
-            // The tunnel must not die with the task. On a stock system this
+        if (running || starting) {
+            // The tunnel must not die with the task, including while connecting. On a stock system this
             // foreground service survives the swipe untouched; shades whose
             // "clean all" treats the removal as a kill trigger get the service
             // re-asserted right here — the strongest defence an app has. If
@@ -252,7 +252,10 @@ class MikuVpnService : VpnService(), ServiceControl {
     }
 
     override fun onRevoke() {
-        // System or another VPN app revoked our permission.
+        // Revocation is an explicit stop, not a crash to resurrect.
+        startRequested = false
+        startReplayQueued = false
+        TunnelGuard.expectRunning(this, false)
         stopVpn()
         super.onRevoke()
     }
@@ -289,10 +292,12 @@ class MikuVpnService : VpnService(), ServiceControl {
         MikuProxyService.stop(this)
         lastTunError = null
         // The foreground notification must appear promptly; the heavy work runs
-        // after it. A refusal (a background start without an exemption) is
-        // logged and the start continues — the tunnel can still come up, and
-        // the guard arms itself again for the next window.
-        startForegroundNotification()
+        // after it. Never establish a tunnel without foreground protection.
+        if (!startForegroundNotification()) {
+            stopVpn()
+            return
+        }
+        com.miku.ray.handler.ExitIpSnapshot.invalidate()
         startExecutor.execute {
             if (generation.get() != request) return@execute
             // Tracked so a failure between establish() and the core taking over
@@ -307,7 +312,7 @@ class MikuVpnService : VpnService(), ServiceControl {
                     return@execute
                 }
                 val profile = MihomoProfileStore.selected(this)
-                val config = profile?.config ?: MihomoConfigStore.activeConfig(this)
+                val config = profile?.let { com.mikubox.mihomo.profile.ProfileRouting.apply(this, it) } ?: MihomoConfigStore.activeConfig(this)
                 require(config.isNotBlank()) { "Update the subscription before connecting" }
                 // The routing rules the core is about to be given come from this
                 // configuration, so the screen's list is refreshed against it —
@@ -526,7 +531,7 @@ class MikuVpnService : VpnService(), ServiceControl {
                         traffic.uploadTotal.toTrafficString(),
                         traffic.downloadTotal.toTrafficString()),
                     getString(R.string.vpn_notification_exit_ip,
-                        exitIpDisplay?.let { compactExitIspForNotification(it) } ?: "…"),
+                        com.miku.ray.handler.ExitIpSnapshot.current()?.let { compactExitIspForNotification(it) } ?: "…"),
                 ),
             ),
         )
@@ -571,10 +576,13 @@ class MikuVpnService : VpnService(), ServiceControl {
         // can move the exit without touching the core's counters, so drop the
         // cached reading: otherwise the notification keeps the previous node's
         // exit for the remainder of the five-minute TTL.
+        com.miku.ray.handler.ExitIpSnapshot.invalidate()
         exitIpDisplay = null
         exitIpFetchedAt = 0L
         exitIpFailures = 0
         exitIpEpoch++
+        // Replace the scheduled beat; repeated switches must not multiply loops.
+        checkpointHandler.removeCallbacks(notificationStatsUpdate)
         checkpointHandler.post(notificationStatsUpdate)
     }
 
@@ -583,6 +591,7 @@ class MikuVpnService : VpnService(), ServiceControl {
         // Read before the flags are cleared: a stop that had no tunnel to stop
         // must not tell the UI that a connection ended.
         val hadTunnel = tunFd != MihomoCore.NO_TUN
+        com.miku.ray.handler.ExitIpSnapshot.invalidate()
         val stopGeneration = generation.incrementAndGet()
         val stoppingRevision = ConnectionStatus.update(this, ConnectionStatus.Phase.DISCONNECTING)
         starting = false
@@ -926,7 +935,7 @@ internal fun notificationSpeed(
 internal const val MAX_NOTIFICATION_ISP_LENGTH = 24
 
 /** Exit IP is a network probe; re-fetching it every beat would be wasteful. */
-internal const val EXIT_IP_REFRESH_MS = 5 * 60_000L
+internal const val EXIT_IP_REFRESH_MS = 60_000L
 
 internal const val EXIT_IP_RETRY_MS = 15_000L
 

@@ -29,6 +29,10 @@ import com.miku.ray.util.Utils
 class ServerCustomConfigActivity : BaseActivity() {
     private val binding by lazy { ActivityServerCustomConfigBinding.inflate(layoutInflater) }
 
+    private lateinit var visualEditor: VisualConfigEditor
+    private var visualMode = false
+    private var selectedGroup = AppConfig.DEFAULT_SUBSCRIPTION_ID
+
     private val editGuid by lazy { intent.getStringExtra("guid").orEmpty() }
     private val isRunning by lazy {
         intent.getBooleanExtra("isRunning", false)
@@ -44,18 +48,42 @@ class ServerCustomConfigActivity : BaseActivity() {
         binding.serverScrollContent.applyEdgeToEdgeListInsets()
 
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
-        setupToolbar(toolbar, showHomeAsUp = true, title = if (com.miku.ray.MikuProfiles.impl != null) "mihomo YAML / JSON" else EConfigType.CUSTOM.toString(), subtitle = getString(R.string.subtitle_server_config))
+        setupToolbar(toolbar, showHomeAsUp = true, title = if (com.miku.ray.MikuProfiles.impl != null) getString(R.string.profile_editor_title) else EConfigType.CUSTOM.toString(), subtitle = getString(R.string.subtitle_server_config))
 
         if (!Utils.getDarkModeStatus(this)) {
             binding.editor.colorScheme = EditorTheme.INTELLIJ_LIGHT
         }
         binding.editor.language = JsonLanguage()
+        selectedGroup = savedInstanceState?.getString("profileGroup") ?: com.miku.ray.MikuProfiles.impl?.get(editGuid)?.groupId ?: intent.getStringExtra("groupId")?.takeIf { it.isNotBlank() } ?: AppConfig.DEFAULT_SUBSCRIPTION_ID
         val config = MmkvManager.decodeServerConfig(editGuid)
         if (config != null) {
             bindingServer(config)
         } else {
             clearServer()
+            binding.editor.setTextContent(Utils.getEditable("mode: rule\nrules:\n  - MATCH,DIRECT\n"))
         }
+        savedInstanceState?.getString("yamlDraft")?.let { binding.editor.setTextContent(Utils.getEditable(it)) }
+        savedInstanceState?.getString("nameDraft")?.let { binding.etRemarks.setText(it) }
+        visualEditor = VisualConfigEditor(this) { yaml -> binding.editor.setTextContent(Utils.getEditable(yaml)) }
+        (binding.editor.parent as android.view.ViewGroup).addView(visualEditor)
+        setVisualMode(savedInstanceState?.getBoolean("visualMode", true) ?: true)
+    }
+
+    private fun setVisualMode(enabled: Boolean) {
+        if (enabled) {
+            try { visualEditor.load(binding.editor.text.toString()) }
+            catch (error: Exception) {
+                visualEditor.visibility = android.view.View.GONE
+                binding.editor.visibility = android.view.View.VISIBLE
+                visualMode = false
+                snackbarError("无法解析配置，请在原始 YAML 中修正：${error.message}", title = getString(R.string.title_alerter_error))
+                return
+            }
+        }
+        visualMode = enabled
+        visualEditor.visibility = if (enabled) android.view.View.VISIBLE else android.view.View.GONE
+        binding.editor.visibility = if (enabled) android.view.View.GONE else android.view.View.VISIBLE
+        invalidateOptionsMenu()
     }
 
     private fun bindingServer(config: ProfileItem): Boolean {
@@ -83,7 +111,8 @@ class ServerCustomConfigActivity : BaseActivity() {
 
         com.miku.ray.MikuProfiles.impl?.let { store ->
             return try {
-                store.save(editGuid.takeIf { it.isNotBlank() }, binding.etRemarks.text.toString(), binding.editor.text.toString())
+                val savedId = store.save(editGuid.takeIf { it.isNotBlank() }, binding.etRemarks.text.toString(), binding.editor.text.toString())
+                store.moveToGroup(savedId, selectedGroup)
                 SettingsChangeManager.makeSetupGroupTab()
                 toastSuccess(R.string.toast_success)
                 finish()
@@ -137,6 +166,10 @@ class ServerCustomConfigActivity : BaseActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.action_server, menu)
+        if (com.miku.ray.MikuProfiles.impl != null) {
+            menu.add(0, 0x6d02, 0, "配置组")
+            menu.add(0, 0x6d03, 0, if (visualMode) "原始 YAML" else "可视化编辑")
+        }
         val delButton = menu.findItem(R.id.del_config)
         val saveButton = menu.findItem(R.id.save_config)
 
@@ -152,7 +185,20 @@ class ServerCustomConfigActivity : BaseActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("profileGroup", selectedGroup)
+        outState.putString("yamlDraft", binding.editor.text.toString())
+        outState.putString("nameDraft", binding.etRemarks.text.toString())
+        outState.putBoolean("visualMode", visualMode)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        0x6d03 -> { setVisualMode(!visualMode); true }
+        0x6d02 -> {
+            ProfileGroupPicker.choose(this, selectedGroup) { selectedGroup = it.id }
+            true
+        }
         R.id.del_config -> {
             deleteServer()
             true

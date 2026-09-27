@@ -26,6 +26,7 @@ object MihomoProfileStore {
         val updateThroughProxy: Boolean = false,
         val updatedAtMillis: Long = 0,
         val pinned: Boolean = false,
+        val groupId: String = com.miku.ray.AppConfig.DEFAULT_SUBSCRIPTION_ID,
     ) {
         val isSubscription: Boolean get() = !subscriptionUrl.isNullOrBlank()
     }
@@ -55,12 +56,13 @@ object MihomoProfileStore {
     fun activeConfig(context: Context): String =
         selected(context)?.config ?: DEFAULT_CONFIG
 
-    fun create(context: Context, name: String, config: String): Profile {
+    fun create(context: Context, name: String, config: String, groupId: String = com.miku.ray.AppConfig.DEFAULT_SUBSCRIPTION_ID): Profile {
         require(config.isNotBlank()) { context.getString(R.string.error_mihomo_config_blank) }
         val profile = Profile(
             id = UUID.randomUUID().toString(),
             name = name.ifBlank { context.getString(R.string.profile_default_name) },
             config = config,
+            groupId = groupId,
             updatedAtMillis = System.currentTimeMillis(),
         )
         synchronized(this) {
@@ -77,6 +79,7 @@ object MihomoProfileStore {
         intervalMinutes: Long = 24 * 60,
         updateWhenConnectedOnly: Boolean = false,
         updateThroughProxy: Boolean = false,
+        groupId: String = com.miku.ray.AppConfig.DEFAULT_SUBSCRIPTION_ID,
     ): Profile {
         require(url.isNotBlank()) { context.getString(R.string.error_subscription_url_blank) }
         val profile = Profile(
@@ -84,6 +87,7 @@ object MihomoProfileStore {
             name = name.ifBlank { context.getString(R.string.profile_subscription_default_name) },
             config = "", // A subscription must be downloaded before it can connect.
             subscriptionUrl = url,
+            groupId = groupId,
             updateIntervalMinutes = if (intervalMinutes <= 0) 0 else intervalMinutes.coerceAtLeast(15),
             updateWhenConnectedOnly = updateWhenConnectedOnly,
             updateThroughProxy = updateThroughProxy,
@@ -169,6 +173,7 @@ object MihomoProfileStore {
     fun exportBackup(context: Context): String = synchronized(this) {
         JSONObject().apply {
             put("version", 1)
+            put("groups", JSONArray(prefs(context).getString("groups", "[]")))
             put("selected", prefs(context).getString(KEY_SELECTED, null))
             // "Connect after device boot" is MikuRay's setting, and its own
             // receiver and preference carry it; the backup only has to say which
@@ -184,6 +189,7 @@ object MihomoProfileStore {
         replaceProfiles(context, restored)
         val selected = root.optString("selected").takeIf { id -> restored.any { it.id == id } }
         prefs(context).edit()
+            .putString("groups", (root.optJSONArray("groups") ?: JSONArray()).toString())
             .putString(KEY_SELECTED, selected ?: restored.firstOrNull()?.id)
             .commit()
         MihomoSubscriptionUpdater.reconfigure(context)
@@ -209,6 +215,7 @@ object MihomoProfileStore {
         put("updateThroughProxy", updateThroughProxy)
         put("updatedAtMillis", updatedAtMillis)
         put("pinned", pinned)
+        put("groupId", groupId)
     }
 
     private fun JSONObject.toProfile(context: Context) = Profile(
@@ -221,6 +228,7 @@ object MihomoProfileStore {
         updateThroughProxy = optBoolean("updateThroughProxy"),
         updatedAtMillis = optLong("updatedAtMillis"),
         pinned = optBoolean("pinned"),
+        groupId = optString("groupId", com.miku.ray.AppConfig.DEFAULT_SUBSCRIPTION_ID),
     )
 
     private val DEFAULT_CONFIG = """

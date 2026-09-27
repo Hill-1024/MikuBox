@@ -1,0 +1,11 @@
+<resources>
+    <string name="profile_editor_title">配置编辑器</string>
+    <string name="profile_editor_hint">保存后重新连接生效。可在菜单中切换可视化编辑和完整原始 YAML。</string>
+    <string name="profile_visual_summary">基础设置、节点、策略组、规则与 DNS。长按条目可删除或排序。可视化修改会重新排版并移除注释；未知字段会保留。</string>
+    <string name="profile_section_proxies">代理节点</string>
+    <string name="profile_section_groups">策略组</string>
+    <string name="profile_section_rules">分流规则</string>
+    <string name="profile_section_dns">DNS</string>
+    <string name="profile_section_providers">节点提供者</string>
+    <string name="profile_section_rule_providers">规则集</string>
+</resources>

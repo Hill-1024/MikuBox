@@ -48,6 +48,8 @@ class SubEditActivity : HelperBaseActivity() {
     private val boolEntries: Array<out String> by lazy { resources.getStringArray(R.array.bool_dropdown_entries) }
     private val boolValues: Array<out String> by lazy { resources.getStringArray(R.array.bool_dropdown_values) }
 
+    private var selectedGroup = com.miku.ray.AppConfig.DEFAULT_SUBSCRIPTION_ID
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         savedInstanceState?.getString("savedSubscriptionId")?.let { intent.putExtra("subId", it) }
@@ -91,16 +93,25 @@ class SubEditActivity : HelperBaseActivity() {
             R.id.allow_insecure_url,
         )
 
+        selectedGroup = savedInstanceState?.getString("groupId")
+            ?: subscriptionId?.let { com.miku.ray.MikuProfiles.impl?.get(it)?.groupId }
+            ?: intent.getStringExtra("groupId")?.takeIf { it.isNotBlank() }
+            ?: com.miku.ray.AppConfig.DEFAULT_SUBSCRIPTION_ID
         load()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menu.add(0, 0x6d02, 0, "配置组")
         menu.add(Menu.NONE, MENU_SAVE, Menu.NONE, android.R.string.ok)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == 0x6d02) {
+            com.miku.ray.ui.server.ProfileGroupPicker.choose(this, selectedGroup) { selectedGroup = it.id }
+            return true
+        }
         if (item.itemId == MENU_SAVE) {
             save()
             return true
@@ -125,6 +136,7 @@ class SubEditActivity : HelperBaseActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString("savedSubscriptionId", subscriptionId)
+        outState.putString("groupId", selectedGroup)
         super.onSaveInstanceState(outState)
     }
 
@@ -147,7 +159,11 @@ class SubEditActivity : HelperBaseActivity() {
             try {
                 val fetched = MikuSubscriptions.saveAndRefresh(
                     subscriptionId, title, address, automatic, minutes, proxy,
-                    onSaved = { intent.putExtra("subId", it) },
+                    onSaved = {
+                        intent.putExtra("subId", it)
+                        com.miku.ray.MikuProfiles.impl?.moveToGroup(it, selectedGroup)
+                        com.miku.ray.handler.SettingsChangeManager.makeSetupGroupTab()
+                    },
                 )
                 if (fetched) finish()
                 else android.widget.Toast.makeText(this@SubEditActivity,

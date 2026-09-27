@@ -13,14 +13,12 @@ import com.miku.ray.util.LogUtil
 /**
  * Brings the tunnel back when the process is killed with it up.
  *
- * START_STICKY is not enough on Android 12+: a killed process's foreground
- * service is not restarted, because the restart would need a background
- * foreground-service start the platform refuses (observed: the service record
- * keeps `startRequested=true` and the system never schedules anything). Alarms
- * live in the platform rather than in the process, so a short repeating check
- * survives the kill and re-launches the service within about a minute. The
- * expectation is persisted, so the guard only ever restores a tunnel the user
- * actually asked for: disconnecting clears it, and so does a failed start.
+ * START_STICKY asks Android to recreate a killed service; framework-managed
+ * sticky foreground-service restarts are exempt from background-start limits.
+ * This alarm is a best-effort fallback for devices that delay that restart.
+ * Its explicit start is still subject to background restrictions, and Doze may
+ * defer the alarm, so it cannot promise a restart deadline or defeat force-stop.
+ * The persisted expectation is cleared on manual disconnect and VPN revocation.
  */
 object TunnelGuard {
 
@@ -30,7 +28,7 @@ object TunnelGuard {
      * the tunnel is up within the next check), while the check itself is a
      * broadcast that only reads a flag unless something is wrong. In Doze the
      * platform stretches allow-while-idle alarms to its own cadence, which is
-     * still far better than not returning until the user opens the app.
+     * not a guaranteed recovery interval.
      */
     private const val CHECK_INTERVAL_MS = 30_000L
 

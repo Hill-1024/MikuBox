@@ -79,7 +79,10 @@ object SpeedtestManager {
      * endpoints race in parallel so one slow endpoint cannot hold back the
      * answer.
      */
-    suspend fun getRemoteIPInfo(direct: Boolean = false): String? {
+    suspend fun getRemoteIPInfo(direct: Boolean = false): String? =
+        if (direct) fetchRemoteIPInfo(true) else ExitIpSnapshot.get { fetchRemoteIPInfo(false) }
+
+    private suspend fun fetchRemoteIPInfo(direct: Boolean): String? {
         val url = MmkvManager.decodeSettingsString(AppConfig.PREF_IP_API_URL)
         .takeIf { !it.isNullOrBlank() } ?: AppConfig.IP_API_URL
 

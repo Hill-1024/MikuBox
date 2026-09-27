@@ -42,7 +42,7 @@ class MikuProxyService : Service() {
                 try {
                     MihomoCoreSettings.prepareMixedPort(this)
                     val profile = com.mikubox.mihomo.profile.MihomoProfileStore.selected(this)
-                    val config = profile?.config ?: MihomoConfigStore.activeConfig(this)
+                    val config = profile?.let { com.mikubox.mihomo.profile.ProfileRouting.apply(this, it) } ?: MihomoConfigStore.activeConfig(this)
                     val result = CoreServiceRuntime.start(this) {
                         com.mikubox.mihomo.core.AndroidNetworkBridge.start(this)
                         MihomoCore.start(

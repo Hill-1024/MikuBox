@@ -25,7 +25,7 @@ object QuickActionsSmoke {
                 Thread.sleep(100)
             }
         }
-        fun ipUrl(country: String): String = "http://10.0.2.2:18081/ip/$country"
+        fun ipUrl(country: String): String = "http://10.0.2.2:18081/ip/${country.lowercase()}"
         MmkvManager.encodeSettings("pref_mikubox_welcome_completed", true)
         MmkvManager.encodeSettings(AppConfig.PREF_SHOW_SPLASH, false)
         MmkvManager.encodeSettings(AppConfig.PREF_SHOW_QUICK_ACTIONS, true)
