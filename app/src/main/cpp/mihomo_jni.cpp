@@ -7,6 +7,7 @@ void MihomoSetProcessResolver(void* resolver);
 void MihomoSetSocketProtector(void* protector);
 void MihomoUpdateSystemDNS(char* addresses);
 int MihomoStart(char* config, char* home, int tun_fd, char* dns_override, char* overrides_json);
+int MihomoAttachTun(int tun_fd);
 void MihomoStop();
 char* MihomoLastError();
 char* MihomoVersion();
@@ -134,6 +135,11 @@ Java_com_mikubox_mihomo_core_MihomoCore_nativeStart(
 extern "C" JNIEXPORT void JNICALL
 Java_com_mikubox_mihomo_core_MihomoCore_nativeStop(JNIEnv* /* env */, jobject /* thiz */) {
     MihomoStop();
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_mikubox_mihomo_core_MihomoCore_nativeAttachTun(JNIEnv* /* env */, jobject /* thiz */, jint fd) {
+    return MihomoAttachTun(fd);
 }
 
 extern "C" JNIEXPORT jstring JNICALL

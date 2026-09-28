@@ -30,8 +30,19 @@ class MihomoVpnSettingsFragment : com.miku.ray.ui.preference.activity.VpnSetting
         AutomationPreferences.refreshNetwork(this)
         val power = requireContext().getSystemService(android.os.PowerManager::class.java)
         findPreference<Preference>("background_battery_status")?.summary =
-            if (power.isIgnoringBatteryOptimizations(requireContext().packageName)) "已允许后台运行"
-            else "当前受电池优化限制；可在系统设置中允许后台运行，减少待机时的连接中断。"
+            if (power.isIgnoringBatteryOptimizations(requireContext().packageName)) "已忽略 Android 电池优化；厂商的后台运行和自启动权限仍需单独允许。"
+            else "尚未忽略 Android 电池优化，点击申请允许。此权限由系统和你决定。"
+        val service = com.miku.ray.core.CoreServiceManager.serviceControl as? android.net.VpnService
+        findPreference<Preference>("background_always_on")?.summary = when {
+            android.os.Build.VERSION.SDK_INT >= 29 && service?.isAlwaysOn == true ->
+                "系统始终开启 VPN 已启用。" + if (service.isLockdownEnabled) "已启用无 VPN 时阻止连接，恢复期间网络会被系统阻断。" else "未启用无 VPN 时阻止连接。"
+            else -> "点击系统 VPN 设置查看或开启。由系统管理连接恢复，无需锁定最近任务；关闭应用页面不会主动断开。"
+        }
+        findPreference<Preference>("background_recovery")?.summary =
+            if (com.mikubox.mihomo.service.TunnelGuard.recoveryPaused(requireContext()))
+                "自动恢复已连续失败三次并暂停，请检查配置和后台权限后手动连接。"
+            else "意外中断后尝试恢复；连续失败会退避并暂停，避免反复接管网络。强行停止应用或撤销 VPN 权限会中断连接。"
+
     }
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         super.onCreatePreferences(bundle, rootKey)
@@ -39,21 +50,46 @@ class MihomoVpnSettingsFragment : com.miku.ray.ui.preference.activity.VpnSetting
         val category = PreferenceCategory(requireContext()).apply { title = "后台连接保护" }
         preferenceScreen.addPreference(category)
         category.addPreference(Preference(requireContext()).apply {
+            key = "background_always_on"
             title = "系统 VPN · 始终开启"
-            summary = "连接使用前台服务，无需锁定最近任务。建议在系统中开启始终开启 VPN，由系统管理连接恢复。强制停止或撤销 VPN 权限会停止连接。"
             setOnPreferenceClickListener {
-                runCatching { startActivity(android.content.Intent(android.provider.Settings.ACTION_VPN_SETTINGS)) }
+                openSystemSettings(android.content.Intent(android.provider.Settings.ACTION_VPN_SETTINGS))
                 true
             }
         })
         category.addPreference(Preference(requireContext()).apply {
             key = "background_battery_status"
-            title = "电池优化设置"
+            title = "允许忽略电池优化"
             setOnPreferenceClickListener {
-                runCatching { startActivity(android.content.Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)) }
+                val power = requireContext().getSystemService(android.os.PowerManager::class.java)
+                val intent = if (power.isIgnoringBatteryOptimizations(requireContext().packageName))
+                    android.content.Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                else android.content.Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                    android.net.Uri.parse("package:${requireContext().packageName}"))
+                openSystemSettings(intent)
                 true
             }
         })
+        category.addPreference(Preference(requireContext()).apply {
+            title = if (android.os.Build.MANUFACTURER.lowercase() in setOf("oneplus", "oppo", "realme"))
+                "ColorOS / 一加后台运行设置" else "应用后台运行设置"
+            summary = "在系统应用信息中允许后台活动、自启动及关联启动（具体选项取决于系统）。这些权限无法由应用自行开启；电池优化豁免不等于获得厂商清理豁免。"
+            setOnPreferenceClickListener { openSystemSettings(appDetailsIntent()); true }
+        })
+        category.addPreference(Preference(requireContext()).apply {
+            key = "background_recovery"
+            title = "连接恢复状态"
+            isSelectable = false
+        })
+    }
+
+    private fun appDetailsIntent() = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        android.net.Uri.parse("package:${requireContext().packageName}"))
+
+    private fun openSystemSettings(intent: android.content.Intent) {
+        runCatching { startActivity(intent) }.recoverCatching { startActivity(appDetailsIntent()) }
+            .onFailure { Toast.makeText(requireContext(), "无法打开系统设置，请从系统设置中进入 MikuBox 应用信息。", Toast.LENGTH_LONG).show() }
+
     }
 }
 

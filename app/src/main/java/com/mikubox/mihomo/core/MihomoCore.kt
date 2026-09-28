@@ -11,6 +11,7 @@ import java.io.File
 object MihomoCore {
 
     const val NO_TUN = -1
+    internal const val DEFERRED_TUN = -2
 
     data class Traffic(
         val uploadPerSecond: Long,
@@ -130,6 +131,10 @@ object MihomoCore {
 
     fun stop() {
         nativeStop()
+    }
+
+    fun attachTun(fd: Int): Result<Unit> = runCatching {
+        check(nativeAttachTun(fd) == 0) { nativeLastError() }
     }
 
     fun version(): String = nativeVersion()
@@ -317,6 +322,7 @@ object MihomoCore {
 
     private external fun nativeStart(config: String, home: String, tunFd: Int, dnsOverride: String, overridesJson: String): Int
     private external fun nativeStop()
+    private external fun nativeAttachTun(fd: Int): Int
     private external fun nativeLastError(): String
     private external fun nativeVersion(): String
     private external fun nativeTraffic(): String

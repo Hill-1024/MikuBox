@@ -39,8 +39,8 @@ import com.mikubox.mihomo.profile.MihomoTrafficStore
 /**
  * The MikuBox VPN service.
  *
- * Full lifecycle: consent → foreground notification → TUN establishment →
- * hand the TUN file descriptor to the Mihomo core → stop. The TUN installs a
+ * Full lifecycle: consent → foreground notification → core preparation →
+ * TUN establishment and attachment → stop. The TUN installs a
  * catch-all route (0.0.0.0/0 and ::/0) so all traffic is captured and routed
  * through the core, minus this app's own UID to avoid feeding Mihomo's own
  * sockets back into the tunnel.
@@ -166,10 +166,15 @@ class MikuVpnService : VpnService(), ServiceControl {
     override fun getService(): Service = this
 
     override fun startService() {
+        TunnelGuard.resetFailures(this)
+        startRequested = true
         startVpn()
     }
 
     override fun stopService() {
+        startRequested = false
+        startReplayQueued = false
+        TunnelGuard.expectRunning(this, false)
         stopVpn()
     }
 
@@ -181,6 +186,11 @@ class MikuVpnService : VpnService(), ServiceControl {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         LogUtil.i(message = "service command action=${intent?.action} startId=$startId")
+        val recovery = intent == null || intent.action == vpnAction(packageName, ACTION_RECOVER)
+        if (recovery && (!TunnelGuard.isExpected(this) || TunnelGuard.recoveryPaused(this))) {
+            stopVpn()
+            return START_NOT_STICKY
+        }
         when (intent?.action) {
             vpnAction(packageName, ACTION_STOP) -> {
                 startRequested = false
@@ -210,17 +220,11 @@ class MikuVpnService : VpnService(), ServiceControl {
         // action string (a bare suffix constant instead of vpnAction(...) is
         // how the restart and refresh requests were silently dropped once
         // before); say so instead of falling through to a no-op.
-        intent?.action?.let { LogUtil.w(message = "unhandled service action: $it") }
+        intent?.action?.takeUnless { it == vpnAction(packageName, ACTION_RECOVER) || it == SERVICE_INTERFACE }
+            ?.let { LogUtil.w(message = "unhandled service action: $it") }
         if (!running && !starting) {
             startRequested = true
             startVpn()
-        } else if (!running) {
-            // A start is already in flight (typically the automatic reconnect
-            // after the process was killed with the tunnel up). Remember the
-            // request instead of dropping it: the user's tap must survive the
-            // in-flight attempt, including its failure — a silent drop here is
-            // what made the connect button look dead right after a kill.
-            startRequested = true
         }
         return START_STICKY
     }
@@ -234,17 +238,9 @@ class MikuVpnService : VpnService(), ServiceControl {
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
         if (running || starting) {
-            // The tunnel must not die with the task, including while connecting. On a stock system this
-            // foreground service survives the swipe untouched; shades whose
-            // "clean all" treats the removal as a kill trigger get the service
-            // re-asserted right here — the strongest defence an app has. If
-            // the process is killed regardless, START_STICKY reconnects it.
-            runCatching {
-                androidx.core.content.ContextCompat.startForegroundService(
-                    this,
-                    Intent(this, MikuVpnService::class.java),
-                )
-            }
+            // Removing a task does not stop this foreground service. Keep the
+            // fallback armed without issuing a second start during preparation.
+            TunnelGuard.schedule(this)
         } else {
             // Nothing is being carried: the process is free for the cleaner.
             stopSelf()
@@ -294,10 +290,12 @@ class MikuVpnService : VpnService(), ServiceControl {
         // The foreground notification must appear promptly; the heavy work runs
         // after it. Never establish a tunnel without foreground protection.
         if (!startForegroundNotification()) {
+            TunnelGuard.failed(this)
             stopVpn()
             return
         }
         com.miku.ray.handler.ExitIpSnapshot.invalidate()
+        checkpointHandler.postDelayed(startupTimeout, STARTUP_TIMEOUT_MS)
         startExecutor.execute {
             if (generation.get() != request) return@execute
             // Tracked so a failure between establish() and the core taking over
@@ -306,11 +304,6 @@ class MikuVpnService : VpnService(), ServiceControl {
             var descriptorClosed = false
             try {
                 MihomoCoreSettings.prepareMixedPort(this)
-                fd = establishTun() ?: run {
-                    reportStartFailure(lastTunError?.message.orEmpty())
-                    checkpointHandler.post { if (generation.get() == request) stopVpn() }
-                    return@execute
-                }
                 val profile = MihomoProfileStore.selected(this)
                 val config = profile?.let { com.mikubox.mihomo.profile.ProfileRouting.apply(this, it) } ?: MihomoConfigStore.activeConfig(this)
                 require(config.isNotBlank()) { "Update the subscription before connecting" }
@@ -318,27 +311,32 @@ class MikuVpnService : VpnService(), ServiceControl {
                 // configuration, so the screen's list is refreshed against it —
                 // including the rules the user switched off there.
                 val startResult = CoreServiceRuntime.start(this, { MihomoTrafficStore.finish(this) }) {
-                    com.mikubox.mihomo.core.AndroidNetworkBridge.start(this)
-                    MihomoCore.start(
-                    this,
-                    config,
-                    fd,
-                    MihomoDnsSettings.effectiveOverride(this, config),
-                    MihomoCoreSettings.overridesJson(
-                        this, AndroidVpnSettings.mtu(this),
-                        "${AndroidVpnSettings.interfaceAddress(this).ipv4Client}/$PRIVATE_VLAN4_PREFIX",
-                        if (AndroidVpnSettings.ipv6Inbound(this)) "${AndroidVpnSettings.interfaceAddress(this).ipv6Client}/$PRIVATE_VLAN6_PREFIX" else null,
-                        profileId = profile?.id,
-                    ),
-                ) }
-                closeDetachedTun(fd)
+                    runCatching {
+                        com.mikubox.mihomo.core.AndroidNetworkBridge.start(this)
+                        // Parse, load providers and make DNS ready before taking over device traffic.
+                        MihomoCore.start(
+                            this, config, MihomoCore.DEFERRED_TUN,
+                            MihomoDnsSettings.effectiveOverride(this, config),
+                            MihomoCoreSettings.overridesJson(
+                                this, AndroidVpnSettings.mtu(this),
+                                "${AndroidVpnSettings.interfaceAddress(this).ipv4Client}/$PRIVATE_VLAN4_PREFIX",
+                                if (AndroidVpnSettings.ipv6Inbound(this)) "${AndroidVpnSettings.interfaceAddress(this).ipv6Client}/$PRIVATE_VLAN6_PREFIX" else null,
+                                profileId = profile?.id,
+                            ),
+                        ).getOrThrow()
+                        check(generation.get() == request) { "VPN startup cancelled" }
+                        fd = establishTun() ?: throw (lastTunError ?: IllegalStateException("VPN permission was revoked"))
+                        MihomoCore.attachTun(fd).getOrThrow()
+                    }.onFailure { MihomoCore.stop() }
+                }
+                if (fd != MihomoCore.NO_TUN) closeDetachedTun(fd)
                 descriptorClosed = true
                 if (startResult.isFailure) {
                     val failure = startResult.exceptionOrNull()
                     // The message alone is not enough to place a Kotlin failure;
                     // keep the trace in the log for the diagnostics export.
                     runCatching { failure?.let { LogUtil.e(message = "core start threw", throwable = it) } }
-                    reportStartFailure(failure?.message.orEmpty())
+                    if (generation.get() == request) reportStartFailure(failure?.message.orEmpty())
                     checkpointHandler.post { if (generation.get() == request) stopVpn() }
                     return@execute
                 }
@@ -351,6 +349,7 @@ class MikuVpnService : VpnService(), ServiceControl {
                 MihomoTrafficStore.begin(profile)
                 checkpointHandler.post {
                     if (generation.get() != request) return@post
+                    checkpointHandler.removeCallbacks(startupTimeout)
                     starting = false
                     tunFd = fd
                     running = true
@@ -392,7 +391,7 @@ class MikuVpnService : VpnService(), ServiceControl {
                 }
             } catch (error: Throwable) {
                 if (!descriptorClosed && fd != MihomoCore.NO_TUN) closeDetachedTun(fd)
-                reportStartFailure(error.message.orEmpty())
+                if (generation.get() == request) reportStartFailure(error.message.orEmpty())
                 checkpointHandler.post { if (generation.get() == request) stopVpn() }
             }
         }
@@ -537,7 +536,15 @@ class MikuVpnService : VpnService(), ServiceControl {
         )
     }
 
+    private val startupTimeout = Runnable {
+        if (starting) {
+            reportStartFailure("VPN preparation timed out; automatic recovery will back off")
+            stopVpn()
+        }
+    }
+
     private fun reportStartFailure(detail: String) {
+        TunnelGuard.failed(this)
         val message = detail.ifBlank { getString(R.string.mihomo_start_failed) }
         LogUtil.e(message = "VPN start failed: $message")
         sendBroadcast(
@@ -594,6 +601,7 @@ class MikuVpnService : VpnService(), ServiceControl {
         com.miku.ray.handler.ExitIpSnapshot.invalidate()
         val stopGeneration = generation.incrementAndGet()
         val stoppingRevision = ConnectionStatus.update(this, ConnectionStatus.Phase.DISCONNECTING)
+        checkpointHandler.removeCallbacks(startupTimeout)
         starting = false
         running = false
         startedAtMillis = 0L
@@ -733,11 +741,13 @@ class MikuVpnService : VpnService(), ServiceControl {
         ensureChannel()
         val notification = buildNotification()
         if (Build.VERSION.SDK_INT >= 34) {
-            startForeground(
-                NOTIFICATION_ID,
-                notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
-            )
+            try {
+                // Android explicitly provides this type for configured VPN apps.
+                startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED)
+            } catch (_: SecurityException) {
+                // Some platforms do not grant the VPN exemption until establish().
+                startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+            }
         } else {
             startForeground(NOTIFICATION_ID, notification)
         }
@@ -834,6 +844,8 @@ class MikuVpnService : VpnService(), ServiceControl {
         // applicationId at the call site so a package rename cannot desync
         // senders and receivers.
         const val ACTION_STOP = "STOP_VPN"
+        const val ACTION_RECOVER = "RECOVER_VPN"
+        private const val STARTUP_TIMEOUT_MS = 45_000L
 
         /** Reloads the core in place so changed settings apply immediately. */
         const val ACTION_RESTART = "RESTART_VPN"
@@ -879,19 +891,27 @@ class MikuVpnService : VpnService(), ServiceControl {
         var startedAtMillis: Long = 0L
             private set
 
-        fun start(context: Context) {
+        fun start(context: Context, recovery: Boolean = false) {
             if (running) return
+            if (recovery) {
+                if (!TunnelGuard.isExpected(context) || TunnelGuard.recoveryPaused(context)) return
+            } else TunnelGuard.resetFailures(context)
             ConnectionStatus.update(context, ConnectionStatus.Phase.CONNECTING)
             // Throws when the platform refuses a background foreground-service
             // start; callers include the guard's broadcast receiver, where an
             // escaping exception would take the whole process down.
             androidx.core.content.ContextCompat.startForegroundService(
                 context,
-                Intent(context, MikuVpnService::class.java),
+                Intent(context, MikuVpnService::class.java).apply {
+                    if (recovery) action = vpnAction(context.packageName, ACTION_RECOVER)
+                },
             )
         }
 
         fun stop(context: Context) {
+            // Persist before delivery: a rejected command or a concurrent process
+            // death must not leave the guard armed after a deliberate disconnect.
+            TunnelGuard.expectRunning(context, false)
             ConnectionStatus.update(context, ConnectionStatus.Phase.DISCONNECTING)
             // Background start restrictions (API 26+) can reject a startService
             // from a non-visual entry point; a stop request that never lands

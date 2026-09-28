@@ -37,7 +37,7 @@ public class NetworkProbeActivity extends Activity {
                 }
                 byte[] payload = new byte[384 * 1024];
                 for (int i = 0; i < payload.length; i++) payload[i] = (byte)(i % 251);
-                for (int port : new int[]{18082}) {
+                for (int port : getIntent().getBooleanExtra("echo_only", false) ? new int[]{} : new int[]{18082}) {
                     HttpURLConnection c = (HttpURLConnection)new URL("http://10.0.2.2:" + port + "/echo").openConnection(Proxy.NO_PROXY);
                     try {
                         c.setConnectTimeout(8000); c.setReadTimeout(8000);
@@ -65,6 +65,9 @@ public class NetworkProbeActivity extends Activity {
                     }
                 }
             } catch (Throwable e) { result.putString("failure", e.toString()); }
+            // Also observable when checking a killed/restarted release process,
+            // where instrumentation cannot stay attached to the target UID.
+            android.util.Log.i("MikuNetworkProbe", result.toString());
             sendBroadcast(new Intent("com.mikubox.mihomo.QA_NETWORK_RESULT").setPackage("com.mikubox.mihomo").putExtras(result));
             runOnUiThread(this::finish);
         }, "external-uid-probe").start();

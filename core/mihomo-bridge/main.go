@@ -38,11 +38,15 @@ var core = struct {
 	lastErr    string
 	groupOrder []string
 	effective  map[string]any
+	pendingTun *listenerconfig.Tun
 }{}
 
 // bridgeRevision identifies the compiled bridge in exported diagnostics; bump
 // it whenever the native side changes so a log proves which build produced it.
-const bridgeRevision = "2026-09-20.3"
+const bridgeRevision = "2026-09-28.1"
+
+// Prepare the complete VPN configuration before Android installs catch-all routes.
+const deferredTunFD = -2
 
 // MihomoStart initializes the Alpha core in-process. The Android app owns the
 // VPN interface and passes its already-open descriptor to Mihomo's TUN inbound.
@@ -83,9 +87,39 @@ func MihomoStop() {
 	log.Infoln("[Stop] done")
 }
 
+// MihomoAttachTun adopts a descriptor only after providers, DNS and routing are ready.
+//
+//export MihomoAttachTun
+func MihomoAttachTun(fd C.int) C.int {
+	core.Lock()
+	defer core.Unlock()
+	if err := attachTun(int(fd)); err != nil {
+		core.lastErr = err.Error()
+		shutdownCore()
+		core.running = false
+		return 1
+	}
+	return 0
+}
+
+func attachTun(fd int) error {
+	if !core.running || core.pendingTun == nil || fd < 0 {
+		return errors.New("VPN core is not prepared for a TUN descriptor")
+	}
+	conf := *core.pendingTun
+	core.pendingTun = nil
+	conf.FileDescriptor = fd
+	listener.ReCreateTun(conf, tunnel.Tunnel)
+	if !listener.LastTunConf.Enable {
+		return errors.New("TUN listener failed to start, see the core log")
+	}
+	return nil
+}
+
 // Upstream Shutdown is intended for process exit and only cleans up TUN.
 // An embedded core must also release proxy sockets and live connections.
 func shutdownCore() {
+	core.pendingTun = nil
 	stopTrafficSampler()
 	listener.ReCreateHTTP(0, tunnel.Tunnel)
 	listener.ReCreateSocks(0, tunnel.Tunnel)
@@ -389,6 +423,8 @@ func MihomoValidateDns(dnsYaml *C.char) *C.char {
 }
 
 func start(configText, homeDir string, tunFD int, dnsOverride, overridesJson string) ([]string, error) {
+	core.pendingTun = nil
+	vpnMode := tunFD >= 0 || tunFD == deferredTunFD
 	constant.SetHomeDir(homeDir)
 	// Path.Config() is a bare relative name that the mihomo CLI resolves
 	// against its own working directory. Android app processes run with a
@@ -524,14 +560,18 @@ func start(configText, homeDir string, tunFD int, dnsOverride, overridesJson str
 	// The app owns the interface itself, so these TUN fields are applied last:
 	// nothing a profile or an override says may move the descriptor or the
 	// routes Android installed.
-	if tunFD >= 0 {
+	if vpnMode {
 		tun, ok := raw["tun"].(map[string]any)
 		if !ok || tun == nil {
 			tun = map[string]any{}
 		}
 		tun["enable"] = true
 		tun["device"] = "MikuBox"
-		tun["file-descriptor"] = tunFD
+		if tunFD >= 0 {
+			tun["file-descriptor"] = tunFD
+		} else {
+			delete(tun, "file-descriptor")
+		}
 		tun["auto-route"] = false
 		tun["auto-detect-interface"] = false
 		tun["strict-route"] = false
@@ -581,9 +621,16 @@ func start(configText, homeDir string, tunFD int, dnsOverride, overridesJson str
 		if appendSystemDNS {
 			cfg.DNS.NameServer = append(cfg.DNS.NameServer, dns.NameServer{Net: "system"})
 		}
-		if tunFD >= 0 && len(android4) > 0 {
+		if vpnMode && len(android4) > 0 {
 			cfg.General.Tun.Inet4Address = android4
 			cfg.General.Tun.Inet6Address = android6
+		}
+		if tunFD == deferredTunFD {
+			pending := cfg.General.Tun
+			core.pendingTun = &pending
+			// Keep VPN-specific DNS/settings, but don't create an interface while
+			// ApplyConfig is still loading providers and suspending the tunnel.
+			cfg.General.Tun.Enable = false
 		}
 	}); err != nil {
 		return nil, err

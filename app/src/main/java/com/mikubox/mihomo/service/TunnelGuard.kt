@@ -22,15 +22,20 @@ import com.miku.ray.util.LogUtil
  */
 object TunnelGuard {
 
-    /**
-     * How often the guard checks. Half a minute keeps the gap after a kill
-     * short (observed end to end: the alarm fires, the service comes back and
-     * the tunnel is up within the next check), while the check itself is a
-     * broadcast that only reads a flag unless something is wrong. In Doze the
-     * platform stretches allow-while-idle alarms to its own cadence, which is
-     * not a guaranteed recovery interval.
-     */
     private const val CHECK_INTERVAL_MS = 30_000L
+
+    fun recoveryPaused(context: Context): Boolean = RecoveryBackoff.failures(context) >= 3
+
+    fun resetFailures(context: Context) = RecoveryBackoff.reset(context)
+
+    fun failed(context: Context) {
+        if (!isExpected(context)) return
+        RecoveryBackoff.failed(context)
+        if (recoveryPaused(context)) {
+            cancel(context)
+            LogUtil.w(message = "Automatic VPN recovery paused after three failures; reconnect manually")
+        } else schedule(context)
+    }
 
     /** True while the tunnel is supposed to be up. */
     fun isExpected(context: Context): Boolean =
@@ -45,13 +50,15 @@ object TunnelGuard {
     fun expectRunning(context: Context, expected: Boolean) {
         runCatching { MmkvManager.encodeSettings(AppConfig.PREF_TUNNEL_EXPECTED, expected) }
             .onFailure { LogUtil.w(message = "Could not record the tunnel expectation", throwable = it) }
+        resetFailures(context)
         if (expected) schedule(context) else cancel(context)
     }
 
     /** Arms the next check; the receiver re-arms it after every firing. */
     fun schedule(context: Context) {
+        if (!isExpected(context) || recoveryPaused(context)) { cancel(context); return }
         val manager = context.getSystemService(AlarmManager::class.java) ?: return
-        val at = SystemClock.elapsedRealtime() + CHECK_INTERVAL_MS
+        val at = SystemClock.elapsedRealtime() + maxOf(CHECK_INTERVAL_MS, RecoveryBackoff.remainingMillis(context))
         runCatching {
             // Allow-while-idle needs no exact-alarm permission; the platform
             // may defer it in Doze, which is the documented behaviour.
@@ -80,20 +87,39 @@ object TunnelGuard {
 class TunnelGuardReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (!TunnelGuard.isExpected(context)) {
+        if (!TunnelGuard.isExpected(context) || TunnelGuard.recoveryPaused(context)) {
             // Disconnected while the alarm was in flight; let it lapse.
             TunnelGuard.cancel(context)
             return
         }
-        if (!MikuVpnService.running) {
+        if (RecoveryBackoff.remainingMillis(context) > 0) { TunnelGuard.schedule(context); return }
+        if (!MikuVpnService.running && ConnectionStatus.phase.value != ConnectionStatus.Phase.CONNECTING) {
             LogUtil.w(message = "Tunnel expected but not running; restarting it")
             // The start is refused outright when the platform does not allow a
             // background foreground-service start (no battery-optimization
             // exemption, device in Doze); say so instead of throwing out of a
             // broadcast, and keep the alarm armed so the next window retries.
-            runCatching { MikuVpnService.start(context) }
-                .onFailure { LogUtil.w(message = "Tunnel guard could not restart the service", throwable = it) }
+            runCatching { MikuVpnService.start(context, recovery = true) }
+                .onFailure {
+                    ConnectionStatus.update(context, ConnectionStatus.Phase.DISCONNECTED)
+                    TunnelGuard.failed(context)
+                    LogUtil.w(message = "Tunnel guard could not restart the service", throwable = it)
+                }
         }
         TunnelGuard.schedule(context)
     }
+}
+
+/** Persist across process death so a bad profile cannot produce an endless reconnect loop. */
+internal object RecoveryBackoff {
+    private fun prefs(context: Context) = context.getSharedPreferences("tunnel_recovery", Context.MODE_PRIVATE)
+    fun failures(context: Context): Int = prefs(context).getInt("failures", 0)
+    fun remainingMillis(context: Context, now: Long = System.currentTimeMillis()): Long =
+        (prefs(context).getLong("retry_at", 0) - now).coerceIn(0L, 120_000L)
+    @Synchronized fun failed(context: Context, now: Long = System.currentTimeMillis()) {
+        val failures = (failures(context) + 1).coerceAtMost(3)
+        prefs(context).edit().putInt("failures", failures)
+            .putLong("retry_at", now + (30_000L shl (failures - 1))).commit()
+    }
+    @Synchronized fun reset(context: Context) { prefs(context).edit().clear().commit() }
 }

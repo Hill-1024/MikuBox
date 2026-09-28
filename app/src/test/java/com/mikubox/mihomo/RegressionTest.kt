@@ -31,6 +31,45 @@ class RegressionTest {
         context = RuntimeEnvironment.getApplication()
     }
 
+    @Test fun vpnNeverUsesNetworkEnumerationOrderAsTransportPriority() {
+        val cellular = org.robolectric.shadows.ShadowNetwork.newInstance(100)
+        val wifi = org.robolectric.shadows.ShadowNetwork.newInstance(101)
+        val vpn = org.robolectric.shadows.ShadowNetwork.newInstance(102)
+        fun caps(transport: Int) = org.robolectric.shadows.ShadowNetworkCapabilities.newInstance().apply {
+            org.robolectric.Shadows.shadowOf(this).apply {
+                addTransportType(transport)
+                addCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                addCapability(android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+                addCapability(android.net.NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
+            }
+        }
+        val candidates = listOf(cellular to caps(android.net.NetworkCapabilities.TRANSPORT_CELLULAR),
+            wifi to caps(android.net.NetworkCapabilities.TRANSPORT_WIFI),
+            vpn to caps(android.net.NetworkCapabilities.TRANSPORT_VPN)
+                .apply { org.robolectric.Shadows.shadowOf(this).removeCapability(android.net.NetworkCapabilities.NET_CAPABILITY_NOT_VPN) })
+        assertEquals(wifi, com.mikubox.mihomo.core.chooseUnderlyingNetwork(candidates, vpn, null))
+        assertEquals(wifi, com.mikubox.mihomo.core.chooseUnderlyingNetwork(candidates.reversed(), vpn, wifi))
+        assertEquals(cellular, com.mikubox.mihomo.core.chooseUnderlyingNetwork(candidates, cellular, wifi))
+        assertEquals(cellular, com.mikubox.mihomo.core.chooseUnderlyingNetwork(candidates.filter { it.first != wifi }, vpn, wifi))
+        assertNull(com.mikubox.mihomo.core.chooseUnderlyingNetwork(listOf(candidates.last()), vpn, null))
+    }
+
+    @Test fun failedRecoveryBacksOffPersistsAndPausesUntilReset() {
+        val recovery = com.mikubox.mihomo.service.RecoveryBackoff
+        recovery.reset(context)
+        recovery.failed(context, 1000)
+        assertEquals(30_000L, recovery.remainingMillis(context, 1000))
+        recovery.failed(context, 31_000)
+        assertEquals(60_000L, recovery.remainingMillis(context, 31_000))
+        assertEquals(2, context.getSharedPreferences("tunnel_recovery", 0).getInt("failures", 0))
+        recovery.failed(context, 91_000)
+        assertTrue(com.mikubox.mihomo.service.TunnelGuard.recoveryPaused(context))
+        assertEquals(0L, recovery.remainingMillis(context, 999_999))
+        recovery.reset(context)
+        assertFalse(com.mikubox.mihomo.service.TunnelGuard.recoveryPaused(context))
+        assertEquals(0L, recovery.remainingMillis(context, 1000))
+    }
+
     @Test fun deletingGroupMovesProfilesAndKeepsInFlightSubscriptionMetadata() {
         val group = com.mikubox.mihomo.profile.ProfileGroups.create(context, "Remove me")
         val source = MihomoProfileStore.createSubscription(context, "Subscription", "https://example.com/sub", 60,

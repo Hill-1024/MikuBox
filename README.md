@@ -12,7 +12,16 @@ An Android universal proxy toolchain powered by **Mihomo**.
 
 [![Banner](https://raw.githubusercontent.com/HatsuneMikuUwU/MikuBoxForAndroid/main/image/uwu_banner.png)]()
 
-## v0.2.1 配置与连接管理
+## v0.2.2 连接与后台恢复
+
+- 配置、DNS 和规则供应器准备完成后才接管设备网络，避免启动和恢复期间空转。
+- 跟随系统选出的底层网络，避免连接后因枚举顺序误从 Wi-Fi 切换到蜂窝网络。
+- VPN 使用对应的前台服务类型；主动停止同时取消恢复，连续恢复失败后退避并暂停。
+- VPN 设置可申请电池优化豁免，并提供 ColorOS 后台权限说明与应用设置入口。
+
+详见 [v0.2.2 更新说明](docs/releases/v0.2.2.md)。厂商一键清理策略仍需真机确认；始终开启 VPN、后台权限和电池优化豁免分别由系统管理，应用无法阻止强行停止。
+
+## 配置与连接管理
 
 - 主页「＋」可创建、管理配置组；删除组后配置移回 Miku。导入内容进入当前组，编辑页面可修改归属。
 - 路由设置按配置文件、策略提供开关，独立保存覆盖项，不改写订阅原始规则。

@@ -15,6 +15,11 @@ class RuntimeSmokeInstrumentation : Instrumentation() {
     override fun onStart() {
         waitForIdleSync()
         val output = Bundle()
+        if (arguments.getString("lifecycle") == "true") {
+            try { finish(android.app.Activity.RESULT_OK, LifecycleSmoke.run(this)) }
+            catch (error: Throwable) { output.putString("stream", android.util.Log.getStackTraceString(error)); finish(android.app.Activity.RESULT_CANCELED, output) }
+            return
+        }
         if (arguments.getString("profile_features") == "true") {
             try { finish(android.app.Activity.RESULT_OK, ProfileFeaturesSmoke.run(this)) }
             catch (error: Throwable) { output.putString("stream", android.util.Log.getStackTraceString(error)); finish(android.app.Activity.RESULT_CANCELED, output) }
