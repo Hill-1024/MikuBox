@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.File
+import java.io.ByteArrayOutputStream
 import java.time.LocalDate
 import java.util.Properties
 import java.util.zip.ZipEntry
@@ -45,13 +46,13 @@ android {
         // Release workflows override both with the pushed tag (and the CI run
         // number, which only ever grows) so a tagged build reports and sorts
         // as the version it publishes; local builds keep the checked-in values.
-        versionCode = (findProperty("versionCodeOverride") as String?)?.toIntOrNull() ?: 202
-        versionName = (findProperty("versionNameOverride") as String?) ?: "0.2.2"
+        versionCode = (findProperty("versionCodeOverride") as String?)?.toIntOrNull() ?: 203
+        versionName = (findProperty("versionNameOverride") as String?) ?: "0.2.3"
 
         // The ported banner card (uwu_banner_theme / uwu_maintainer) reads these
         // the same way MikuRay's does — MikuRay declares them as resValues in its
         // build script, so the vendored layouts expect the names to exist.
-        val bannerVersionName = versionName ?: "0.2.2"
+        val bannerVersionName = versionName ?: "0.2.3"
         resValue("string", "uwu_version_name", bannerVersionName)
         resValue("string", "uwu_package_name", "com.mikubox.mihomo")
         resValue("string", "uwu_build_date", LocalDate.now().toString())
@@ -159,19 +160,91 @@ val mihomoJniLibsDir = layout.buildDirectory.dir("generated/mihomo-jniLibs")
 
 android.sourceSets.getByName("main").jniLibs.srcDir(mihomoJniLibsDir)
 
+val mihomoOverlay = layout.buildDirectory.file("mihomo-overlay.json")
+val mihomoPatchedMod = layout.buildDirectory.file("mihomo-patched.mod")
+val patchedSingTun = layout.buildDirectory.dir("patched/sing-tun")
+val prepareMihomoOverlay by tasks.registering {
+    inputs.file(mihomoBridgeDir.resolve("go.mod"))
+    inputs.file(mihomoBridgeDir.resolve("go.sum"))
+    inputs.dir(rootProject.file("core/patches"))
+    outputs.file(mihomoOverlay)
+    outputs.file(mihomoPatchedMod)
+    outputs.dir(patchedSingTun)
+    // Module-cache paths differ across hosts and can disappear after cleanup.
+    outputs.upToDateWhen { false }
+    doLast {
+        exec {
+            workingDir = mihomoBridgeDir
+            commandLine("go", "mod", "download", "github.com/metacubex/sing-tun")
+        }
+        val modulePath = ByteArrayOutputStream()
+        exec {
+            workingDir = mihomoBridgeDir
+            commandLine("go", "list", "-m", "-f", "{{.Dir}}", "github.com/metacubex/sing-tun")
+            standardOutput = modulePath
+        }
+        val singTunDir = File(modulePath.toString().trim())
+        check(singTunDir.resolve("stack_gvisor_filter.go").isFile) { "sing-tun filter source not found" }
+        // Go forbids overlays inside GOMODCACHE. Patch an isolated generated
+        // copy instead, with a separate modfile shared by builds and tests.
+        patchedSingTun.get().asFile.walkTopDown().forEach { it.setWritable(true) }
+        sync {
+            from(singTunDir)
+            exclude("stack_gvisor_filter.go")
+            into(patchedSingTun)
+            dirPermissions { unix("0755") }
+            filePermissions { unix("0644") }
+        }
+        rootProject.file("core/patches/stack_gvisor_filter.go").copyTo(
+            patchedSingTun.get().file("stack_gvisor_filter.go").asFile, overwrite = true)
+        val patchedMod = mihomoPatchedMod.get().asFile
+        mihomoBridgeDir.resolve("go.mod").copyTo(patchedMod, overwrite = true)
+        mihomoBridgeDir.resolve("go.sum").copyTo(patchedMod.resolveSibling("mihomo-patched.sum"), overwrite = true)
+        exec {
+            workingDir = mihomoBridgeDir
+            commandLine("go", "mod", "edit", "-modfile=${patchedMod.absolutePath}",
+                "-replace=github.com/metacubex/sing-tun=${patchedSingTun.get().asFile.absolutePath}")
+        }
+        val overlay = mihomoOverlay.get().asFile
+        overlay.parentFile.mkdirs()
+        fun jsonPath(file: File) = file.absolutePath.replace("\\", "\\\\").replace("\"", "\\\"")
+        val replacements = mapOf(
+            mihomoSourceDir.resolve("listener/sing_tun/server_notwindows.go") to rootProject.file("core/patches/server_notwindows.go"),
+            mihomoSourceDir.resolve("dns/patch_android.go") to rootProject.file("core/patches/patch_android.go"),
+        )
+        overlay.writeText("{\"Replace\":{" + replacements.entries.joinToString(",") {
+            "\"${jsonPath(it.key)}\":\"${jsonPath(it.value)}\""
+        } + "}}")
+    }
+}
+
+val testMihomoBridge by tasks.registering {
+    group = "verification"
+    description = "Tests the native bridge with the same dependency patches shipped in APKs."
+    dependsOn(prepareMihomoOverlay)
+    doLast {
+        exec {
+            workingDir = mihomoBridgeDir
+            commandLine("go", "test", "-modfile=${mihomoPatchedMod.get().asFile.absolutePath}",
+                "-overlay=${mihomoOverlay.get().asFile.absolutePath}", "-tags", "with_gvisor cmfa", "./...")
+        }
+    }
+}
+
 val buildMihomoBridge by tasks.registering {
     group = "build"
     description = "Builds the bundled HSSkyBoy/mihomo Alpha JNI bridge for every Android ABI."
+    dependsOn(prepareMihomoOverlay)
     inputs.dir(mihomoBridgeDir)
     inputs.dir(rootProject.file("core/patches"))
     inputs.dir(mihomoSourceDir)
+    inputs.file(mihomoOverlay)
+    inputs.file(mihomoPatchedMod)
+    inputs.dir(patchedSingTun)
     outputs.dir(mihomoJniLibsDir)
 
     doLast {
-        val overlay = layout.buildDirectory.file("mihomo-overlay.json").get().asFile
-        overlay.parentFile.mkdirs()
-        fun jsonPath(file: File) = file.absolutePath.replace("\\", "\\\\").replace("\"", "\\\"")
-        overlay.writeText("""{"Replace":{"${jsonPath(mihomoSourceDir.resolve("listener/sing_tun/server_notwindows.go"))}":"${jsonPath(rootProject.file("core/patches/server_notwindows.go"))}","${jsonPath(mihomoSourceDir.resolve("dns/patch_android.go"))}":"${jsonPath(rootProject.file("core/patches/patch_android.go"))}"}}""")
+        val overlay = mihomoOverlay.get().asFile
         val ndkDir = android.ndkDirectory
         val hostOs = System.getProperty("os.name").lowercase()
         val (hostTag, exeExt) = when {
@@ -216,7 +289,8 @@ val buildMihomoBridge by tasks.registering {
                     // reports success - a VPN that is up with no traffic at all.
                     // The tag is Mihomo's own switch for apps that embed the core
                     // and own the VpnService themselves.
-                    "go", "build", "-overlay=${overlay.absolutePath}", "-trimpath", "-buildmode=c-shared",
+                    "go", "build", "-modfile=${mihomoPatchedMod.get().asFile.absolutePath}",
+                    "-overlay=${overlay.absolutePath}", "-trimpath", "-buildmode=c-shared",
                     "-tags", "with_gvisor cmfa",
                     "-ldflags=-s -w", "-o", output.absolutePath, "."
                 )

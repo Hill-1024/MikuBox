@@ -47,9 +47,7 @@ jobs:
       - name: Verify Kotlin and native regressions
         run: |
           chmod +x gradlew
-          ./gradlew :app:testDebugUnitTest :app:lintDebug --no-daemon --console=plain
-          cd core/mihomo-bridge
-          go test -tags 'with_gvisor cmfa' ./...
+          ./gradlew :app:testDebugUnitTest :app:testMihomoBridge :app:lintDebug --no-daemon --console=plain
 
       - name: Restore the release signing keystore
         run: echo "$KEYSTORE_BASE64" | base64 --decode > release.keystore

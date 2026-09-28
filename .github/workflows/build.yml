@@ -62,7 +62,7 @@ jobs:
       - name: Run unit tests
         run: |
           chmod +x gradlew
-          ./gradlew :app:testDebugUnitTest --console=plain
+          ./gradlew :app:testDebugUnitTest :app:testMihomoBridge --console=plain
 
       - name: Build debug APKs (per-ABI)
         env:

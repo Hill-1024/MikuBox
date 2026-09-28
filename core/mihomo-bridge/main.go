@@ -43,7 +43,7 @@ var core = struct {
 
 // bridgeRevision identifies the compiled bridge in exported diagnostics; bump
 // it whenever the native side changes so a log proves which build produced it.
-const bridgeRevision = "2026-09-28.1"
+const bridgeRevision = "2026-09-28.2"
 
 // Prepare the complete VPN configuration before Android installs catch-all routes.
 const deferredTunFD = -2

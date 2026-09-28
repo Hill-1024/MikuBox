@@ -14,3 +14,17 @@ The pinned sing-tun v0.4.21 Android/Linux constructor with FileDescriptor > 0
 adopts the supplied descriptor without an error path; keep this ownership
 contract under review when upgrading the dependency. Non-Android builds retain
 the original constructor behavior.
+
+## gVisor detach
+
+`stack_gvisor_filter.go` replaces sing-tun v0.4.21's packet filter in a generated
+copy under `app/build/patched`, selected by a separate Go modfile. Its upstream
+`Attach(nil)` wraps the nil dispatcher, hiding the detach signal from gVisor's
+FD endpoint. The endpoint consequently never stops and joins its packet readers.
+After closing the Android descriptor, an idle `ppoll` can retain the TUN file
+until the next packet, leaving VPN routes active without a working core.
+
+Preserve nil when detaching; keep the existing filter for a live dispatcher.
+The module cache is never edited. `./gradlew :app:testMihomoBridge` and every ABI
+build consume the same generated module and overlay, and the regression test checks that
+the underlying endpoint receives a real nil dispatcher.
