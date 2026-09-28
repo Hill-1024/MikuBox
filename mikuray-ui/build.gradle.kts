@@ -41,8 +41,8 @@ android {
         // honour the same -PversionNameOverride/-PversionCodeOverride the app
         // module reads, or a tagged build shows the checked-in version while
         // reporting itself as the tag.
-        val bannerVersionName = (findProperty("versionNameOverride") as? String?)?.takeIf { it.isNotBlank() } ?: "0.2.0"
-        val bannerVersionCode = (findProperty("versionCodeOverride") as? String?)?.toIntOrNull() ?: 200
+        val bannerVersionName = (findProperty("versionNameOverride") as? String?)?.takeIf { it.isNotBlank() } ?: "0.2.1"
+        val bannerVersionCode = (findProperty("versionCodeOverride") as? String?)?.toIntOrNull() ?: 201
         buildConfigField("String", "APPLICATION_ID", "\"com.mikubox.mihomo\"")
         buildConfigField("String", "VERSION_NAME", "\"$bannerVersionName\"")
         buildConfigField("int", "VERSION_CODE", "$bannerVersionCode")

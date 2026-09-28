@@ -12,6 +12,7 @@ object MikuProfiles {
         fun setPolicyEnabled(id: String, policy: String, enabled: Boolean)
         fun groups(): List<Group>
         fun createGroup(name: String): Group
+        fun deleteGroup(id: String)
         fun moveToGroup(id: String, groupId: String)
         fun get(id: String): Profile?
         fun save(id: String?, name: String, content: String): String

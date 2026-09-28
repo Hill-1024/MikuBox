@@ -65,7 +65,11 @@ object MihomoSubscriptionUpdater {
 
     fun update(context: Context, profile: MihomoProfileStore.Profile): UpdateResult {
         val url = requireNotNull(profile.subscriptionUrl)
-        val body = fetch(context, url, profile.updateThroughProxy)
+        val routeThroughProxy = profile.updateThroughProxy &&
+            (profile.config.isNotBlank() || VpnController.isRunning)
+        // A first download cannot depend on the configuration it is downloading.
+        // Preserve the preference: only an empty subscription may bootstrap directly.
+        val body = fetch(context, url, routeThroughProxy)
         val config = MihomoSubscriptionDecoder.toMihomoConfig(context, body)
         val previous = proxyNames(profile.config)
         val current = proxyNames(config)
@@ -112,10 +116,10 @@ object MihomoSubscriptionUpdater {
             require(port in 1..65535) { "Invalid proxy port" }
             Proxy(Proxy.Type.HTTP, InetSocketAddress("127.0.0.1", port))
         } else {
-            null
+            Proxy.NO_PROXY
         }
         repeat(maxRedirects + 1) {
-            val opened = if (proxy != null) target.openConnection(proxy) else target.openConnection()
+            val opened = target.openConnection(proxy)
             val connection = (opened as HttpURLConnection).apply {
                 connectTimeout = 15_000
                 readTimeout = 30_000

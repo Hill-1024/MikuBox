@@ -71,7 +71,7 @@ class SubSettingActivity : HelperBaseActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.action_sub_setting, menu)
-        menu.add(0, 0x6d01, 0, "创建配置组")
+        menu.add(0, 0x6d01, 0, "管理配置组")
         // Sorting subscriptions would need an order this store does not keep.
         menu.findItem(R.id.sub_sort)?.isVisible = false
         (menu.findItem(R.id.search_view)?.actionView as? SearchView)?.setOnQueryTextListener(
@@ -89,9 +89,9 @@ class SubSettingActivity : HelperBaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         0x6d01 -> {
-            com.miku.ray.ui.server.ProfileGroupPicker.create(this) {
+            com.miku.ray.ui.server.ProfileGroupPicker.manage(this) {
                 com.miku.ray.handler.SettingsChangeManager.makeSetupGroupTab()
-                android.widget.Toast.makeText(this, "已创建配置组：${it.name}", android.widget.Toast.LENGTH_SHORT).show()
+
             }
             true
         }

@@ -60,10 +60,20 @@ object ProfileFeaturesSmoke {
         ProfileRouting.setEnabled(context, profile.id, true)
         ProfileRouting.setPolicy(context, profile.id, "REJECT", true)
         check(MihomoProfileStore.selected(context)?.config == profile.config)
+        com.mikubox.mihomo.core.MikuRayProfiles.deleteGroup(group.id)
+        repeat(2) { MikuRayProfileSync.sync(context) }
+        check(MmkvManager.decodeSubscription(group.id) == null)
+        check(profile.id in MmkvManager.decodeServerList(AppConfig.DEFAULT_SUBSCRIPTION_ID))
+        check(MihomoProfileStore.selected(context)?.id == profile.id)
+        check(MihomoProfileStore.selected(context)?.config == profile.config)
+        val subscription = MihomoProfileStore.createSubscription(context, "Bootstrap QA", "http://10.0.2.2:18081/sub/qa", 0, updateThroughProxy = true)
+        com.mikubox.mihomo.profile.MihomoSubscriptionUpdater.update(context, subscription)
+        check(MihomoProfileStore.profiles(context).first { it.id == subscription.id }.let { it.config.isNotBlank() && it.updateThroughProxy })
+        MikuRayProfileSync.sync(context)
         return Bundle().apply {
             putString("profileId", profile.id)
             putString("groupId", group.id)
-            putString("stream", "PASS: MMKV group migration/idempotency, live policy and file rule switches, original YAML preservation, manual disconnect clears recovery")
+            putString("stream", "PASS: MMKV group migration/idempotency, live policy and file rule switches, original YAML preservation, manual disconnect clears recovery, group deletion preserves profiles, initial proxy subscription bootstrap")
         }
     }
 }

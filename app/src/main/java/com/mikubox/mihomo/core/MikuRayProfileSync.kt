@@ -32,6 +32,7 @@ object MikuRayProfileSync {
             val previous = MmkvManager.decodeSubscription(group.id)
             MmkvManager.encodeSubscription(group.id, (previous ?: com.miku.ray.dto.entities.SubscriptionItem()).copy(remarks = group.name))
         }
+        val groups = com.mikubox.mihomo.profile.ProfileGroups.list(context).map { it.id }.toSet()
         val known = profiles.map { it.id }.toSet()
 
         profiles.forEach { profile ->
@@ -67,6 +68,11 @@ object MikuRayProfileSync {
                 MmkvManager.encodeServerConfig(profile.id, entry)
             }
             MmkvManager.encodeServerRaw(profile.id, profile.config)
+        }
+
+        // Profiles have already moved; removing the empty mirror cannot delete them.
+        MmkvManager.decodeSubscriptions().filter { it.guid !in groups }.forEach { stale ->
+            if (MmkvManager.decodeServerList(stale.guid).isEmpty()) MmkvManager.removeSubscription(stale.guid)
         }
 
         // Entries whose profile is gone.

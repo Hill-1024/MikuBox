@@ -12,14 +12,16 @@ An Android universal proxy toolchain powered by **Mihomo**.
 
 [![Banner](https://raw.githubusercontent.com/HatsuneMikuUwU/MikuBoxForAndroid/main/image/uwu_banner.png)]()
 
-## v0.2.0 配置与连接管理
+## v0.2.1 配置与连接管理
 
-- 主页「＋」可创建配置组；导入内容进入当前组，编辑页面可修改归属。
+- 主页「＋」可创建、管理配置组；删除组后配置移回 Miku。导入内容进入当前组，编辑页面可修改归属。
 - 路由设置按配置文件、策略提供开关，独立保存覆盖项，不改写订阅原始规则。
-- 配置编辑器提供 YAML 解析树、分流规则表单和完整原始 YAML 编辑；可视化修改会重新排版并移除注释。
+- 配置编辑器以分区卡片呈现字段，提供分流规则表单和可视化 / 完整 YAML 切换；可视化修改会重新排版并移除注释。
 - 通知与主页共享出口信息，VPN 设置提供始终开启与电池优化入口。
 
-详见 [v0.2.0 更新说明](docs/releases/v0.2.0.md)。
+开启代理更新的订阅在首次无配置、未连接时先直连获取，后续保留代理更新设置。
+
+详见 [v0.2.1 更新说明](docs/releases/v0.2.1.md)。
 
 ## Screenshots / 截圖預覽
 

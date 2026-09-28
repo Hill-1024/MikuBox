@@ -11,13 +11,13 @@ import java.util.UUID
 object ProfileGroups {
     private fun prefs(context: Context) = context.getSharedPreferences("mihomo_profiles", Context.MODE_PRIVATE)
 
-    @Synchronized fun list(context: Context): List<MikuProfiles.Group> {
+    fun list(context: Context): List<MikuProfiles.Group> = synchronized(MihomoProfileStore) {
         val saved = JSONArray(prefs(context).getString("groups", "[]"))
         return listOf(MikuProfiles.Group(AppConfig.DEFAULT_SUBSCRIPTION_ID, "Miku")) +
             List(saved.length()) { saved.getJSONObject(it).let { g -> MikuProfiles.Group(g.getString("id"), g.getString("name")) } }
     }
 
-    @Synchronized fun create(context: Context, name: String): MikuProfiles.Group {
+    fun create(context: Context, name: String): MikuProfiles.Group = synchronized(MihomoProfileStore) {
         val trimmed = name.trim()
         require(trimmed.isNotEmpty()) { "请输入组名" }
         require(list(context).none { it.name.equals(trimmed, ignoreCase = true) }) { "组名已存在" }

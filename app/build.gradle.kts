@@ -45,13 +45,13 @@ android {
         // Release workflows override both with the pushed tag (and the CI run
         // number, which only ever grows) so a tagged build reports and sorts
         // as the version it publishes; local builds keep the checked-in values.
-        versionCode = (findProperty("versionCodeOverride") as String?)?.toIntOrNull() ?: 200
-        versionName = (findProperty("versionNameOverride") as String?) ?: "0.2.0"
+        versionCode = (findProperty("versionCodeOverride") as String?)?.toIntOrNull() ?: 201
+        versionName = (findProperty("versionNameOverride") as String?) ?: "0.2.1"
 
         // The ported banner card (uwu_banner_theme / uwu_maintainer) reads these
         // the same way MikuRay's does — MikuRay declares them as resValues in its
         // build script, so the vendored layouts expect the names to exist.
-        val bannerVersionName = versionName ?: "0.2.0"
+        val bannerVersionName = versionName ?: "0.2.1"
         resValue("string", "uwu_version_name", bannerVersionName)
         resValue("string", "uwu_package_name", "com.mikubox.mihomo")
         resValue("string", "uwu_build_date", LocalDate.now().toString())

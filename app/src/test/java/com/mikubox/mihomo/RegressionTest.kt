@@ -31,6 +31,62 @@ class RegressionTest {
         context = RuntimeEnvironment.getApplication()
     }
 
+    @Test fun deletingGroupMovesProfilesAndKeepsInFlightSubscriptionMetadata() {
+        val group = com.mikubox.mihomo.profile.ProfileGroups.create(context, "Remove me")
+        val source = MihomoProfileStore.createSubscription(context, "Subscription", "https://example.com/sub", 60,
+            updateThroughProxy = true, groupId = group.id)
+        val pinned = MihomoProfileStore.create(context, "Pinned", "rules: [MATCH,DIRECT]", group.id)
+        MihomoProfileStore.update(context, pinned.copy(pinned = true))
+        MihomoProfileStore.select(context, source.id)
+        MihomoProfileStore.deleteGroup(context, group.id)
+        MihomoProfileStore.updateSubscription(context, source, "rules: [MATCH,DIRECT]")
+        val saved = MihomoProfileStore.selected(context)!!
+        assertEquals(com.miku.ray.AppConfig.DEFAULT_SUBSCRIPTION_ID, saved.groupId)
+        assertTrue(saved.updateThroughProxy)
+        assertEquals(60L, saved.updateIntervalMinutes)
+        assertEquals(2, MihomoProfileStore.profiles(context).size)
+        assertTrue(MihomoProfileStore.profiles(context).first { it.id == pinned.id }.pinned)
+        val backup = MihomoProfileStore.exportBackup(context)
+        MihomoProfileStore.restoreBackup(context, backup)
+        assertFalse(com.mikubox.mihomo.profile.ProfileGroups.list(context).any { it.id == group.id })
+        assertEquals(source.id, MihomoProfileStore.selected(context)?.id)
+        assertThrows(IllegalArgumentException::class.java) {
+            MihomoProfileStore.deleteGroup(context, com.miku.ray.AppConfig.DEFAULT_SUBSCRIPTION_ID)
+        }
+        val empty = com.mikubox.mihomo.profile.ProfileGroups.create(context, "Empty")
+        MihomoProfileStore.deleteGroup(context, empty.id)
+        assertEquals(1, com.mikubox.mihomo.profile.ProfileGroups.list(context).size)
+    }
+
+    @Test fun firstProxiedSubscriptionBootstrapsWithoutConnectionButLaterUpdatesStayProxied() = withSubscriptionServer { url, requests, _ ->
+        MikuRayBridgeContext.attach(context)
+        com.miku.ray.MikuSubscriptions.install(MikuRaySubscriptions)
+        kotlinx.coroutines.runBlocking {
+            var id: String? = null
+            assertTrue(com.miku.ray.MikuSubscriptions.saveAndRefresh(null, "First", url, false, 0, true) { id = it })
+            val saved = MihomoProfileStore.profiles(context).single { it.id == id }
+            assertTrue(saved.config.isNotBlank())
+            assertTrue(saved.updateThroughProxy)
+            assertEquals(1, requests.get())
+            assertThrows(IllegalStateException::class.java) {
+                com.mikubox.mihomo.profile.MihomoSubscriptionUpdater.update(context, saved)
+            }
+            assertEquals("Existing subscriptions must not silently bypass the proxy preference", 1, requests.get())
+        }
+    }
+
+    @Test fun failedBootstrapCanBeRetriedWithoutDisablingProxyPreference() = withSubscriptionServer { url, requests, status ->
+        val profile = MihomoProfileStore.createSubscription(context, "Retry", url, 0, updateThroughProxy = true)
+        status.set(503)
+        assertThrows(IllegalStateException::class.java) { com.mikubox.mihomo.profile.MihomoSubscriptionUpdater.update(context, profile) }
+        assertTrue(MihomoProfileStore.selected(context)!!.config.isBlank())
+        status.set(200)
+        com.mikubox.mihomo.profile.MihomoSubscriptionUpdater.update(context, profile)
+        assertEquals(2, requests.get())
+        assertTrue(MihomoProfileStore.selected(context)!!.updateThroughProxy)
+        assertTrue(MihomoProfileStore.selected(context)!!.config.isNotBlank())
+    }
+
     @Test fun profileGroupsSurviveSubscriptionRefreshAndBackup() {
         val groups = com.mikubox.mihomo.profile.ProfileGroups
         val group = groups.create(context, "Work")

@@ -29,6 +29,31 @@ object ProfileGroupPicker {
         dialog.show()
     }
 
+    fun manage(context: Context, done: () -> Unit) {
+        val store = MikuProfiles.impl ?: return
+        val groups = store.groups().filter { it.id != com.miku.ray.AppConfig.DEFAULT_SUBSCRIPTION_ID }
+        val builder = MaterialAlertDialogBuilder(context).setTitle("管理配置组")
+            .setNeutralButton("创建配置组") { _, _ -> create(context) { done() } }
+            .setNegativeButton(android.R.string.cancel, null)
+        if (groups.isEmpty()) builder.setMessage("默认 Miku 组用于收纳配置，不能删除。你可以创建新的配置组。")
+        else builder.setItems(groups.map { group ->
+            "${group.name} · ${store.list().count { it.groupId == group.id }} 个配置"
+        }.toTypedArray()) { _, index -> confirmDelete(context, groups[index], done) }
+        builder.show()
+    }
+
+    fun confirmDelete(context: Context, group: MikuProfiles.Group, done: () -> Unit) {
+        if (group.id == com.miku.ray.AppConfig.DEFAULT_SUBSCRIPTION_ID) { manage(context, done); return }
+        MaterialAlertDialogBuilder(context).setTitle("删除配置组“${group.name}”？")
+            .setMessage("组内的配置和订阅将移回 Miku，内容、订阅设置和当前连接都会保留。")
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton("删除配置组") { _, _ ->
+                runCatching { requireNotNull(MikuProfiles.impl).deleteGroup(group.id) }
+                    .onSuccess { done() }
+                    .onFailure { Toast.makeText(context, it.message, Toast.LENGTH_LONG).show() }
+            }.show()
+    }
+
     fun choose(context: Context, selected: String, done: (MikuProfiles.Group) -> Unit) {
         val groups = MikuProfiles.impl?.groups().orEmpty()
         MaterialAlertDialogBuilder(context).setTitle("配置组")

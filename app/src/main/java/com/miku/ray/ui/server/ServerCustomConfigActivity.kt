@@ -65,8 +65,19 @@ class ServerCustomConfigActivity : BaseActivity() {
         savedInstanceState?.getString("yamlDraft")?.let { binding.editor.setTextContent(Utils.getEditable(it)) }
         savedInstanceState?.getString("nameDraft")?.let { binding.etRemarks.setText(it) }
         visualEditor = VisualConfigEditor(this) { yaml -> binding.editor.setTextContent(Utils.getEditable(yaml)) }
-        (binding.editor.parent as android.view.ViewGroup).addView(visualEditor)
+        binding.visualEditorContainer.addView(visualEditor)
+        fun refreshGroupLabel() {
+            val group = com.miku.ray.MikuProfiles.impl?.groups()?.firstOrNull { it.id == selectedGroup }
+            binding.profileGroup.text = getString(R.string.profile_editor_group, group?.name ?: "Miku")
+        }
+        refreshGroupLabel()
+        binding.profileGroup.setOnClickListener {
+            ProfileGroupPicker.choose(this, selectedGroup) { selectedGroup = it.id; refreshGroupLabel() }
+        }
         setVisualMode(savedInstanceState?.getBoolean("visualMode", true) ?: true)
+        binding.editorMode.addOnButtonCheckedListener { _, id, checked ->
+            if (checked && (id == R.id.mode_visual) != visualMode) setVisualMode(id == R.id.mode_visual)
+        }
     }
 
     private fun setVisualMode(enabled: Boolean) {
@@ -74,15 +85,17 @@ class ServerCustomConfigActivity : BaseActivity() {
             try { visualEditor.load(binding.editor.text.toString()) }
             catch (error: Exception) {
                 visualEditor.visibility = android.view.View.GONE
-                binding.editor.visibility = android.view.View.VISIBLE
+                binding.rawEditorCard.visibility = android.view.View.VISIBLE
                 visualMode = false
+                binding.editorMode.check(R.id.mode_yaml)
                 snackbarError("无法解析配置，请在原始 YAML 中修正：${error.message}", title = getString(R.string.title_alerter_error))
                 return
             }
         }
         visualMode = enabled
         visualEditor.visibility = if (enabled) android.view.View.VISIBLE else android.view.View.GONE
-        binding.editor.visibility = if (enabled) android.view.View.GONE else android.view.View.VISIBLE
+        binding.rawEditorCard.visibility = if (enabled) android.view.View.GONE else android.view.View.VISIBLE
+        binding.editorMode.check(if (enabled) R.id.mode_visual else R.id.mode_yaml)
         invalidateOptionsMenu()
     }
 
@@ -166,10 +179,6 @@ class ServerCustomConfigActivity : BaseActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.action_server, menu)
-        if (com.miku.ray.MikuProfiles.impl != null) {
-            menu.add(0, 0x6d02, 0, "配置组")
-            menu.add(0, 0x6d03, 0, if (visualMode) "原始 YAML" else "可视化编辑")
-        }
         val delButton = menu.findItem(R.id.del_config)
         val saveButton = menu.findItem(R.id.save_config)
 

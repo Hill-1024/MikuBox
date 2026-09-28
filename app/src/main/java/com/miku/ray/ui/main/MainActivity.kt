@@ -929,9 +929,12 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
         binding.btnAddSub.contentDescription = "添加订阅或配置组"
         binding.btnAddSub.setOnClickListener {
             MaterialAlertDialogBuilder(this).setTitle("添加")
-                .setItems(arrayOf("添加订阅", "创建配置组")) { _, choice ->
+                .setItems(arrayOf("添加订阅", "创建配置组", "管理配置组")) { _, choice ->
                     if (choice == 0) requestActivityLauncher.launch(Intent(this, SubEditActivity::class.java).putExtra("groupId", mainViewModel.subscriptionId))
-                    else com.miku.ray.ui.server.ProfileGroupPicker.create(this) {
+                    else if (choice == 1) com.miku.ray.ui.server.ProfileGroupPicker.create(this) {
+                        SettingsChangeManager.makeSetupGroupTab()
+                        setupGroupTab()
+                    } else com.miku.ray.ui.server.ProfileGroupPicker.manage(this) {
                         SettingsChangeManager.makeSetupGroupTab()
                         setupGroupTab()
                     }
@@ -1365,6 +1368,8 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
 
     private fun setupGroupTab() {
         lifecycleScope.launch(Dispatchers.IO) {
+            // Reused group fragments need new contents as well as new tab metadata.
+            mainViewModel.reloadServerList()
             val groups = mainViewModel.getSubscriptions(this@MainActivity)
             withContext(Dispatchers.Main) {
                 if (isFinishing || isDestroyed) return@withContext
@@ -1406,7 +1411,7 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
 
                         tab.customView = tabView
                         tab.view.setOnLongClickListener {
-                            com.miku.ray.ui.server.ProfileGroupPicker.create(this@MainActivity) {
+                            com.miku.ray.ui.server.ProfileGroupPicker.confirmDelete(this@MainActivity, com.miku.ray.MikuProfiles.Group(group.id, group.remarks)) {
                                 SettingsChangeManager.makeSetupGroupTab()
                                 setupGroupTab()
                             }

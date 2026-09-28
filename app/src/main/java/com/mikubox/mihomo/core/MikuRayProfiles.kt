@@ -15,6 +15,11 @@ object MikuRayProfiles : MikuProfiles.Impl {
     override fun setPolicyEnabled(id: String, policy: String, enabled: Boolean) = com.mikubox.mihomo.profile.ProfileRouting.setPolicy(context, id, policy, enabled)
     override fun groups() = com.mikubox.mihomo.profile.ProfileGroups.list(context)
     override fun createGroup(name: String) = com.mikubox.mihomo.profile.ProfileGroups.create(context, name).also { sync() }
+    override fun deleteGroup(id: String) {
+        MihomoProfileStore.deleteGroup(context, id)
+        sync()
+        com.miku.ray.handler.SettingsChangeManager.makeSetupGroupTab()
+    }
     override fun moveToGroup(id: String, groupId: String) {
         require(groups().any { it.id == groupId }) { "Unknown group" }
         val profile = requireNotNull(MihomoProfileStore.profiles(context).firstOrNull { it.id == id })
