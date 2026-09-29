@@ -19,10 +19,14 @@ import com.miku.ray.handler.SpeedtestManager
 import com.miku.ray.util.LogUtil
 import com.miku.ray.util.MessageUtil
 import com.miku.ray.util.Utils
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -233,14 +237,42 @@ object CoreServiceManager {
         if (!isRunning()) return
         measureIp(service, requestId)
         backgroundScope.launch {
-            val testUrl = SettingsManager.getDelayTestUrl()
-            val delay = runCatching { MikuCoreBridge.currentNodeDelay(testUrl) }.getOrDefault(-1L)
-            val result = if (delay >= 0L) {
-                service.getString(R.string.connection_test_available, delay)
-            } else {
-                service.getString(R.string.connection_test_error, "")
+            MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, connectionTestResult(service), requestId)
+        }
+    }
+
+    /**
+     * The card's connection test as the line it shows.
+     *
+     * The endpoints are raced rather than tried one after another, because the
+     * profile's own routing decides which of them is reachable: a configuration
+     * that sends Google through a group of its own makes the app's default
+     * `generate_204` probe fail while the tunnel carries everything else, and
+     * the card used to report exactly that as a bare "错误：" — a connection
+     * that looks broken while traffic flows. The first endpoint to answer wins;
+     * only a tunnel that carries none of them is an error, and then the line
+     * names the endpoint that could not be reached instead of trailing off.
+     */
+    private suspend fun connectionTestResult(service: Service): String = coroutineScope {
+        val endpoints = connectionTestEndpoints(
+            SettingsManager.getDelayTestUrl(),
+            SettingsManager.getDelayTestUrl(second = true),
+            MmkvManager.decodeSettingsString(AppConfig.PREF_IP_API_URL).orEmpty().ifBlank { AppConfig.IP_API_URL },
+        )
+        val answer = CompletableDeferred<Long>()
+        val attempts = endpoints.map { url ->
+            async(Dispatchers.IO) {
+                val delay = runCatching { MikuCoreBridge.currentNodeDelay(url) }.getOrDefault(-1L)
+                if (delay >= 0L) answer.complete(delay)
             }
-            MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, result, requestId)
+        }
+        val delay = withTimeoutOrNull(CONNECTION_TEST_WINDOW_MS) { answer.await() }
+        attempts.forEach { it.cancel() }
+        if (delay != null) {
+            service.getString(R.string.connection_test_available, delay)
+        } else {
+            LogUtil.w(message = "connection test carried nothing through any endpoint: $endpoints")
+            service.getString(R.string.connection_test_error, endpointHost(endpoints.first()))
         }
     }
 
@@ -264,3 +296,29 @@ object CoreServiceManager {
         }
     }
 }
+
+/**
+ * Endpoints the connection test races, in priority order: the delay URL the
+ * user configured, the built-in second one, and the address the exit probe
+ * already trusts. Blank entries are dropped and duplicates collapse, so a
+ * profile that points several of these settings at one host is asked once.
+ * Public and top level (the vendored layer is its own module) so the list is
+ * unit-testable without a running service.
+ */
+fun connectionTestEndpoints(primary: String, secondary: String, api: String): List<String> =
+    listOf(primary, secondary, api)
+        .map { it.trim().replace("{ip}", "", ignoreCase = true) }
+        .filter { it.isNotEmpty() }
+        .distinct()
+        .ifEmpty { listOf(AppConfig.DELAY_TEST_URL) }
+
+/**
+ * The host alone: the card's error line names what could not be reached, which
+ * is the difference between "错误：" and knowing that the route to the test
+ * endpoint is what failed.
+ */
+fun endpointHost(url: String): String =
+    runCatching { java.net.URL(url).host }.getOrNull()?.takeIf { it.isNotBlank() } ?: url
+
+/** Whole-race budget: an endpoint's own five-second timeouts plus hand-off slack. */
+private const val CONNECTION_TEST_WINDOW_MS = 7_000L

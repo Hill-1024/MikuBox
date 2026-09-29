@@ -954,4 +954,49 @@ class RegressionTest {
         assertEquals(30_000L, retry(2))
         assertEquals(30_000L, retry(9))
     }
+
+    @Test fun failedExitProbeHoldsEveryCallerOffUntilAFlushAsksAgain() = kotlinx.coroutines.runBlocking {
+        val snapshot = com.miku.ray.handler.ExitIpSnapshot
+        snapshot.invalidate()
+        // One round failed. The screen's retry, the notification's next beat and
+        // a fresh measurement all arrive inside the backoff window, and none of
+        // them may start a round of its own: a node that is down used to be
+        // probed continuously, three HTTPS attempts at a time.
+        assertNull(snapshot.get { null })
+        assertNull(snapshot.get { error("a failed probe must not be repeated immediately") })
+        assertNull(snapshot.get { error("still inside the backoff window") })
+        // A deliberate refresh is how the app says "ask again now".
+        snapshot.invalidate()
+        assertEquals("new exit", snapshot.get { "new exit" })
+        assertEquals("new exit", snapshot.get { error("a fresh sample is reused, not re-probed") })
+    }
+
+    @Test fun connectionTestRacesDistinctEndpointsAndNamesTheOneThatFailed() {
+        // The profile's own routing decides which endpoint is reachable: a
+        // config that sends Google through a group of its own must not turn a
+        // tunnel that carries everything else into a bare "错误：".
+        val endpoints = { primary: String, secondary: String, api: String ->
+            com.miku.ray.core.connectionTestEndpoints(primary, secondary, api)
+        }
+        assertEquals(
+            listOf(
+                "https://www.gstatic.com/generate_204",
+                "https://www.google.com/generate_204",
+                "https://api.ip.sb/geoip",
+            ),
+            endpoints("https://www.gstatic.com/generate_204", "https://www.google.com/generate_204", "https://api.ip.sb/geoip"),
+        )
+        // Duplicates and blanks collapse; the API template loses its {ip} hole.
+        assertEquals(
+            listOf("https://a.example/generate_204", "https://api.ip.sb/geoip"),
+            endpoints(" https://a.example/generate_204 ", "https://a.example/generate_204", "https://api.ip.sb/geoip{ip}"),
+        )
+        assertEquals(
+            listOf(com.miku.ray.AppConfig.DELAY_TEST_URL),
+            endpoints("", "  ", ""),
+        )
+        // The error line names the host; something unparsable is shown as is.
+        assertEquals("www.gstatic.com", com.miku.ray.core.endpointHost("https://www.gstatic.com/generate_204"))
+        assertEquals("generate_204", com.miku.ray.core.endpointHost("generate_204"))
+    }
 }

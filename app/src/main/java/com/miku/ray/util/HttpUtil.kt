@@ -92,7 +92,17 @@ object HttpUtil {
                 return response.body?.string()
             }
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to get URL content", e)
+            // A probe that cannot reach its endpoint is the expected outcome on
+            // a blocked network; naming the endpoint and the reason keeps the
+            // export readable, where a stack trace per attempt read like a
+            // crash and buried whatever the round was actually doing.
+            if (request.quiet) {
+                LogUtil.w(
+                    message = "Failed to get URL content: ${url} (${e.javaClass.simpleName}: ${e.message})",
+                )
+            } else {
+                LogUtil.e(AppConfig.TAG, "Failed to get URL content", e)
+            }
         }
         return null
     }

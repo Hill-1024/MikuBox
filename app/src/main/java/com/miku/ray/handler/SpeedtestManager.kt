@@ -110,6 +110,7 @@ object SpeedtestManager {
                         val content = HttpUtil.getUrlContent(UrlContentRequest(
                             url = endpoint, timeout = PROBE_TIMEOUT_MS, httpPort = httpPort,
                             proxyUsername = proxyUsername, proxyPassword = proxyPassword,
+                            quiet = true,
                         )) ?: return@runCatching null
                         JsonUtil.fromJsonSafe(content, IPAPIInfo::class.java)
                     }.getOrNull() ?: return@async

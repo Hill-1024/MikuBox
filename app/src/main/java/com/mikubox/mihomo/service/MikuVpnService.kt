@@ -16,13 +16,16 @@ import android.os.Looper
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock
 import androidx.core.app.NotificationCompat
+import com.miku.ray.AppConfig
 import com.miku.ray.contracts.ServiceControl
 import com.miku.ray.core.CoreServiceManager
 import com.miku.ray.extension.toSpeedString
 import com.miku.ray.extension.toTrafficString
+import com.miku.ray.handler.ExitIpSnapshot
 import com.miku.ray.handler.SpeedtestManager
 import com.miku.ray.handler.TrafficController
 import com.miku.ray.util.LogUtil
+import com.miku.ray.util.MessageUtil
 import com.mikubox.mihomo.R
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -482,7 +485,9 @@ class MikuVpnService : VpnService(), ServiceControl {
         // right after a (re)start the first attempt usually lands in the core's
         // warm-up window and fails, and a steep backoff would keep the exit
         // line stale — or blank — for minutes while traffic flows fine. Failures
-        // retry at 15 s, then 30 s, capped there.
+        // retry at 15 s, then 30 s, capped there. The shared snapshot enforces
+        // the same floor, so a screen that asks for the exit on its own beat
+        // cannot turn this into a probe every three seconds.
         val cooldown = if (exitIpDisplay == null) {
             notificationExitRetryMs(exitIpFailures)
         } else {
@@ -500,6 +505,11 @@ class MikuVpnService : VpnService(), ServiceControl {
             if (fetched != null) {
                 exitIpDisplay = fetched
                 exitIpFailures = 0
+                // The screen fills its readout from the requests it sends; a
+                // reading obtained here — after the backoff expires, or when
+                // its own retries ran out — has to reach it too, or a blank
+                // line stays blank until the user happens to trigger a probe.
+                MessageUtil.sendMsg2UI(this@MikuVpnService, AppConfig.MSG_MEASURE_IP_SUCCESS, fetched, "")
             } else {
                 exitIpFailures++
             }
@@ -957,17 +967,14 @@ internal const val MAX_NOTIFICATION_ISP_LENGTH = 24
 /** Exit IP is a network probe; re-fetching it every beat would be wasteful. */
 internal const val EXIT_IP_REFRESH_MS = 60_000L
 
-internal const val EXIT_IP_RETRY_MS = 15_000L
-
 /**
- * Retry delay for the notification's exit probe while the reading is missing:
- * 15 s after the first failure (usually the core's warm-up window swallowing
- * the attempt right after a connect or a node switch), 30 s from the second on,
- * capped there — traffic keeps flowing, so waiting minutes for a line is worse
- * than a cheap probe every half minute. Top level so it is unit-testable.
+ * Retry delay for the notification's exit probe while the reading is missing.
+ * The schedule lives with the shared snapshot ([ExitIpSnapshot.retryDelayMs]),
+ * which enforces the same floor for every caller — the screen's own retries go
+ * through it too, so this can stay a plain read of the shared answer.
  */
 internal fun notificationExitRetryMs(failures: Int): Long =
-    EXIT_IP_RETRY_MS shl (failures - 1).coerceIn(0, 1)
+    ExitIpSnapshot.retryDelayMs(failures)
 
 /**
  * OEM shades tend to give a row one line and ellipsize its tail, so the
