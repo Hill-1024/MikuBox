@@ -45,14 +45,23 @@ android {
         targetSdk = 36
         // Release workflows override both with the pushed tag (and the CI run
         // number, which only ever grows) so a tagged build reports and sorts
-        // as the version it publishes; local builds keep the checked-in values.
-        versionCode = (findProperty("versionCodeOverride") as String?)?.toIntOrNull() ?: 203
-        versionName = (findProperty("versionNameOverride") as String?) ?: "0.2.3"
+        // as the version it publishes. Local builds read the same values from
+        // gradle.properties (appVersionName/appVersionCode) — the single source
+        // :mikuray-ui reads too, so the about screen cannot drift from the
+        // package version again.
+        val releaseVersionName = (findProperty("versionNameOverride") as String?)?.takeIf { it.isNotBlank() }
+            ?: (findProperty("appVersionName") as String?)?.takeIf { it.isNotBlank() }
+            ?: error("Set appVersionName in gradle.properties or pass -PversionNameOverride")
+        val releaseVersionCode = (findProperty("versionCodeOverride") as String?)?.toIntOrNull()
+            ?: (findProperty("appVersionCode") as String?)?.toIntOrNull()
+            ?: error("Set appVersionCode in gradle.properties or pass -PversionCodeOverride")
+        versionCode = releaseVersionCode
+        versionName = releaseVersionName
 
         // The ported banner card (uwu_banner_theme / uwu_maintainer) reads these
         // the same way MikuRay's does — MikuRay declares them as resValues in its
         // build script, so the vendored layouts expect the names to exist.
-        val bannerVersionName = versionName ?: "0.2.3"
+        val bannerVersionName = releaseVersionName
         resValue("string", "uwu_version_name", bannerVersionName)
         resValue("string", "uwu_package_name", "com.mikubox.mihomo")
         resValue("string", "uwu_build_date", LocalDate.now().toString())
@@ -130,9 +139,10 @@ android {
 
     buildTypes {
         release {
-            // R8 shrinking only — proguard-rules.pro pins -dontobfuscate, and the
-            // JNI entry points are covered by the -keep rules. Obfuscation stays
-            // off so stack traces stay readable.
+            // R8 shrinking only — proguard-rules.pro pins -dontobfuscate so stack
+            // traces stay readable, and carries an explicit keep for the
+            // MihomoCore native methods (AGP's default file keeps `native
+            // <methods>` too; the explicit rule does not depend on it).
             isMinifyEnabled = true
             isShrinkResources = false
             proguardFiles(

@@ -1,8 +1,15 @@
 -repackageclasses ''
 -allowaccessmodification
 
--keep class io.nekohasekai.sagernet.** { *;}
--keep class moe.matsuri.nb4a.** { *;}
+# JNI entry points. AGP's default proguard-android-optimize.txt keeps
+# `native <methods>` names (keepclasseswithmembernames), but that default file
+# is an implementation detail of the AGP version — pin the rule here too so
+# libmikubox_core's Java_com_mikubox_mihomo_core_MihomoCore_* bindings survive
+# regardless of it. -dontobfuscate below keeps stack traces readable on top.
+-keepclasseswithmembernames class com.mikubox.mihomo.core.MihomoCore {
+    native <methods>;
+}
+
 -keep class com.yalantis.ucrop.UCropActivity { *; }
 
 # Gson builds these models reflectively. When R8 drops a model's constructor
@@ -35,9 +42,6 @@
     static void checkNotNullParameter(java.lang.Object, java.lang.String);
     static void throwUninitializedPropertyAccessException(java.lang.String);
 }
-
-# ini4j
--keep public class org.ini4j.spi.** { <init>(); }
 
 # SnakeYaml
 -keep class org.yaml.snakeyaml.** { *; }
