@@ -1067,4 +1067,857 @@
     <string name="policy_group_round_robin">Round Robin</string>
     <string name="config_backup_local">Локальное</string>
     <string name="config_backup_webdav">WebDAV</string>
+
+    <!-- Дополнения MikuBox (2026-10-02, сознательное отклонение от upstream MikuRay): строки экранов MikuBox. При повторном re-sync из upstream будут удалены. -->
+    <string name="mihomo_autoconnect_title">Автоподключение при запуске</string>
+    <string name="mihomo_autoconnect_summary">Подключать выбранный профиль при запуске приложения, если доступ к VPN уже выдан.</string>
+    <string name="mihomo_update_when_connected_only">Обновлять только при подключении</string>
+    <string name="mihomo_update_when_connected_only_summary">Обновления подписок выполняются только при активном VPN — источник подписки не опрашивается напрямую.</string>
+    <string name="mihomo_yaml_parse_failed">Не удалось разобрать YAML: %1$s</string>
+    <string name="mihomo_config_parse_failed">Не удалось разобрать профиль — исправьте его в редакторе YAML: %1$s</string>
+    <string name="mihomo_group_name_hint">Название группы</string>
+    <string name="mihomo_group_create_title">Создать группу</string>
+    <string name="mihomo_group_manage_title">Управление группами</string>
+    <string name="mihomo_group_manage_empty">Группа Miku по умолчанию служит хранилищем профилей и не может быть удалена. Вы можете создать новые группы.</string>
+    <string name="mihomo_group_entry_count">%1$s · профилей: %2$d</string>
+    <string name="mihomo_group_delete_title">Удалить группу «%1$s»?</string>
+    <string name="mihomo_group_delete_message">Профили и подписки из этой группы вернутся в Miku. Содержимое, настройки подписок и текущее подключение сохранятся.</string>
+    <string name="mihomo_group_delete_action">Удалить группу</string>
+    <string name="mihomo_group_choose_title">Группы</string>
+    <string name="mihomo_group_new_action">Новая группа</string>
+    <string name="mihomo_group_name_required">Введите название группы</string>
+    <string name="mihomo_group_name_exists">Такое название группы уже существует</string>
+    <string name="mihomo_group_default_undeletable">Группу по умолчанию нельзя удалить</string>
+    <string name="mihomo_group_missing">Неизвестная группа</string>
+    <string name="mihomo_routing_title">Маршрутизация</string>
+    <string name="mihomo_routing_description">В режиме правил трафик распределяется по профилям и политикам. Отключённые правила в сопоставлении не участвуют; трафик, не подошедший ни под одно правило, идёт напрямую. Изменения вступят в силу при следующем подключении — или переподключитесь сразу.</string>
+    <string name="mihomo_routing_apply_now">Применить к текущему подключению</string>
+    <string name="mihomo_routing_saved_next_connect">Сохранено — вступит в силу при следующем подключении</string>
+    <string name="mihomo_routing_reconnecting">Переподключение…</string>
+    <string name="mihomo_routing_reconnect_failed">Не удалось переподключиться — повторите вручную</string>
+    <string name="mihomo_routing_empty">Профилей пока нет — сначала импортируйте профиль или подписку.</string>
+    <string name="mihomo_routing_no_rules">В этом файле нет правил распределения трафика</string>
+    <string name="mihomo_routing_parse_failed">Не удалось разобрать: %1$s</string>
+    <plurals name="mihomo_routing_rule_count">
+        <item quantity="one">%1$d правило</item>
+        <item quantity="few">%1$d правила</item>
+        <item quantity="many">%1$d правил</item>
+        <item quantity="other">%1$d правила</item>
+    </plurals>
+    <string name="mihomo_vpn_battery_ok">Оптимизация батареи Android отключена для приложения; фоновые разрешения и автозапуск от производителя нужно выдать отдельно.</string>
+    <string name="mihomo_vpn_battery_off">Оптимизация батареи Android ещё не отключена — нажмите, чтобы запросить. Решение за вами и системой.</string>
+    <string name="mihomo_vpn_always_on_enabled">Системная функция «Всегда включённый VPN» включена.\u0020</string>
+    <string name="mihomo_vpn_lockdown_on">Включена блокировка без VPN; во время восстановления система блокирует сеть.</string>
+    <string name="mihomo_vpn_lockdown_off">Блокировка без VPN выключена.</string>
+    <string name="mihomo_vpn_always_on_hint">Нажмите, чтобы открыть системные настройки VPN. Восстановлением подключения управляет система — закреплять приложение в недавних не нужно; закрытие экранов приложения не разрывает подключение.</string>
+    <string name="mihomo_vpn_recovery_paused">Автовосстановление три раза подряд не удалось и приостановлено. Проверьте профиль и фоновые разрешения, затем подключитесь вручную.</string>
+    <string name="mihomo_vpn_recovery_summary">Пытается восстановиться после неожиданного прерывания; повторные неудачи включают выдержку и паузу вместо постоянного перехвата сети. Принудительная остановка приложения или отзыв разрешения VPN разрывают подключение.</string>
+    <string name="mihomo_vpn_recovery_title">Состояние восстановления подключения</string>
+    <string name="mihomo_vpn_bg_category">Защита подключения в фоне</string>
+    <string name="mihomo_vpn_always_on_title">Системный VPN · Всегда включён</string>
+    <string name="mihomo_vpn_battery_title">Разрешить игнорировать оптимизацию батареи</string>
+    <string name="mihomo_vpn_oem_title_coloros">Фоновые настройки ColorOS / OnePlus</string>
+    <string name="mihomo_vpn_oem_title">Фоновые настройки приложения</string>
+    <string name="mihomo_vpn_oem_summary">Разрешите фоновую активность, автозапуск и связанный запуск в сведениях о приложении (набор опций зависит от системы). Приложение не может выдать их само; отключение оптимизации батареи не равнозначно освобождению от очистки производителя.</string>
+    <string name="mihomo_vpn_open_settings_failed">Не удалось открыть системные настройки — откройте сведения о приложении MikuBox в настройках системы.</string>
+    <string-array name="allowinsecures" translatable="false">
+        <item></item>
+        <item>true</item>
+        <item>false</item>
+    </string-array>
+    <string-array name="app_font_entries" translatable="false">
+        <item>Default</item>
+        <item>IOS 15</item>
+        <item>Google Sans</item>
+        <item>Roboto</item>
+        <item>Poppins</item>
+        <item>ChocoCooky</item>
+        <item>SimpleDay</item>
+        <item>Fucek</item>
+        <item>SF Pro Display</item>
+        <item>Dancing Script</item>
+        <item>Cream</item>
+        <item>OneUI</item>
+        <item>Inconsolata</item>
+        <item>Emily\'s Candy</item>
+        <item>Summer Dream</item>
+        <item>Rine</item>
+        <item>Evolve Sans</item>
+    </string-array>
+    <string-array name="app_font_values" translatable="false">
+        <item>default</item>
+        <item>ios15</item>
+        <item>google</item>
+        <item>roboto</item>
+        <item>poppins</item>
+        <item>chococooky</item>
+        <item>simpleday</item>
+        <item>fucek</item>
+        <item>sfprodisplay</item>
+        <item>dancingscript</item>
+        <item>cream</item>
+        <item>oneui</item>
+        <item>inconsolata</item>
+        <item>emilyscandy</item>
+        <item>summerdream</item>
+        <item>rine</item>
+        <item>evolve</item>
+    </string-array>
+    <string-array name="app_icon_entries" translatable="false">
+        <item>Project SEKAI</item>
+        <item>Teal</item>
+        <item>Basic</item>
+        <item>Cherry Pop</item>
+        <item>Rabbit Hole</item>
+        <item>Mesmerizer</item>
+        <item>Sakura</item>
+        <item>Magical Mirai 2024</item>
+        <item>Deep Sea Girl</item>
+        <item>Snow Miku 2025</item>
+        <item>Symphony 2022</item>
+        <item>Racing Miku 2025</item>
+        <item>Cinnamiku</item>
+        <item>Retry Now</item>
+    </string-array>
+    <string-array name="app_icon_values" translatable="false">
+        <item>default</item>
+        <item>mikuTeal</item>
+        <item>basic</item>
+        <item>cherryPop</item>
+        <item>rabbitHole</item>
+        <item>mesmerizer</item>
+        <item>sakura</item>
+        <item>magicalMirai2024</item>
+        <item>deepSeaGirl</item>
+        <item>snowMiku2025</item>
+        <item>symphony2022</item>
+        <item>racingMiku2025</item>
+        <item>cinnamiku</item>
+        <item>retryNow</item>
+    </string-array>
+    <string name="app_name">MikuRay</string>
+    <string-array name="app_name_entries" translatable="false">
+        <item>@string/app_name</item>
+        <item>@string/app_name_variant_miku1</item>
+        <item>@string/app_name_variant_miku2</item>
+        <item>@string/app_name_variant_miku3</item>
+        <item>@string/app_name_variant_miku4</item>
+        <item>@string/app_name_variant_miku5</item>
+        <item>@string/app_name_variant_miku6</item>
+        <item>@string/app_name_variant_miku7</item>
+        <item>@string/app_name_variant_miku8</item>
+        <item>@string/app_name_variant_miku9</item>
+        <item>@string/app_name_variant_miku10</item>
+        <item>@string/app_name_variant_miku11</item>
+        <item>@string/app_name_variant_miku12</item>
+    </string-array>
+    <string-array name="app_name_values" translatable="false">
+        <item>default</item>
+        <item>miku1</item>
+        <item>miku2</item>
+        <item>miku3</item>
+        <item>miku4</item>
+        <item>miku5</item>
+        <item>miku6</item>
+        <item>miku7</item>
+        <item>miku8</item>
+        <item>miku9</item>
+        <item>miku10</item>
+        <item>miku11</item>
+        <item>miku12</item>
+    </string-array>
+    <string name="app_name_variant_miku1">HatsuneRay</string>
+    <string name="app_name_variant_miku10">MikuProxy</string>
+    <string name="app_name_variant_miku11">MikuExpo</string>
+    <string name="app_name_variant_miku12">v2mikuNG</string>
+    <string name="app_name_variant_miku2">MikuNG</string>
+    <string name="app_name_variant_miku3">HatsuneNG</string>
+    <string name="app_name_variant_miku4">MikuTunnel</string>
+    <string name="app_name_variant_miku5">MikuBoard</string>
+    <string name="app_name_variant_miku6">MikuPoi</string>
+    <string name="app_name_variant_miku7">MikuHub</string>
+    <string name="app_name_variant_miku8">MikuCube</string>
+    <string name="app_name_variant_miku9">MikuDayo</string>
+    <string name="app_widget_traffic_detail_name">Детализация трафика</string>
+    <string-array name="banner_settings_character_entries" translatable="false">
+        <item>Hatsune Miku V2</item>
+        <item>Hatsune Miku V2 Chinese</item>
+        <item>Hatsune Miku V2 Append</item>
+        <item>Hatsune Miku V3</item>
+        <item>Hatsune Miku V3 English</item>
+        <item>Hatsune Miku V4</item>
+        <item>Hatsune Miku Super Pack</item>
+        <item>Hatsune Miku V6</item>
+        <item>@string/banner_settings_character_custom</item>
+    </string-array>
+    <string-array name="banner_settings_character_values" translatable="false">
+        <item>uwu_banner_miku_v2</item>
+        <item>uwu_banner_miku_v2_chinese</item>
+        <item>uwu_banner_miku_v2_append</item>
+        <item>uwu_banner_miku_v3</item>
+        <item>uwu_banner_miku_v3_english</item>
+        <item>uwu_banner_miku_v4</item>
+        <item>uwu_banner_miku_super_pack</item>
+        <item>uwu_banner_miku_v6</item>
+        <item>custom</item>
+    </string-array>
+    <string-array name="bool_dropdown_entries" translatable="false">
+        <item>@string/label_enable</item>
+        <item>@string/label_disable</item>
+    </string-array>
+    <string-array name="bool_dropdown_values" translatable="false">
+        <item>true</item>
+        <item>false</item>
+    </string-array>
+    <string-array name="browser_dialer_mode" translatable="false">
+        <item>@string/browser_dialer_mode_disable</item>
+        <item>@string/browser_dialer_mode_okhttp</item>
+        <item>@string/browser_dialer_mode_webview</item>
+    </string-array>
+    <string-array name="browser_dialer_mode_value" translatable="false">
+        <item>Disable</item>
+        <item>OkHttp</item>
+        <item>WebView</item>
+    </string-array>
+    <string-array name="category_style_entries" translatable="false">
+        <item>Gradient</item>
+        <item>Hatsune Miku (Teal)</item>
+        <item>Hatsune Miku (Project SEKAI)</item>
+        <item>Kasane Teto (UTAU)</item>
+        <item>Kasane Teto (Synthesizer)</item>
+        <item>Akita Neru</item>
+        <item>Hatsune Miku (Basic)</item>
+        <item>Hatsune Miku (Cherry Pop)</item>
+        <item>Hatsune Miku (Rabbit Hole)</item>
+        <item>Hatsune Miku (Mesmerizer)</item>
+        <item>Hatsune Miku (Sakura)</item>
+        <item>Hatsune Miku (Magical Mirai 2024)</item>
+        <item>Hatsune Miku (Deep Sea Girl)</item>
+        <item>Hatsune Miku (Snow Miku 2025)</item>
+        <item>Hatsune Miku (Symphony 2022)</item>
+        <item>Hatsune Miku (Racing Miku 2025)</item>
+        <item>Hatsune Miku (Cinnamiku)</item>
+        <item>Hatsune Miku (Retry Now)</item>
+    </string-array>
+    <string-array name="category_style_values" translatable="false">
+        <item>gradient</item>
+        <item>miku</item>
+        <item>miku2</item>
+        <item>teto</item>
+        <item>teto2</item>
+        <item>neru</item>
+        <item>basic</item>
+        <item>cherry_pop</item>
+        <item>rabbit_hole</item>
+        <item>mesmerizer</item>
+        <item>sakura</item>
+        <item>magical_mirai_2024</item>
+        <item>deep_sea_girl</item>
+        <item>snow_miku_2025</item>
+        <item>symphony_2022</item>
+        <item>racing_miku_2025</item>
+        <item>cinnamiku</item>
+        <item>retry_now</item>
+    </string-array>
+    <string-array name="config_backup_options" translatable="false">
+        <item>@string/config_backup_local</item>
+        <item>@string/config_backup_webdav</item>
+    </string-array>
+    <string-array name="core_loglevel" translatable="false">
+        <item>debug</item>
+        <item>info</item>
+        <item>warning</item>
+        <item>error</item>
+        <item>none</item>
+    </string-array>
+    <string-array name="flows" translatable="false">
+        <item></item>
+        <item>xtls-rprx-vision</item>
+        <item>xtls-rprx-vision-udp443</item>
+    </string-array>
+    <string-array name="fragment_packets" translatable="false">
+        <item>tlshello</item>
+        <item>1-1</item>
+        <item>1-2</item>
+        <item>1-3</item>
+        <item>1-5</item>
+    </string-array>
+    <string-array name="geo_files_sources_entries" translatable="false">
+        <item>Loyalsoldier/v2ray-rules-dat</item>
+        <item>runetfreedom/russia-v2ray-rules-dat</item>
+        <item>Chocolate4U/Iran-v2ray-rules</item>
+    </string-array>
+    <string-array name="geo_files_sources_values" translatable="false">
+        <item>Loyalsoldier/v2ray-rules-dat</item>
+        <item>runetfreedom/russia-v2ray-rules-dat</item>
+        <item>Chocolate4U/Iran-v2ray-rules</item>
+    </string-array>
+    <string-array name="header_type_kcp_and_quic" translatable="false">
+        <item>none</item>
+        <item>srtp</item>
+        <item>utp</item>
+        <item>wechat-video</item>
+        <item>dtls</item>
+        <item>wireguard</item>
+        <item>dns</item>
+    </string-array>
+    <string-array name="header_type_tcp" translatable="false">
+        <item>none</item>
+        <item>http</item>
+    </string-array>
+    <string-array name="hev_tunnel_icmp" translatable="false">
+        <item>off</item>
+        <item>reply</item>
+    </string-array>
+    <string-array name="hev_tunnel_loglevel" translatable="false">
+        <item>error</item>
+        <item>warn</item>
+        <item>info</item>
+        <item>debug</item>
+    </string-array>
+    <string-array name="hev_tunnel_udp_mode" translatable="false">
+        <item>udp</item>
+        <item>tcp</item>
+    </string-array>
+    <string-array name="icon_shape_entries" translatable="false">
+        <item>Arch</item>
+        <item>Arrow</item>
+        <item>Boom</item>
+        <item>Bun</item>
+        <item>Burst</item>
+        <item>Circle</item>
+        <item>Clover 4</item>
+        <item>Clover 8</item>
+        <item>Cookie 4</item>
+        <item>Cookie 6</item>
+        <item>Cookie 7</item>
+        <item>Cookie 9</item>
+        <item>Cookie 12</item>
+        <item>Diamond</item>
+        <item>Fan</item>
+        <item>Flower</item>
+        <item>Gem</item>
+        <item>Ghost-ish</item>
+        <item>Heart</item>
+        <item>Hexagon</item>
+        <item>Oval</item>
+        <item>Pentagon</item>
+        <item>Pill</item>
+        <item>Pixel Circle</item>
+        <item>Pixel Triangle</item>
+        <item>Puffy</item>
+        <item>Puffy Diamond</item>
+        <item>Semicircle</item>
+        <item>Slanted Square</item>
+        <item>Soft Boom</item>
+        <item>Soft Burst</item>
+        <item>Square</item>
+        <item>Sunny</item>
+        <item>Triangle</item>
+        <item>Very Sunny</item>
+    </string-array>
+    <string-array name="icon_shape_values" translatable="false">
+        <item>uwu_shape_arch</item>
+        <item>uwu_shape_arrow</item>
+        <item>uwu_shape_boom</item>
+        <item>uwu_shape_bun</item>
+        <item>uwu_shape_burst</item>
+        <item>uwu_shape_circle</item>
+        <item>uwu_shape_clover_4</item>
+        <item>uwu_shape_clover_8</item>
+        <item>uwu_shape_cookie_4</item>
+        <item>uwu_shape_cookie_6</item>
+        <item>uwu_shape_cookie_7</item>
+        <item>uwu_shape_cookie_9</item>
+        <item>uwu_shape_cookie_12</item>
+        <item>uwu_shape_diamond</item>
+        <item>uwu_shape_fan</item>
+        <item>uwu_shape_flower</item>
+        <item>uwu_shape_gem</item>
+        <item>uwu_shape_ghostish</item>
+        <item>uwu_shape_heart</item>
+        <item>uwu_shape_hexagon</item>
+        <item>uwu_shape_oval</item>
+        <item>uwu_shape_pentagon</item>
+        <item>uwu_shape_pill</item>
+        <item>uwu_shape_pixel_circle</item>
+        <item>uwu_shape_pixel_triangle</item>
+        <item>uwu_shape_puffy</item>
+        <item>uwu_shape_puffy_diamond</item>
+        <item>uwu_shape_semicircle</item>
+        <item>uwu_shape_slanted_square</item>
+        <item>uwu_shape_soft_boom</item>
+        <item>uwu_shape_soft_burst</item>
+        <item>uwu_shape_square</item>
+        <item>uwu_shape_sunny</item>
+        <item>uwu_shape_triangle</item>
+        <item>uwu_shape_very_sunny</item>
+    </string-array>
+    <string-array name="language_select" translatable="false">
+        <item>auto</item>
+        <item>English</item>
+        <item>中文简体</item>
+        <item>Русский</item>
+        <item>Bahasa Indonesia</item>
+    </string-array>
+    <string-array name="language_select_value" translatable="false">
+        <item></item>
+        <item>en</item>
+        <item>zh-CN</item>
+        <item>ru</item>
+        <item>in</item>
+    </string-array>
+    <string name="mihomo_allow_bypass">Разрешить приложениям обходить VPN</string>
+    <string name="mihomo_app_diagnostics">Приложение и диагностика</string>
+    <string name="mihomo_append_system">Добавлять системный DNS</string>
+    <string name="mihomo_batch_test_unavailable">Пакетная проверка недоступна для полных конфигураций. Сначала подключитесь и используйте проверку подключения.</string>
+    <string name="mihomo_choose_exit">Выберите группу или узел</string>
+    <string name="mihomo_disabled">Выкл.</string>
+    <string name="mihomo_dns_hijack">Адреса перехвата DNS</string>
+    <string name="mihomo_dns_hijack_hint">Разделяйте записи пробелами или переводами строк, например any:53 tcp://any:53. Очистите поле, чтобы отключить перехват; при отключённом перехвате укажите доступный DNS VPN-интерфейса. Применяется после переподключения.</string>
+    <string name="mihomo_enabled">Вкл.</string>
+    <string name="mihomo_exit_empty">Нет совпадений</string>
+    <string name="mihomo_exit_filter_all">Все</string>
+    <string name="mihomo_exit_filter_groups">Группы</string>
+    <string name="mihomo_exit_filter_nodes">Узлы</string>
+    <string name="mihomo_exit_search">Поиск прокси</string>
+    <string name="mihomo_exit_section_groups">Группы прокси</string>
+    <string name="mihomo_exit_section_nodes">Узлы</string>
+    <string name="mihomo_extra_authentication">Аутентификация HTTP/SOCKS (user:password, по строке на запись)</string>
+    <string name="mihomo_extra_dns_fallback_filter_geoip">Резервный фильтр GeoIP</string>
+    <string name="mihomo_extra_dns_fallback_filter_ipcidr">Диапазоны IP резервного фильтра</string>
+    <string name="mihomo_extra_dns_nameserver_policy">Политика DNS-серверов (JSON)</string>
+    <string name="mihomo_extra_external_controller">Внешний контроллер</string>
+    <string name="mihomo_extra_external_controller_address">Адрес прослушивания контроллера</string>
+    <string name="mihomo_extra_external_controller_secret">Секрет контроллера</string>
+    <string name="mihomo_extra_global_ua">User-Agent загрузок ядра</string>
+    <string name="mihomo_extra_hosts">Hosts (JSON)</string>
+    <string name="mihomo_filter_country">Регион резервного DNS</string>
+    <string name="mihomo_filter_domain">Доменный фильтр резервного DNS</string>
+    <string name="mihomo_filter_geosite">Категории сайтов резервного DNS</string>
+    <string name="mihomo_fingerprint">Глобальный TLS-отпечаток клиента</string>
+    <string name="mihomo_follow_profile">Как в профиле</string>
+    <string name="mihomo_geo_low_memory">Экономия памяти (memconservative)</string>
+    <string name="mihomo_geo_standard">Стандартный загрузчик</string>
+    <string name="mihomo_global_exit">Глобальный выход: %1$s</string>
+    <string name="mihomo_icmp_timeout">Тайм-аут ICMP в TUN (секунды)</string>
+    <string name="mihomo_invalid_value">Значение вне допустимого диапазона</string>
+    <string name="mihomo_ipv6_inbound">Входящий IPv6</string>
+    <string name="mihomo_mode_direct">Напрямую</string>
+    <string name="mihomo_mode_failed">Не удалось применить выбор. Проверьте активный профиль.</string>
+    <string name="mihomo_mode_global">Глобальный</string>
+    <string name="mihomo_mode_rule">Правила</string>
+    <string name="mihomo_mode_selected">Выбранное</string>
+    <string name="mihomo_network_cellular">Подключать в мобильной сети</string>
+    <string name="mihomo_network_ethernet">Подключать в Ethernet</string>
+    <string name="mihomo_network_other">Подключать в других сетях</string>
+    <string name="mihomo_network_wifi">Подключать в Wi-Fi</string>
+    <string name="mihomo_on_demand">Подключение по требованию</string>
+    <string name="mihomo_on_demand_connecting">Автоподключение включено в этой сети</string>
+    <string name="mihomo_on_demand_excluded">Исключённые сети Wi-Fi</string>
+    <string name="mihomo_on_demand_excluded_hint">По одному точному имени Wi-Fi с учётом регистра на строку, до 32 байтов UTF-8. Если имя прочитать нельзя, VPN остаётся на паузе.</string>
+    <string name="mihomo_on_demand_hint">Подключаться в разрешённых сетях; ставить на паузу в исключённых Wi-Fi. Ручное отключение действует до следующей смены сети. Выключение функции не меняет текущее подключение.</string>
+    <string name="mihomo_on_demand_paused">Пауза в этой сети; отслеживание изменений</string>
+    <string name="mihomo_on_demand_permission">Доступ к именам Wi-Fi</string>
+    <string name="mihomo_on_demand_permission_hint">Нужно только для исключений Wi-Fi: выдайте точное местоположение, выберите «Разрешить всё время» в настройках системы и включите определение местоположения. Нажмите, чтобы выдать разрешение или открыть настройки.</string>
+    <string name="mihomo_on_demand_permission_ready">Доступ к местоположению выдан. Держите определение местоположения включённым, чтобы читать имена Wi-Fi.</string>
+    <string name="mihomo_on_demand_setup">Сначала выберите загруженный профиль и выдайте разрешение VPN.</string>
+    <string name="mihomo_on_demand_ssid_missing">Пауза: не удаётся прочитать имя Wi-Fi. Проверьте доступ к местоположению.</string>
+    <string name="mihomo_on_demand_stop">Отключить и разорвать</string>
+    <string name="mihomo_on_demand_waiting">Ожидание сети</string>
+    <string name="mihomo_performance">Производительность и подключения Mihomo</string>
+    <string name="mihomo_preview_advanced">Параллельный TCP, единая задержка, поиск процессов, экономный загрузчик Geo, TLS, keep-alive, сценарии конфигурации и диагностика приложения</string>
+    <string name="mihomo_preview_core">Режим маршрутизации, порты, доступ в LAN, сниффинг, DNS-серверы, Fake-IP и источники Geo-данных</string>
+    <string name="mihomo_preview_vpn">IPv6, удержание пробуждения, перехват DNS, стек TUN, маршруты VPN, MTU, по-приложенный прокси, тайм-ауты и подключение по требованию</string>
+    <string name="mihomo_process_always">Всегда определять процесс</string>
+    <string name="mihomo_process_requirement">Требуется Android 10 или новее и активный VPN</string>
+    <string name="mihomo_process_strict">Определять, когда того требуют правила процессов</string>
+    <string name="mihomo_proxy_exclusions">Домены, исключённые из системного прокси</string>
+    <string name="mihomo_route_addresses">Свои маршруты VPN (CIDR, по одному в строке)</string>
+    <string name="mihomo_route_all">Маршрутизировать весь трафик</string>
+    <string name="mihomo_route_custom">Свои включаемые маршруты</string>
+    <string name="mihomo_route_mode">Режим маршрутизации прокси</string>
+    <string name="mihomo_route_profile">Использовать включаемые маршруты профиля</string>
+    <string name="mihomo_route_public">Обходить частные сети</string>
+    <string name="mihomo_script">Сценарий конфигурации</string>
+    <string name="mihomo_script_add">Новый сценарий</string>
+    <string name="mihomo_script_bindings">Назначить сценарии профилям</string>
+    <string name="mihomo_script_bindings_hint">Для каждого профиля выберите отдельный сценарий, глобальный сценарий или отключение сценариев</string>
+    <string name="mihomo_script_delete">Удалить сценарий</string>
+    <string name="mihomo_script_delete_hint">Удалить «%1$s»? Привязанные профили отключат сценарии вместо наследования глобального.</string>
+    <string name="mihomo_script_deleted">Этот сценарий удалён.</string>
+    <string name="mihomo_script_edit">Редактировать и проверить сценарий</string>
+    <string name="mihomo_script_enable">Включить глобальный сценарий</string>
+    <string name="mihomo_script_error">Сценарий завершился ошибкой</string>
+    <string name="mihomo_script_hint">Определите main(config) и верните объект конфигурации. Предпросмотр не меняет подключение. Нет доступа к файлам, сети и таймерам; лимит выполнения 2 секунды. Настройки UI и поля Android TUN имеют приоритет.</string>
+    <string name="mihomo_script_inherit">Наследовать глобальный сценарий</string>
+    <string name="mihomo_script_library">Библиотека сценариев</string>
+    <string name="mihomo_script_library_hint">Создавайте, редактируйте, переименовывайте и удаляйте повторно используемые сценарии</string>
+    <string name="mihomo_script_name">Название сценария</string>
+    <string name="mihomo_script_name_invalid">Введите уникальное название</string>
+    <string name="mihomo_script_none">Отключить сценарии</string>
+    <string name="mihomo_script_preview_profile">Профиль предпросмотра: %1$s</string>
+    <string name="mihomo_script_rename">Переименовать</string>
+    <string name="mihomo_script_result">Результат сценария (до переопределений настроек)</string>
+    <string name="mihomo_script_save">Проверить и сохранить</string>
+    <string name="mihomo_script_summary">Применяется к профилям, наследующим глобальный сценарий, до переопределений настроек. Ошибка прерывает подключение.</string>
+    <string name="mihomo_script_test">Предпросмотр результата</string>
+    <string name="mihomo_section_adv_controller">Внешний контроллер</string>
+    <string name="mihomo_section_adv_keepalive">Keep-alive</string>
+    <string name="mihomo_section_adv_performance">Производительность ядра</string>
+    <string name="mihomo_section_adv_tls">Безопасность транспорта</string>
+    <string name="mihomo_section_core_basics">Основное</string>
+    <string name="mihomo_section_core_overrides">Переопределения и дополнения</string>
+    <string name="mihomo_section_dns_behavior">Поведение и кеш</string>
+    <string name="mihomo_section_dns_fakeip">Fake-IP и расширенный режим</string>
+    <string name="mihomo_section_dns_fallback">Резервный фильтр</string>
+    <string name="mihomo_section_dns_resolvers">DNS-серверы</string>
+    <string name="mihomo_section_vpn_general">Общие</string>
+    <string name="mihomo_section_vpn_routing">Маршрутизация и раздельное туннелирование</string>
+    <string name="mihomo_section_vpn_tun">Интерфейс TUN</string>
+    <string name="mihomo_select_exit">Выбрать прокси</string>
+    <string name="mihomo_setting_allow_lan">allow-lan</string>
+    <string name="mihomo_setting_disable_keep_alive">disable-keep-alive</string>
+    <string name="mihomo_setting_dns_cache_algorithm">dns.cache-algorithm</string>
+    <string name="mihomo_setting_dns_default_nameserver">dns.default-nameserver</string>
+    <string name="mihomo_setting_dns_direct_nameserver">dns.direct-nameserver</string>
+    <string name="mihomo_setting_dns_direct_nameserver_follow_policy">dns.direct-nameserver-follow-policy</string>
+    <string name="mihomo_setting_dns_enhanced_mode">dns.enhanced-mode</string>
+    <string name="mihomo_setting_dns_fake_ip_filter">dns.fake-ip-filter</string>
+    <string name="mihomo_setting_dns_fake_ip_range">dns.fake-ip-range</string>
+    <string name="mihomo_setting_dns_fallback">dns.fallback</string>
+    <string name="mihomo_setting_dns_ipv6">dns.ipv6</string>
+    <string name="mihomo_setting_dns_nameserver">dns.nameserver</string>
+    <string name="mihomo_setting_dns_prefer_h3">dns.prefer-h3</string>
+    <string name="mihomo_setting_dns_proxy_server_nameserver">dns.proxy-server-nameserver</string>
+    <string name="mihomo_setting_dns_respect_rules">dns.respect-rules</string>
+    <string name="mihomo_setting_dns_use_hosts">dns.use-hosts</string>
+    <string name="mihomo_setting_dns_use_system_hosts">dns.use-system-hosts</string>
+    <string name="mihomo_setting_find_process_mode">find-process-mode</string>
+    <string name="mihomo_setting_geodata_loader">geodata-loader</string>
+    <string name="mihomo_setting_geodata_mode">geodata-mode</string>
+    <string name="mihomo_setting_ipv6">ipv6</string>
+    <string name="mihomo_setting_keep_alive_idle">keep-alive-idle</string>
+    <string name="mihomo_setting_keep_alive_interval">keep-alive-interval</string>
+    <string name="mihomo_setting_log_level">log-level</string>
+    <string name="mihomo_setting_mixed_port">mixed-port</string>
+    <string name="mihomo_setting_sniffer_enable">sniffer.enable</string>
+    <string name="mihomo_setting_sniffer_override_destination">sniffer.override-destination</string>
+    <string name="mihomo_setting_tcp_concurrent">tcp-concurrent</string>
+    <string name="mihomo_setting_tun_stack">tun.stack</string>
+    <string name="mihomo_setting_unified_delay">unified-delay</string>
+    <string name="mihomo_settings_hint">Переподключитесь, чтобы применить; «как в профиле» сохраняет значения профиля</string>
+    <string name="mihomo_settings_title">mihomo settings</string>
+    <string name="mihomo_skip_tls">Пропускать проверку сертификатов</string>
+    <string name="mihomo_tls_verification">Проверка сертификатов TLS</string>
+    <string name="mihomo_udp_timeout">Тайм-аут UDP в TUN (секунды)</string>
+    <string name="mihomo_verify_tls">Проверять сертификаты</string>
+    <string name="mihomo_vpn_route_mode">Режим маршрутов VPN</string>
+    <string-array name="mode_entries" translatable="false">
+        <item>@string/mode_entry_vpn</item>
+        <item>@string/mode_entry_proxy_only</item>
+    </string-array>
+    <string-array name="mode_type_grpc" translatable="false">
+        <item>gun</item>
+        <item>multi</item>
+    </string-array>
+    <string-array name="mode_value" translatable="false">
+        <item>VPN</item>
+        <item>Proxy only</item>
+    </string-array>
+    <string-array name="mux_enabled_entries" translatable="false">
+        <item>@string/label_disable</item>
+        <item>@string/label_enable</item>
+    </string-array>
+    <string-array name="mux_enabled_values" translatable="false">
+        <item>false</item>
+        <item>true</item>
+    </string-array>
+    <string-array name="mux_xudp_quic_entries" translatable="false">
+        <item>@string/mux_xudp_quic_reject</item>
+        <item>@string/mux_xudp_quic_allow</item>
+        <item>@string/mux_xudp_quic_skip</item>
+    </string-array>
+    <string-array name="mux_xudp_quic_value" translatable="false">
+        <item>reject</item>
+        <item>allow</item>
+        <item>skip</item>
+    </string-array>
+    <string-array name="networks" translatable="false">
+        <item>tcp</item>
+        <item>kcp</item>
+        <item>ws</item>
+        <item>httpupgrade</item>
+        <item>xhttp</item>
+        <item>h2</item>
+        <item>grpc</item>
+    </string-array>
+    <string-array name="observatory_least_load_method" translatable="false">
+        <item>GET</item>
+        <item>HEAD</item>
+    </string-array>
+    <string-array name="outbound_domain_resolve_method" translatable="false">
+        <item>@string/outbound_resolve_do_not_resolve</item>
+        <item>@string/outbound_resolve_add_dns_hosts</item>
+        <item>@string/outbound_resolve_replace_domain</item>
+    </string-array>
+    <string-array name="outbound_domain_resolve_method_value" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="outbound_tag" translatable="false">
+        <item>proxy</item>
+        <item>direct</item>
+        <item>block</item>
+    </string-array>
+    <string-array name="policy_group_type" translatable="false">
+        <item>@string/policy_group_least_ping</item>
+        <item>@string/policy_group_least_load</item>
+        <item>@string/policy_group_random</item>
+        <item>@string/policy_group_round_robin</item>
+    </string-array>
+    <string name="pref_header_top_row_padding_summary_value">%1$ddp</string>
+    <string name="pref_home_banner_height_summary_value">%1$ddp</string>
+    <string-array name="preset_rulesets" translatable="false">
+        <item>@string/preset_ruleset_china_whitelist</item>
+        <item>@string/preset_ruleset_china_blacklist</item>
+        <item>@string/preset_ruleset_global</item>
+        <item>@string/preset_ruleset_iran_whitelist</item>
+        <item>@string/preset_ruleset_russia_whitelist</item>
+    </string-array>
+    <string name="profile_editor_actions">Действия для %1$s</string>
+    <string name="profile_editor_add_field">Добавить поле</string>
+    <string name="profile_editor_add_item">Добавить запись</string>
+    <string name="profile_editor_allow_lan">Разрешить доступ к LAN</string>
+    <string name="profile_editor_back">Назад из %1$s</string>
+    <string name="profile_editor_disabled">Отключено</string>
+    <string name="profile_editor_empty">Записей пока нет</string>
+    <string name="profile_editor_enabled">Включено</string>
+    <string name="profile_editor_fields">%1$d полей</string>
+    <string name="profile_editor_general">General</string>
+    <string name="profile_editor_group">Группа · %1$s</string>
+    <string name="profile_editor_hint">Сохраните, затем переподключитесь. Визуальное редактирование удаляет комментарии YAML.</string>
+    <string name="profile_editor_item">Запись %1$d</string>
+    <string name="profile_editor_items">%1$d записей</string>
+    <string name="profile_editor_log_level">Уровень журнала</string>
+    <string name="profile_editor_mixed_port">Смешанный порт</string>
+    <string name="profile_editor_mode">Режим маршрутизации</string>
+    <string name="profile_editor_move_down">Переместить вниз</string>
+    <string name="profile_editor_move_up">Переместить вверх</string>
+    <string name="profile_editor_remove">Удалить</string>
+    <string name="profile_editor_sections">Конфигурация</string>
+    <string name="profile_editor_title">Редактор конфигурации</string>
+    <string name="profile_editor_visual">Визуальный</string>
+    <string name="profile_editor_yaml">YAML</string>
+    <string name="profile_section_dns">DNS</string>
+    <string name="profile_section_groups">Группы прокси</string>
+    <string name="profile_section_providers">Провайдеры прокси</string>
+    <string name="profile_section_proxies">Прокси</string>
+    <string name="profile_section_rule_providers">Провайдеры правил</string>
+    <string name="profile_section_rules">Правила маршрутизации</string>
+    <string name="profile_visual_summary">Визуальные изменения переформатируют YAML и удаляют комментарии. Исходный текст правьте в режиме YAML.</string>
+    <string-array name="routing_domain_strategy" translatable="false">
+        <item>AsIs</item>
+        <item>IPIfNonMatch</item>
+        <item>IPOnDemand</item>
+    </string-array>
+    <string-array name="search_bar_chip_entries" translatable="false">
+        <item>@string/pref_search_bar_chip_disabled</item>
+        <item>@string/pref_search_bar_chip_weather</item>
+        <item>@string/pref_search_bar_chip_total_traffic</item>
+        <item>@string/pref_search_bar_chip_dual_swipe</item>
+    </string-array>
+    <string-array name="search_bar_chip_values" translatable="false">
+        <item>disabled</item>
+        <item>weather</item>
+        <item>total_traffic</item>
+        <item>dual_swipe</item>
+    </string-array>
+    <string-array name="securitys" translatable="false">
+        <item>chacha20-poly1305</item>
+        <item>aes-128-gcm</item>
+        <item>auto</item>
+        <item>none</item>
+        <item>zero</item>
+    </string-array>
+    <string name="selected_banner_dim_summary_value">%1$d%%</string>
+    <string-array name="share_method" translatable="false">
+        <item>@string/share_qrcode</item>
+        <item>@string/share_export_clipboard</item>
+        <item>@string/share_export_full_clipboard</item>
+    </string-array>
+    <string-array name="share_method_more" translatable="false">
+        <item>@string/share_qrcode</item>
+        <item>@string/share_export_clipboard</item>
+        <item>@string/share_export_full_clipboard</item>
+        <item>@string/share_edit</item>
+        <item>@string/share_delete</item>
+    </string-array>
+    <string-array name="share_sub_method" translatable="false">
+        <item>@string/share_qrcode</item>
+        <item>@string/share_export_clipboard</item>
+    </string-array>
+    <string name="sheet_banner_dim_summary_value">%1$d%%</string>
+    <string-array name="ss_securitys" translatable="false">
+        <item>aes-256-gcm</item>
+        <item>aes-128-gcm</item>
+        <item>chacha20-poly1305</item>
+        <item>chacha20-ietf-poly1305</item>
+        <item>xchacha20-poly1305</item>
+        <item>xchacha20-ietf-poly1305</item>
+        <item>none</item>
+        <item>plain</item>
+        <item>2022-blake3-aes-128-gcm</item>
+        <item>2022-blake3-aes-256-gcm</item>
+        <item>2022-blake3-chacha20-poly1305</item>
+    </string-array>
+    <string-array name="streamsecurity_alpn" translatable="false">
+        <item></item>
+        <item>h3</item>
+        <item>h2</item>
+        <item>http/1.1</item>
+        <item>h3,h2,http/1.1</item>
+        <item>h3,h2</item>
+        <item>h2,http/1.1</item>
+    </string-array>
+    <string-array name="streamsecurity_utls" translatable="false">
+        <item></item>
+        <item>chrome</item>
+        <item>firefox</item>
+        <item>safari</item>
+        <item>ios</item>
+        <item>android</item>
+        <item>edge</item>
+        <item>360</item>
+        <item>qq</item>
+        <item>random</item>
+        <item>randomized</item>
+    </string-array>
+    <string-array name="streamsecuritys" translatable="false">
+        <item></item>
+        <item>tls</item>
+    </string-array>
+    <string-array name="streamsecuritys_entries" translatable="false">
+        <item>@string/label_disable</item>
+        <item>TLS</item>
+    </string-array>
+    <string-array name="streamsecurityxs" translatable="false">
+        <item></item>
+        <item>tls</item>
+        <item>reality</item>
+    </string-array>
+    <string-array name="streamsecurityxs_entries" translatable="false">
+        <item>@string/label_disable</item>
+        <item>TLS</item>
+        <item>REALITY</item>
+    </string-array>
+    <plurals name="sub_setting_server_count">
+        <item quantity="few">%1$d сервера</item>
+        <item quantity="many">%1$d серверов</item>
+        <item quantity="one">%1$d сервер</item>
+        <item quantity="other">%1$d сервера</item>
+    </plurals>
+    <string name="subscription_initial_fetch_failed">Подписка сохранена, но первичная загрузка не удалась. Проверьте адрес и сеть, затем сохраните снова для повтора.</string>
+    <string name="subscription_update_through_proxy">Обновлять через прокси</string>
+    <string name="subscription_update_through_proxy_summary">Использовать работающий прокси. Только для первой загрузки — прямое подключение, если прокси не запущен; последующие обновления следуют этой настройке.</string>
+    <string name="subtitle_about_update">Версия, обновления и автопроверка</string>
+    <string name="subtitle_ui_alerts">Звуки уведомлений и подключения</string>
+    <string name="subtitle_ui_banner">Баннеры, профиль и изображения</string>
+    <string name="subtitle_ui_home">Главный экран, список и строка поиска</string>
+    <string name="summary_navigate_about_update">Сведения о версии, проверка обновлений и включение автопроверки</string>
+    <string name="summary_navigate_ui_alerts">Уведомление о скорости и звуки подключения</string>
+    <string name="summary_navigate_ui_banner">Баннеры главного экрана и шита, выбранные стиль и профиль</string>
+    <string name="summary_navigate_ui_home">Поведение главного экрана, список и чипы строки поиска</string>
+    <string name="summary_pref_auto_check_update">Спрашивать GitHub о новом релизе при каждом холодном старте</string>
+    <string-array name="tab_badge_limit_entries" translatable="false">
+        <item>@string/tab_badge_limit_unlimited</item>
+        <item>99+</item>
+        <item>999+</item>
+        <item>9999+</item>
+    </string-array>
+    <string-array name="tab_badge_limit_values" translatable="false">
+        <item>0</item>
+        <item>99</item>
+        <item>999</item>
+        <item>9999</item>
+    </string-array>
+    <string name="title_about_update">О программе и обновления</string>
+    <string name="title_about_update_category">Обновление</string>
+    <string name="title_pref_auto_check_update">Проверять обновления при запуске</string>
+    <string name="title_ui_alerts">Уведомления и звук</string>
+    <string name="title_ui_banner">Баннеры и оформление</string>
+    <string name="title_ui_home">Главный экран и список</string>
+    <string-array name="ui_mode_night" translatable="false">
+        <item>@string/ui_mode_night_follow_system</item>
+        <item>@string/ui_mode_night_light</item>
+        <item>@string/ui_mode_night_dark</item>
+        <item>@string/ui_mode_night_auto</item>
+    </string-array>
+    <string-array name="ui_mode_night_value" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string name="update_available_toast">Доступна новая версия %1$s</string>
+    <string-array name="uwu_random_text" translatable="false">
+        <item>@string/uwu_random_text_1</item>
+        <item>@string/uwu_random_text_2</item>
+        <item>@string/uwu_random_text_3</item>
+        <item>@string/uwu_random_text_4</item>
+        <item>@string/uwu_random_text_5</item>
+        <item>@string/uwu_random_text_6</item>
+        <item>@string/uwu_random_text_7</item>
+        <item>@string/uwu_random_text_8</item>
+        <item>@string/uwu_random_text_9</item>
+        <item>@string/uwu_random_text_10</item>
+    </string-array>
+    <string name="version_line_with_core">v%1$s (mihomo %2$s)</string>
+    <string-array name="vpn_bypass_lan" translatable="false">
+        <item>@string/vpn_bypass_lan_follow_config</item>
+        <item>@string/vpn_bypass_lan_bypass</item>
+        <item>@string/vpn_bypass_lan_not_bypass</item>
+    </string-array>
+    <string-array name="vpn_bypass_lan_value" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="vpn_interface_address" translatable="false">
+        <item>10.10.14.x</item>
+        <item>10.1.0.x</item>
+        <item>10.0.0.x</item>
+        <item>172.31.0.x</item>
+        <item>172.20.0.x</item>
+        <item>172.16.0.x</item>
+        <item>192.168.100.x</item>
+    </string-array>
+    <string-array name="vpn_interface_address_value" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+    <string name="weather_loading">Загрузка…</string>
+    <string name="weather_temp_format">%d°C</string>
+    <string-array name="weather_unit_entries" translatable="false">
+        <item>Celsius (°C)</item>
+        <item>Fahrenheit (°F)</item>
+        <item>Auto</item>
+    </string-array>
+    <string-array name="weather_unit_values" translatable="false">
+        <item>true</item>
+        <item>false</item>
+        <item></item>
+    </string-array>
+    <string-array name="xhttp_mode" translatable="false">
+        <item>auto</item>
+        <item>packet-up</item>
+        <item>stream-up</item>
+        <item>stream-one</item>
+    </string-array>
 </resources>

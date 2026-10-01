@@ -1055,4 +1055,866 @@ yang kamu butuhin."</string>
     <string name="policy_group_round_robin">Round Robin</string>
     <string name="config_backup_local">Lokal</string>
     <string name="config_backup_webdav">WebDAV</string>
+
+    <!-- MikuBox additions (2026-10-02, deliberate deviation from upstream MikuRay): strings for MikuBox-specific surfaces. Upstream re-sync would remove them. -->
+    <string name="mihomo_autoconnect_title">Sambungkan otomatis saat mulai</string>
+    <string name="mihomo_autoconnect_summary">Sambungkan profil terpilih saat aplikasi dimulai, jika izin VPN sudah diberikan.</string>
+    <string name="mihomo_update_when_connected_only">Perbarui hanya saat terhubung</string>
+    <string name="mihomo_update_when_connected_only_summary">Pembaruan langganan hanya dijalankan saat VPN terhubung, sehingga penyedia tidak pernah dihubungi secara langsung.</string>
+    <string name="mihomo_yaml_parse_failed">Gagal mengurai YAML: %1$s</string>
+    <string name="mihomo_config_parse_failed">Tidak dapat mengurai profil — perbaiki di editor YAML mentah: %1$s</string>
+    <string name="mihomo_group_name_hint">Nama grup</string>
+    <string name="mihomo_group_create_title">Buat grup</string>
+    <string name="mihomo_group_manage_title">Kelola grup</string>
+    <string name="mihomo_group_manage_empty">Grup Miku bawaan menampung profil dan tidak dapat dihapus. Anda dapat membuat grup baru.</string>
+    <string name="mihomo_group_entry_count">%1$s · %2$d profil</string>
+    <string name="mihomo_group_delete_title">Hapus grup “%1$s”?</string>
+    <string name="mihomo_group_delete_message">Profil dan langganan di grup ini kembali ke Miku. Isi, pengaturan langganan, dan koneksi saat ini tetap dipertahankan.</string>
+    <string name="mihomo_group_delete_action">Hapus grup</string>
+    <string name="mihomo_group_choose_title">Grup</string>
+    <string name="mihomo_group_new_action">Grup baru</string>
+    <string name="mihomo_group_name_required">Masukkan nama grup</string>
+    <string name="mihomo_group_name_exists">Nama grup sudah dipakai</string>
+    <string name="mihomo_group_default_undeletable">Grup bawaan tidak dapat dihapus</string>
+    <string name="mihomo_group_missing">Grup tidak dikenal</string>
+    <string name="mihomo_routing_title">Routing</string>
+    <string name="mihomo_routing_description">Dalam mode rule, lalu lintas dipisah per profil dan kebijakan. Rule yang dimatikan tidak ikut pencocokan; lalu lintas yang tidak cocok dengan rule mana pun tersambung langsung. Perubahan berlaku pada koneksi berikutnya, atau sambungkan ulang sekarang.</string>
+    <string name="mihomo_routing_apply_now">Terapkan ke koneksi saat ini</string>
+    <string name="mihomo_routing_saved_next_connect">Disimpan — berlaku pada koneksi berikutnya</string>
+    <string name="mihomo_routing_reconnecting">Menyambung ulang…</string>
+    <string name="mihomo_routing_reconnect_failed">Tidak dapat menyambung ulang — coba lagi secara manual</string>
+    <string name="mihomo_routing_empty">Belum ada profil — impor profil atau langganan terlebih dahulu.</string>
+    <string name="mihomo_routing_no_rules">File ini tidak punya rule pemisah lalu lintas</string>
+    <string name="mihomo_routing_parse_failed">Tidak dapat mengurai: %1$s</string>
+    <plurals name="mihomo_routing_rule_count">
+        <item quantity="one">%1$d rule</item>
+        <item quantity="other">%1$d rule</item>
+    </plurals>
+    <string name="mihomo_vpn_battery_ok">Optimisasi baterai Android diabaikan; izin latar belakang dan autostart khusus vendor masih perlu diberikan terpisah.</string>
+    <string name="mihomo_vpn_battery_off">Optimisasi baterai Android belum diabaikan — ketuk untuk memintanya. Keputusannya ada pada Anda dan sistem.</string>
+    <string name="mihomo_vpn_always_on_enabled">VPN Selalu-aktif sistem aktif.\u0020</string>
+    <string name="mihomo_vpn_lockdown_on">Blokir koneksi tanpa VPN aktif; sistem memblokir jaringan selama pemulihan.</string>
+    <string name="mihomo_vpn_lockdown_off">Blokir koneksi tanpa VPN nonaktif.</string>
+    <string name="mihomo_vpn_always_on_hint">Ketuk untuk membuka pengaturan VPN sistem. Sistem mengelola pemulihan koneksi — tidak perlu mengunci aplikasi di Recents; menutup layar aplikasi tidak memutus koneksi.</string>
+    <string name="mihomo_vpn_recovery_paused">Pemulihan otomatis gagal tiga kali berturut-turut dan dijeda. Periksa profil dan izin latar belakang, lalu sambungkan secara manual.</string>
+    <string name="mihomo_vpn_recovery_summary">Mencoba pulih setelah interupsi tak terduga; kegagalan berulang akan mundur teratur dan berhenti sementara alih-alih terus mengambil alih jaringan. Memaksa berhenti aplikasi atau mencabut izin VPN akan memutus koneksi.</string>
+    <string name="mihomo_vpn_recovery_title">Status pemulihan koneksi</string>
+    <string name="mihomo_vpn_bg_category">Proteksi koneksi latar belakang</string>
+    <string name="mihomo_vpn_always_on_title">VPN Sistem · Selalu-aktif</string>
+    <string name="mihomo_vpn_battery_title">Izinkan mengabaikan optimisasi baterai</string>
+    <string name="mihomo_vpn_oem_title_coloros">Pengaturan latar belakang ColorOS / OnePlus</string>
+    <string name="mihomo_vpn_oem_title">Pengaturan latar belakang aplikasi</string>
+    <string name="mihomo_vpn_oem_summary">Izinkan aktivitas latar belakang, autostart, dan peluncuran terkait di info aplikasi sistem (opsinya tergantung sistem). Aplikasi tidak dapat memberikannya sendiri; pengecualian optimisasi baterai bukan berarti pengecualian pembersihan vendor.</string>
+    <string name="mihomo_vpn_open_settings_failed">Tidak dapat membuka pengaturan sistem — buka info aplikasi MikuBox dari Pengaturan sistem.</string>
+    <string-array name="allowinsecures" translatable="false">
+        <item></item>
+        <item>true</item>
+        <item>false</item>
+    </string-array>
+    <string-array name="app_font_entries" translatable="false">
+        <item>Default</item>
+        <item>IOS 15</item>
+        <item>Google Sans</item>
+        <item>Roboto</item>
+        <item>Poppins</item>
+        <item>ChocoCooky</item>
+        <item>SimpleDay</item>
+        <item>Fucek</item>
+        <item>SF Pro Display</item>
+        <item>Dancing Script</item>
+        <item>Cream</item>
+        <item>OneUI</item>
+        <item>Inconsolata</item>
+        <item>Emily\'s Candy</item>
+        <item>Summer Dream</item>
+        <item>Rine</item>
+        <item>Evolve Sans</item>
+    </string-array>
+    <string-array name="app_font_values" translatable="false">
+        <item>default</item>
+        <item>ios15</item>
+        <item>google</item>
+        <item>roboto</item>
+        <item>poppins</item>
+        <item>chococooky</item>
+        <item>simpleday</item>
+        <item>fucek</item>
+        <item>sfprodisplay</item>
+        <item>dancingscript</item>
+        <item>cream</item>
+        <item>oneui</item>
+        <item>inconsolata</item>
+        <item>emilyscandy</item>
+        <item>summerdream</item>
+        <item>rine</item>
+        <item>evolve</item>
+    </string-array>
+    <string-array name="app_icon_entries" translatable="false">
+        <item>Project SEKAI</item>
+        <item>Teal</item>
+        <item>Basic</item>
+        <item>Cherry Pop</item>
+        <item>Rabbit Hole</item>
+        <item>Mesmerizer</item>
+        <item>Sakura</item>
+        <item>Magical Mirai 2024</item>
+        <item>Deep Sea Girl</item>
+        <item>Snow Miku 2025</item>
+        <item>Symphony 2022</item>
+        <item>Racing Miku 2025</item>
+        <item>Cinnamiku</item>
+        <item>Retry Now</item>
+    </string-array>
+    <string-array name="app_icon_values" translatable="false">
+        <item>default</item>
+        <item>mikuTeal</item>
+        <item>basic</item>
+        <item>cherryPop</item>
+        <item>rabbitHole</item>
+        <item>mesmerizer</item>
+        <item>sakura</item>
+        <item>magicalMirai2024</item>
+        <item>deepSeaGirl</item>
+        <item>snowMiku2025</item>
+        <item>symphony2022</item>
+        <item>racingMiku2025</item>
+        <item>cinnamiku</item>
+        <item>retryNow</item>
+    </string-array>
+    <string name="app_name">MikuRay</string>
+    <string-array name="app_name_entries" translatable="false">
+        <item>@string/app_name</item>
+        <item>@string/app_name_variant_miku1</item>
+        <item>@string/app_name_variant_miku2</item>
+        <item>@string/app_name_variant_miku3</item>
+        <item>@string/app_name_variant_miku4</item>
+        <item>@string/app_name_variant_miku5</item>
+        <item>@string/app_name_variant_miku6</item>
+        <item>@string/app_name_variant_miku7</item>
+        <item>@string/app_name_variant_miku8</item>
+        <item>@string/app_name_variant_miku9</item>
+        <item>@string/app_name_variant_miku10</item>
+        <item>@string/app_name_variant_miku11</item>
+        <item>@string/app_name_variant_miku12</item>
+    </string-array>
+    <string-array name="app_name_values" translatable="false">
+        <item>default</item>
+        <item>miku1</item>
+        <item>miku2</item>
+        <item>miku3</item>
+        <item>miku4</item>
+        <item>miku5</item>
+        <item>miku6</item>
+        <item>miku7</item>
+        <item>miku8</item>
+        <item>miku9</item>
+        <item>miku10</item>
+        <item>miku11</item>
+        <item>miku12</item>
+    </string-array>
+    <string name="app_name_variant_miku1">HatsuneRay</string>
+    <string name="app_name_variant_miku10">MikuProxy</string>
+    <string name="app_name_variant_miku11">MikuExpo</string>
+    <string name="app_name_variant_miku12">v2mikuNG</string>
+    <string name="app_name_variant_miku2">MikuNG</string>
+    <string name="app_name_variant_miku3">HatsuneNG</string>
+    <string name="app_name_variant_miku4">MikuTunnel</string>
+    <string name="app_name_variant_miku5">MikuBoard</string>
+    <string name="app_name_variant_miku6">MikuPoi</string>
+    <string name="app_name_variant_miku7">MikuHub</string>
+    <string name="app_name_variant_miku8">MikuCube</string>
+    <string name="app_name_variant_miku9">MikuDayo</string>
+    <string name="app_widget_traffic_detail_name">Detail Lalu Lintas</string>
+    <string-array name="banner_settings_character_entries" translatable="false">
+        <item>Hatsune Miku V2</item>
+        <item>Hatsune Miku V2 Chinese</item>
+        <item>Hatsune Miku V2 Append</item>
+        <item>Hatsune Miku V3</item>
+        <item>Hatsune Miku V3 English</item>
+        <item>Hatsune Miku V4</item>
+        <item>Hatsune Miku Super Pack</item>
+        <item>Hatsune Miku V6</item>
+        <item>@string/banner_settings_character_custom</item>
+    </string-array>
+    <string-array name="banner_settings_character_values" translatable="false">
+        <item>uwu_banner_miku_v2</item>
+        <item>uwu_banner_miku_v2_chinese</item>
+        <item>uwu_banner_miku_v2_append</item>
+        <item>uwu_banner_miku_v3</item>
+        <item>uwu_banner_miku_v3_english</item>
+        <item>uwu_banner_miku_v4</item>
+        <item>uwu_banner_miku_super_pack</item>
+        <item>uwu_banner_miku_v6</item>
+        <item>custom</item>
+    </string-array>
+    <string-array name="bool_dropdown_entries" translatable="false">
+        <item>@string/label_enable</item>
+        <item>@string/label_disable</item>
+    </string-array>
+    <string-array name="bool_dropdown_values" translatable="false">
+        <item>true</item>
+        <item>false</item>
+    </string-array>
+    <string-array name="browser_dialer_mode" translatable="false">
+        <item>@string/browser_dialer_mode_disable</item>
+        <item>@string/browser_dialer_mode_okhttp</item>
+        <item>@string/browser_dialer_mode_webview</item>
+    </string-array>
+    <string-array name="browser_dialer_mode_value" translatable="false">
+        <item>Disable</item>
+        <item>OkHttp</item>
+        <item>WebView</item>
+    </string-array>
+    <string-array name="category_style_entries" translatable="false">
+        <item>Gradient</item>
+        <item>Hatsune Miku (Teal)</item>
+        <item>Hatsune Miku (Project SEKAI)</item>
+        <item>Kasane Teto (UTAU)</item>
+        <item>Kasane Teto (Synthesizer)</item>
+        <item>Akita Neru</item>
+        <item>Hatsune Miku (Basic)</item>
+        <item>Hatsune Miku (Cherry Pop)</item>
+        <item>Hatsune Miku (Rabbit Hole)</item>
+        <item>Hatsune Miku (Mesmerizer)</item>
+        <item>Hatsune Miku (Sakura)</item>
+        <item>Hatsune Miku (Magical Mirai 2024)</item>
+        <item>Hatsune Miku (Deep Sea Girl)</item>
+        <item>Hatsune Miku (Snow Miku 2025)</item>
+        <item>Hatsune Miku (Symphony 2022)</item>
+        <item>Hatsune Miku (Racing Miku 2025)</item>
+        <item>Hatsune Miku (Cinnamiku)</item>
+        <item>Hatsune Miku (Retry Now)</item>
+    </string-array>
+    <string-array name="category_style_values" translatable="false">
+        <item>gradient</item>
+        <item>miku</item>
+        <item>miku2</item>
+        <item>teto</item>
+        <item>teto2</item>
+        <item>neru</item>
+        <item>basic</item>
+        <item>cherry_pop</item>
+        <item>rabbit_hole</item>
+        <item>mesmerizer</item>
+        <item>sakura</item>
+        <item>magical_mirai_2024</item>
+        <item>deep_sea_girl</item>
+        <item>snow_miku_2025</item>
+        <item>symphony_2022</item>
+        <item>racing_miku_2025</item>
+        <item>cinnamiku</item>
+        <item>retry_now</item>
+    </string-array>
+    <string-array name="config_backup_options" translatable="false">
+        <item>@string/config_backup_local</item>
+        <item>@string/config_backup_webdav</item>
+    </string-array>
+    <string-array name="core_loglevel" translatable="false">
+        <item>debug</item>
+        <item>info</item>
+        <item>warning</item>
+        <item>error</item>
+        <item>none</item>
+    </string-array>
+    <string-array name="flows" translatable="false">
+        <item></item>
+        <item>xtls-rprx-vision</item>
+        <item>xtls-rprx-vision-udp443</item>
+    </string-array>
+    <string-array name="fragment_packets" translatable="false">
+        <item>tlshello</item>
+        <item>1-1</item>
+        <item>1-2</item>
+        <item>1-3</item>
+        <item>1-5</item>
+    </string-array>
+    <string-array name="geo_files_sources_entries" translatable="false">
+        <item>Loyalsoldier/v2ray-rules-dat</item>
+        <item>runetfreedom/russia-v2ray-rules-dat</item>
+        <item>Chocolate4U/Iran-v2ray-rules</item>
+    </string-array>
+    <string-array name="geo_files_sources_values" translatable="false">
+        <item>Loyalsoldier/v2ray-rules-dat</item>
+        <item>runetfreedom/russia-v2ray-rules-dat</item>
+        <item>Chocolate4U/Iran-v2ray-rules</item>
+    </string-array>
+    <string-array name="header_type_kcp_and_quic" translatable="false">
+        <item>none</item>
+        <item>srtp</item>
+        <item>utp</item>
+        <item>wechat-video</item>
+        <item>dtls</item>
+        <item>wireguard</item>
+        <item>dns</item>
+    </string-array>
+    <string-array name="header_type_tcp" translatable="false">
+        <item>none</item>
+        <item>http</item>
+    </string-array>
+    <string-array name="hev_tunnel_icmp" translatable="false">
+        <item>off</item>
+        <item>reply</item>
+    </string-array>
+    <string-array name="hev_tunnel_loglevel" translatable="false">
+        <item>error</item>
+        <item>warn</item>
+        <item>info</item>
+        <item>debug</item>
+    </string-array>
+    <string-array name="hev_tunnel_udp_mode" translatable="false">
+        <item>udp</item>
+        <item>tcp</item>
+    </string-array>
+    <string-array name="icon_shape_entries" translatable="false">
+        <item>Arch</item>
+        <item>Arrow</item>
+        <item>Boom</item>
+        <item>Bun</item>
+        <item>Burst</item>
+        <item>Circle</item>
+        <item>Clover 4</item>
+        <item>Clover 8</item>
+        <item>Cookie 4</item>
+        <item>Cookie 6</item>
+        <item>Cookie 7</item>
+        <item>Cookie 9</item>
+        <item>Cookie 12</item>
+        <item>Diamond</item>
+        <item>Fan</item>
+        <item>Flower</item>
+        <item>Gem</item>
+        <item>Ghost-ish</item>
+        <item>Heart</item>
+        <item>Hexagon</item>
+        <item>Oval</item>
+        <item>Pentagon</item>
+        <item>Pill</item>
+        <item>Pixel Circle</item>
+        <item>Pixel Triangle</item>
+        <item>Puffy</item>
+        <item>Puffy Diamond</item>
+        <item>Semicircle</item>
+        <item>Slanted Square</item>
+        <item>Soft Boom</item>
+        <item>Soft Burst</item>
+        <item>Square</item>
+        <item>Sunny</item>
+        <item>Triangle</item>
+        <item>Very Sunny</item>
+    </string-array>
+    <string-array name="icon_shape_values" translatable="false">
+        <item>uwu_shape_arch</item>
+        <item>uwu_shape_arrow</item>
+        <item>uwu_shape_boom</item>
+        <item>uwu_shape_bun</item>
+        <item>uwu_shape_burst</item>
+        <item>uwu_shape_circle</item>
+        <item>uwu_shape_clover_4</item>
+        <item>uwu_shape_clover_8</item>
+        <item>uwu_shape_cookie_4</item>
+        <item>uwu_shape_cookie_6</item>
+        <item>uwu_shape_cookie_7</item>
+        <item>uwu_shape_cookie_9</item>
+        <item>uwu_shape_cookie_12</item>
+        <item>uwu_shape_diamond</item>
+        <item>uwu_shape_fan</item>
+        <item>uwu_shape_flower</item>
+        <item>uwu_shape_gem</item>
+        <item>uwu_shape_ghostish</item>
+        <item>uwu_shape_heart</item>
+        <item>uwu_shape_hexagon</item>
+        <item>uwu_shape_oval</item>
+        <item>uwu_shape_pentagon</item>
+        <item>uwu_shape_pill</item>
+        <item>uwu_shape_pixel_circle</item>
+        <item>uwu_shape_pixel_triangle</item>
+        <item>uwu_shape_puffy</item>
+        <item>uwu_shape_puffy_diamond</item>
+        <item>uwu_shape_semicircle</item>
+        <item>uwu_shape_slanted_square</item>
+        <item>uwu_shape_soft_boom</item>
+        <item>uwu_shape_soft_burst</item>
+        <item>uwu_shape_square</item>
+        <item>uwu_shape_sunny</item>
+        <item>uwu_shape_triangle</item>
+        <item>uwu_shape_very_sunny</item>
+    </string-array>
+    <string name="ip_connected">IP: %1$s</string>
+    <string-array name="language_select" translatable="false">
+        <item>auto</item>
+        <item>English</item>
+        <item>中文简体</item>
+        <item>Русский</item>
+        <item>Bahasa Indonesia</item>
+    </string-array>
+    <string-array name="language_select_value" translatable="false">
+        <item></item>
+        <item>en</item>
+        <item>zh-CN</item>
+        <item>ru</item>
+        <item>in</item>
+    </string-array>
+    <string name="mihomo_allow_bypass">Izinkan aplikasi melewati VPN</string>
+    <string name="mihomo_app_diagnostics">Aplikasi dan diagnostik</string>
+    <string name="mihomo_append_system">Tambahkan DNS sistem</string>
+    <string name="mihomo_batch_test_unavailable">Uji massal tidak tersedia untuk konfigurasi penuh. Sambungkan dulu, lalu gunakan uji koneksi.</string>
+    <string name="mihomo_choose_exit">Pilih grup proxy atau node</string>
+    <string name="mihomo_disabled">Nonaktif</string>
+    <string name="mihomo_dns_hijack">Tujuan pembajakan DNS</string>
+    <string name="mihomo_dns_hijack_hint">Pisahkan entri dengan spasi atau baris baru, mis. any:53 tcp://any:53. Kosongkan untuk mematikan pembajakan; saat mati gunakan server DNS VPN yang dapat dijangkau. Sambungkan ulang untuk menerapkan.</string>
+    <string name="mihomo_enabled">Aktif</string>
+    <string name="mihomo_exit_empty">Tidak ada yang cocok</string>
+    <string name="mihomo_exit_filter_all">Semua</string>
+    <string name="mihomo_exit_filter_groups">Grup</string>
+    <string name="mihomo_exit_filter_nodes">Node</string>
+    <string name="mihomo_exit_search">Cari proxy</string>
+    <string name="mihomo_exit_section_groups">Grup proxy</string>
+    <string name="mihomo_exit_section_nodes">Node</string>
+    <string name="mihomo_extra_authentication">Autentikasi HTTP/SOCKS (user:password per baris)</string>
+    <string name="mihomo_extra_dns_fallback_filter_geoip">Filter fallback GeoIP</string>
+    <string name="mihomo_extra_dns_fallback_filter_ipcidr">Rentang IP filter fallback</string>
+    <string name="mihomo_extra_dns_nameserver_policy">Kebijakan nameserver DNS (JSON)</string>
+    <string name="mihomo_extra_external_controller">Kontroler eksternal</string>
+    <string name="mihomo_extra_external_controller_address">Alamat listen kontroler</string>
+    <string name="mihomo_extra_external_controller_secret">Rahasia kontroler</string>
+    <string name="mihomo_extra_global_ua">User-Agent unduhan core</string>
+    <string name="mihomo_extra_hosts">Hosts (JSON)</string>
+    <string name="mihomo_filter_country">Wilayah DNS fallback</string>
+    <string name="mihomo_filter_domain">Filter domain DNS fallback</string>
+    <string name="mihomo_filter_geosite">Kategori situs DNS fallback</string>
+    <string name="mihomo_fingerprint">Sidik jari klien TLS global</string>
+    <string name="mihomo_follow_profile">Ikuti profil</string>
+    <string name="mihomo_geo_low_memory">Memori rendah (memconservative)</string>
+    <string name="mihomo_geo_standard">Pemuat standar</string>
+    <string name="mihomo_global_exit">Keluar global: %1$s</string>
+    <string name="mihomo_icmp_timeout">Batas waktu ICMP TUN (detik)</string>
+    <string name="mihomo_invalid_value">Nilai di luar rentang yang diizinkan</string>
+    <string name="mihomo_ipv6_inbound">Masuk IPv6</string>
+    <string name="mihomo_mode_direct">Langsung</string>
+    <string name="mihomo_mode_failed">Tidak dapat menerapkan pilihan. Periksa profil aktif.</string>
+    <string name="mihomo_mode_global">Global</string>
+    <string name="mihomo_mode_rule">Rule</string>
+    <string name="mihomo_mode_selected">Terpilih</string>
+    <string name="mihomo_network_cellular">Sambungkan saat memakai data seluler</string>
+    <string name="mihomo_network_ethernet">Sambungkan saat memakai Ethernet</string>
+    <string name="mihomo_network_other">Sambungkan di jaringan lain</string>
+    <string name="mihomo_network_wifi">Sambungkan saat memakai Wi-Fi</string>
+    <string name="mihomo_on_demand">Koneksi sesuai permintaan</string>
+    <string name="mihomo_on_demand_connecting">Sambungan otomatis diaktifkan di jaringan ini</string>
+    <string name="mihomo_on_demand_excluded">Wi-Fi yang dikecualikan</string>
+    <string name="mihomo_on_demand_excluded_hint">Satu nama Wi-Fi persis dan peka huruf besar-kecil per baris, maksimum 32 byte UTF-8. Jika nama tidak dapat dibaca, VPN tetap dijeda.</string>
+    <string name="mihomo_on_demand_hint">Sambungkan di jaringan yang diizinkan; jeda di Wi-Fi yang dikecualikan. Pemutusan manual berlaku sampai pergantian jaringan berikutnya. Mematikan ini tidak mengubah koneksi saat ini.</string>
+    <string name="mihomo_on_demand_paused">Dijeda di jaringan ini; memantau perubahan</string>
+    <string name="mihomo_on_demand_permission">Izin nama Wi-Fi</string>
+    <string name="mihomo_on_demand_permission_hint">Hanya diperlukan untuk pengecualian Wi-Fi: berikan izin lokasi presisi, lalu pilih Izinkan sepanjang waktu di pengaturan sistem dan aktifkan lokasi perangkat. Ketuk untuk mengizinkan atau membuka pengaturan.</string>
+    <string name="mihomo_on_demand_permission_ready">Izin lokasi diberikan. Tetap aktifkan lokasi perangkat agar nama Wi-Fi bisa dibaca.</string>
+    <string name="mihomo_on_demand_setup">Pilih profil yang sudah diunduh dan berikan izin VPN terlebih dahulu.</string>
+    <string name="mihomo_on_demand_ssid_missing">Dijeda: tidak dapat membaca nama Wi-Fi. Periksa izin lokasi.</string>
+    <string name="mihomo_on_demand_stop">Matikan dan putuskan</string>
+    <string name="mihomo_on_demand_waiting">Menunggu jaringan</string>
+    <string name="mihomo_performance">Kinerja dan koneksi Mihomo</string>
+    <string name="mihomo_preview_advanced">Konkurensi TCP, delay terpadu, pencarian proses, pemuat Geo hemat memori, TLS, keep-alive, skrip konfigurasi dan diagnostik aplikasi</string>
+    <string name="mihomo_preview_core">Mode routing, port, akses LAN, sniffing, resolver DNS, Fake-IP dan sumber data Geo</string>
+    <string name="mihomo_preview_vpn">IPv6, tetap bangun, pembajakan DNS, stack TUN, rute VPN, MTU, proxy per aplikasi, batas waktu dan koneksi sesuai permintaan</string>
+    <string name="mihomo_process_always">Selalu cari tahu proses</string>
+    <string name="mihomo_process_requirement">Butuh Android 10 atau lebih baru dan VPN aktif</string>
+    <string name="mihomo_process_strict">Cari tahu saat rule proses memintanya</string>
+    <string name="mihomo_proxy_exclusions">Domain yang dikecualikan dari proxy sistem</string>
+    <string name="mihomo_route_addresses">Rute VPN khusus (CIDR, satu per baris)</string>
+    <string name="mihomo_route_all">Route semua lalu lintas</string>
+    <string name="mihomo_route_custom">Rute include khusus</string>
+    <string name="mihomo_route_mode">Mode routing proxy</string>
+    <string name="mihomo_route_profile">Pakai rute include dari profil</string>
+    <string name="mihomo_route_public">Lewati jaringan privat</string>
+    <string name="mihomo_script">Skrip konfigurasi</string>
+    <string name="mihomo_script_add">Skrip baru</string>
+    <string name="mihomo_script_bindings">Tetapkan skrip ke profil</string>
+    <string name="mihomo_script_bindings_hint">Pilih skrip khusus, warisi skrip global, atau matikan skrip untuk setiap profil</string>
+    <string name="mihomo_script_delete">Hapus skrip</string>
+    <string name="mihomo_script_delete_hint">Hapus “%1$s”? Profil yang terikat akan menonaktifkan skrip, bukan mewarisi skrip global.</string>
+    <string name="mihomo_script_deleted">Skrip ini telah dihapus.</string>
+    <string name="mihomo_script_edit">Edit dan uji skrip</string>
+    <string name="mihomo_script_enable">Aktifkan skrip global</string>
+    <string name="mihomo_script_error">Skrip gagal</string>
+    <string name="mihomo_script_hint">Definisikan main(config) dan kembalikan objek konfigurasi. Pratinjau tidak mengubah koneksi. Tanpa akses file, jaringan, atau timer; batas eksekusi 2 detik. Pengaturan UI dan kolom TUN Android diprioritaskan.</string>
+    <string name="mihomo_script_inherit">Warisi skrip global</string>
+    <string name="mihomo_script_library">Pustaka skrip</string>
+    <string name="mihomo_script_library_hint">Buat, edit, ganti nama, dan hapus skrip yang dapat dipakai ulang</string>
+    <string name="mihomo_script_name">Nama skrip</string>
+    <string name="mihomo_script_name_invalid">Masukkan nama yang unik</string>
+    <string name="mihomo_script_none">Matikan skrip</string>
+    <string name="mihomo_script_preview_profile">Pratinjau profil: %1$s</string>
+    <string name="mihomo_script_rename">Ganti nama</string>
+    <string name="mihomo_script_result">Hasil skrip (sebelum override pengaturan)</string>
+    <string name="mihomo_script_save">Validasi dan simpan</string>
+    <string name="mihomo_script_summary">Berlaku untuk profil yang mewarisi skrip global, sebelum override pengaturan. Kesalahan menghentikan koneksi.</string>
+    <string name="mihomo_script_test">Pratinjau hasil</string>
+    <string name="mihomo_section_adv_controller">Kontroler eksternal</string>
+    <string name="mihomo_section_adv_keepalive">Keep-alive</string>
+    <string name="mihomo_section_adv_performance">Kinerja core</string>
+    <string name="mihomo_section_adv_tls">Keamanan transport</string>
+    <string name="mihomo_section_core_basics">Dasar</string>
+    <string name="mihomo_section_core_overrides">Override &amp; ekstra</string>
+    <string name="mihomo_section_dns_behavior">Perilaku &amp; cache</string>
+    <string name="mihomo_section_dns_fakeip">Fake-IP &amp; mode enhanced</string>
+    <string name="mihomo_section_dns_fallback">Filter fallback</string>
+    <string name="mihomo_section_dns_resolvers">Resolver</string>
+    <string name="mihomo_section_vpn_general">Umum</string>
+    <string name="mihomo_section_vpn_routing">Routing &amp; split tunneling</string>
+    <string name="mihomo_section_vpn_tun">Antarmuka TUN</string>
+    <string name="mihomo_select_exit">Pilih proxy</string>
+    <string name="mihomo_setting_allow_lan">allow-lan</string>
+    <string name="mihomo_setting_disable_keep_alive">disable-keep-alive</string>
+    <string name="mihomo_setting_dns_cache_algorithm">dns.cache-algorithm</string>
+    <string name="mihomo_setting_dns_default_nameserver">dns.default-nameserver</string>
+    <string name="mihomo_setting_dns_direct_nameserver">dns.direct-nameserver</string>
+    <string name="mihomo_setting_dns_direct_nameserver_follow_policy">dns.direct-nameserver-follow-policy</string>
+    <string name="mihomo_setting_dns_enhanced_mode">dns.enhanced-mode</string>
+    <string name="mihomo_setting_dns_fake_ip_filter">dns.fake-ip-filter</string>
+    <string name="mihomo_setting_dns_fake_ip_range">dns.fake-ip-range</string>
+    <string name="mihomo_setting_dns_fallback">dns.fallback</string>
+    <string name="mihomo_setting_dns_ipv6">dns.ipv6</string>
+    <string name="mihomo_setting_dns_nameserver">dns.nameserver</string>
+    <string name="mihomo_setting_dns_prefer_h3">dns.prefer-h3</string>
+    <string name="mihomo_setting_dns_proxy_server_nameserver">dns.proxy-server-nameserver</string>
+    <string name="mihomo_setting_dns_respect_rules">dns.respect-rules</string>
+    <string name="mihomo_setting_dns_use_hosts">dns.use-hosts</string>
+    <string name="mihomo_setting_dns_use_system_hosts">dns.use-system-hosts</string>
+    <string name="mihomo_setting_find_process_mode">find-process-mode</string>
+    <string name="mihomo_setting_geodata_loader">geodata-loader</string>
+    <string name="mihomo_setting_geodata_mode">geodata-mode</string>
+    <string name="mihomo_setting_ipv6">ipv6</string>
+    <string name="mihomo_setting_keep_alive_idle">keep-alive-idle</string>
+    <string name="mihomo_setting_keep_alive_interval">keep-alive-interval</string>
+    <string name="mihomo_setting_log_level">log-level</string>
+    <string name="mihomo_setting_mixed_port">mixed-port</string>
+    <string name="mihomo_setting_sniffer_enable">sniffer.enable</string>
+    <string name="mihomo_setting_sniffer_override_destination">sniffer.override-destination</string>
+    <string name="mihomo_setting_tcp_concurrent">tcp-concurrent</string>
+    <string name="mihomo_setting_tun_stack">tun.stack</string>
+    <string name="mihomo_setting_unified_delay">unified-delay</string>
+    <string name="mihomo_settings_hint">Sambungkan ulang untuk menerapkan; ikuti profil mempertahankan nilainya</string>
+    <string name="mihomo_settings_title">mihomo settings</string>
+    <string name="mihomo_skip_tls">Lewati verifikasi sertifikat</string>
+    <string name="mihomo_tls_verification">Verifikasi sertifikat TLS</string>
+    <string name="mihomo_udp_timeout">Batas waktu UDP TUN (detik)</string>
+    <string name="mihomo_verify_tls">Verifikasi sertifikat</string>
+    <string name="mihomo_vpn_route_mode">Mode rute VPN</string>
+    <string-array name="mode_entries" translatable="false">
+        <item>@string/mode_entry_vpn</item>
+        <item>@string/mode_entry_proxy_only</item>
+    </string-array>
+    <string-array name="mode_type_grpc" translatable="false">
+        <item>gun</item>
+        <item>multi</item>
+    </string-array>
+    <string-array name="mode_value" translatable="false">
+        <item>VPN</item>
+        <item>Proxy only</item>
+    </string-array>
+    <string-array name="mux_enabled_entries" translatable="false">
+        <item>@string/label_disable</item>
+        <item>@string/label_enable</item>
+    </string-array>
+    <string-array name="mux_enabled_values" translatable="false">
+        <item>false</item>
+        <item>true</item>
+    </string-array>
+    <string-array name="mux_xudp_quic_entries" translatable="false">
+        <item>@string/mux_xudp_quic_reject</item>
+        <item>@string/mux_xudp_quic_allow</item>
+        <item>@string/mux_xudp_quic_skip</item>
+    </string-array>
+    <string-array name="mux_xudp_quic_value" translatable="false">
+        <item>reject</item>
+        <item>allow</item>
+        <item>skip</item>
+    </string-array>
+    <string-array name="networks" translatable="false">
+        <item>tcp</item>
+        <item>kcp</item>
+        <item>ws</item>
+        <item>httpupgrade</item>
+        <item>xhttp</item>
+        <item>h2</item>
+        <item>grpc</item>
+    </string-array>
+    <string-array name="observatory_least_load_method" translatable="false">
+        <item>GET</item>
+        <item>HEAD</item>
+    </string-array>
+    <string-array name="outbound_domain_resolve_method" translatable="false">
+        <item>@string/outbound_resolve_do_not_resolve</item>
+        <item>@string/outbound_resolve_add_dns_hosts</item>
+        <item>@string/outbound_resolve_replace_domain</item>
+    </string-array>
+    <string-array name="outbound_domain_resolve_method_value" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="outbound_tag" translatable="false">
+        <item>proxy</item>
+        <item>direct</item>
+        <item>block</item>
+    </string-array>
+    <string-array name="policy_group_type" translatable="false">
+        <item>@string/policy_group_least_ping</item>
+        <item>@string/policy_group_least_load</item>
+        <item>@string/policy_group_random</item>
+        <item>@string/policy_group_round_robin</item>
+    </string-array>
+    <string name="pref_header_top_row_padding_summary_value">%1$ddp</string>
+    <string name="pref_home_banner_height_summary_value">%1$ddp</string>
+    <string-array name="preset_rulesets" translatable="false">
+        <item>@string/preset_ruleset_china_whitelist</item>
+        <item>@string/preset_ruleset_china_blacklist</item>
+        <item>@string/preset_ruleset_global</item>
+        <item>@string/preset_ruleset_iran_whitelist</item>
+        <item>@string/preset_ruleset_russia_whitelist</item>
+    </string-array>
+    <string name="profile_editor_actions">Tindakan untuk %1$s</string>
+    <string name="profile_editor_add_field">Tambah field</string>
+    <string name="profile_editor_add_item">Tambah entri</string>
+    <string name="profile_editor_allow_lan">Izinkan akses LAN</string>
+    <string name="profile_editor_back">Kembali dari %1$s</string>
+    <string name="profile_editor_disabled">Nonaktif</string>
+    <string name="profile_editor_empty">Belum ada entri</string>
+    <string name="profile_editor_enabled">Aktif</string>
+    <string name="profile_editor_fields">%1$d field</string>
+    <string name="profile_editor_general">Umum</string>
+    <string name="profile_editor_group">Grup · %1$s</string>
+    <string name="profile_editor_hint">Simpan, lalu sambungkan ulang. Edit visual menghapus komentar YAML.</string>
+    <string name="profile_editor_item">Entri %1$d</string>
+    <string name="profile_editor_items">%1$d entri</string>
+    <string name="profile_editor_log_level">Level log</string>
+    <string name="profile_editor_mixed_port">Mixed port</string>
+    <string name="profile_editor_mode">Mode routing</string>
+    <string name="profile_editor_move_down">Turunkan</string>
+    <string name="profile_editor_move_up">Naikkan</string>
+    <string name="profile_editor_remove">Hapus</string>
+    <string name="profile_editor_sections">Konfigurasi</string>
+    <string name="profile_editor_title">Editor konfigurasi</string>
+    <string name="profile_editor_visual">Visual</string>
+    <string name="profile_editor_yaml">YAML</string>
+    <string name="profile_section_dns">DNS</string>
+    <string name="profile_section_groups">Grup proxy</string>
+    <string name="profile_section_providers">Penyedia proxy</string>
+    <string name="profile_section_proxies">Proxy</string>
+    <string name="profile_section_rule_providers">Penyedia rule</string>
+    <string name="profile_section_rules">Rule routing</string>
+    <string name="profile_visual_summary">Perubahan visual memformat ulang YAML dan menghapus komentar. Gunakan mode YAML untuk mengedit teks asli.</string>
+    <string name="protocol_http">HTTP</string>
+    <string name="protocol_hysteria2">Hysteria2</string>
+    <string name="protocol_policy_group">Grup Kebijakan</string>
+    <string name="protocol_proxy_chain">Rantai Proxy</string>
+    <string name="protocol_shadowsocks">Shadowsocks</string>
+    <string name="protocol_socks">Socks</string>
+    <string name="protocol_trojan">Trojan</string>
+    <string name="protocol_vless">VLESS</string>
+    <string name="protocol_vmess">VMess</string>
+    <string name="protocol_wireguard">Wireguard</string>
+    <string name="reset">Atur ulang</string>
+    <string-array name="routing_domain_strategy" translatable="false">
+        <item>AsIs</item>
+        <item>IPIfNonMatch</item>
+        <item>IPOnDemand</item>
+    </string-array>
+    <string-array name="search_bar_chip_entries" translatable="false">
+        <item>@string/pref_search_bar_chip_disabled</item>
+        <item>@string/pref_search_bar_chip_weather</item>
+        <item>@string/pref_search_bar_chip_total_traffic</item>
+        <item>@string/pref_search_bar_chip_dual_swipe</item>
+    </string-array>
+    <string-array name="search_bar_chip_values" translatable="false">
+        <item>disabled</item>
+        <item>weather</item>
+        <item>total_traffic</item>
+        <item>dual_swipe</item>
+    </string-array>
+    <string-array name="securitys" translatable="false">
+        <item>chacha20-poly1305</item>
+        <item>aes-128-gcm</item>
+        <item>auto</item>
+        <item>none</item>
+        <item>zero</item>
+    </string-array>
+    <string name="selected_banner_dim_summary_value">%1$d%%</string>
+    <string-array name="share_method" translatable="false">
+        <item>@string/share_qrcode</item>
+        <item>@string/share_export_clipboard</item>
+        <item>@string/share_export_full_clipboard</item>
+    </string-array>
+    <string-array name="share_method_more" translatable="false">
+        <item>@string/share_qrcode</item>
+        <item>@string/share_export_clipboard</item>
+        <item>@string/share_export_full_clipboard</item>
+        <item>@string/share_edit</item>
+        <item>@string/share_delete</item>
+    </string-array>
+    <string-array name="share_sub_method" translatable="false">
+        <item>@string/share_qrcode</item>
+        <item>@string/share_export_clipboard</item>
+    </string-array>
+    <string name="sheet_banner_dim_summary_value">%1$d%%</string>
+    <string-array name="ss_securitys" translatable="false">
+        <item>aes-256-gcm</item>
+        <item>aes-128-gcm</item>
+        <item>chacha20-poly1305</item>
+        <item>chacha20-ietf-poly1305</item>
+        <item>xchacha20-poly1305</item>
+        <item>xchacha20-ietf-poly1305</item>
+        <item>none</item>
+        <item>plain</item>
+        <item>2022-blake3-aes-128-gcm</item>
+        <item>2022-blake3-aes-256-gcm</item>
+        <item>2022-blake3-chacha20-poly1305</item>
+    </string-array>
+    <string-array name="streamsecurity_alpn" translatable="false">
+        <item></item>
+        <item>h3</item>
+        <item>h2</item>
+        <item>http/1.1</item>
+        <item>h3,h2,http/1.1</item>
+        <item>h3,h2</item>
+        <item>h2,http/1.1</item>
+    </string-array>
+    <string-array name="streamsecurity_utls" translatable="false">
+        <item></item>
+        <item>chrome</item>
+        <item>firefox</item>
+        <item>safari</item>
+        <item>ios</item>
+        <item>android</item>
+        <item>edge</item>
+        <item>360</item>
+        <item>qq</item>
+        <item>random</item>
+        <item>randomized</item>
+    </string-array>
+    <string-array name="streamsecuritys" translatable="false">
+        <item></item>
+        <item>tls</item>
+    </string-array>
+    <string-array name="streamsecuritys_entries" translatable="false">
+        <item>@string/label_disable</item>
+        <item>TLS</item>
+    </string-array>
+    <string-array name="streamsecurityxs" translatable="false">
+        <item></item>
+        <item>tls</item>
+        <item>reality</item>
+    </string-array>
+    <string-array name="streamsecurityxs_entries" translatable="false">
+        <item>@string/label_disable</item>
+        <item>TLS</item>
+        <item>REALITY</item>
+    </string-array>
+    <plurals name="sub_setting_server_count">
+        <item quantity="one">%1$d server</item>
+        <item quantity="other">%1$d server</item>
+    </plurals>
+    <string name="subscription_initial_fetch_failed">Langganan tersimpan, tetapi unduhan pertama gagal. Periksa alamat dan jaringan, lalu simpan lagi untuk mencoba ulang.</string>
+    <string name="subscription_update_through_proxy">Perbarui lewat proxy</string>
+    <string name="subscription_update_through_proxy_summary">Pakai proxy yang berjalan. Hanya untuk unduhan pertama, sambungkan langsung jika tidak ada proxy berjalan; pembaruan berikutnya tetap memakai preferensi ini.</string>
+    <string name="subtitle_about_update">Versi, pembaruan dan pemeriksaan otomatis</string>
+    <string name="subtitle_ui_alerts">Suara notifikasi dan koneksi</string>
+    <string name="subtitle_ui_banner">Banner, profil dan gambar</string>
+    <string name="subtitle_ui_home">Layar utama, daftar dan bilah pencarian</string>
+    <string name="summary_navigate_about_update">Info versi, periksa pembaruan dan aktifkan pemeriksaan otomatis</string>
+    <string name="summary_navigate_ui_alerts">Notifikasi kecepatan dan suara koneksi</string>
+    <string name="summary_navigate_ui_banner">Banner utama dan sheet, gaya serta profil terpilih</string>
+    <string name="summary_navigate_ui_home">Perilaku layar utama, daftar dan chip bilah pencarian</string>
+    <string name="summary_pref_auto_check_update">Tanya GitHub untuk rilis lebih baru pada setiap cold start</string>
+    <string-array name="tab_badge_limit_entries" translatable="false">
+        <item>@string/tab_badge_limit_unlimited</item>
+        <item>99+</item>
+        <item>999+</item>
+        <item>9999+</item>
+    </string-array>
+    <string-array name="tab_badge_limit_values" translatable="false">
+        <item>0</item>
+        <item>99</item>
+        <item>999</item>
+        <item>9999</item>
+    </string-array>
+    <string name="title_about_update">Tentang &amp; pembaruan</string>
+    <string name="title_about_update_category">Pembaruan</string>
+    <string name="title_pref_auto_check_update">Periksa pembaruan saat mulai</string>
+    <string name="title_ui_alerts">Notifikasi &amp; suara</string>
+    <string name="title_ui_banner">Banner &amp; personalisasi</string>
+    <string name="title_ui_home">Utama &amp; daftar</string>
+    <string-array name="ui_mode_night" translatable="false">
+        <item>@string/ui_mode_night_follow_system</item>
+        <item>@string/ui_mode_night_light</item>
+        <item>@string/ui_mode_night_dark</item>
+        <item>@string/ui_mode_night_auto</item>
+    </string-array>
+    <string-array name="ui_mode_night_value" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string name="update_available_toast">Versi baru %1$s tersedia</string>
+    <string name="uwu_profile_banner_title">master</string>
+    <string-array name="uwu_random_text" translatable="false">
+        <item>@string/uwu_random_text_1</item>
+        <item>@string/uwu_random_text_2</item>
+        <item>@string/uwu_random_text_3</item>
+        <item>@string/uwu_random_text_4</item>
+        <item>@string/uwu_random_text_5</item>
+        <item>@string/uwu_random_text_6</item>
+        <item>@string/uwu_random_text_7</item>
+        <item>@string/uwu_random_text_8</item>
+        <item>@string/uwu_random_text_9</item>
+        <item>@string/uwu_random_text_10</item>
+    </string-array>
+    <string name="version_line_with_core">v%1$s (mihomo %2$s)</string>
+    <string-array name="vpn_bypass_lan" translatable="false">
+        <item>@string/vpn_bypass_lan_follow_config</item>
+        <item>@string/vpn_bypass_lan_bypass</item>
+        <item>@string/vpn_bypass_lan_not_bypass</item>
+    </string-array>
+    <string-array name="vpn_bypass_lan_value" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="vpn_interface_address" translatable="false">
+        <item>10.10.14.x</item>
+        <item>10.1.0.x</item>
+        <item>10.0.0.x</item>
+        <item>172.31.0.x</item>
+        <item>172.20.0.x</item>
+        <item>172.16.0.x</item>
+        <item>192.168.100.x</item>
+    </string-array>
+    <string-array name="vpn_interface_address_value" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+    <string name="weather_loading">Memuat…</string>
+    <string name="weather_temp_format">%d°C</string>
+    <string-array name="weather_unit_entries" translatable="false">
+        <item>Celsius (°C)</item>
+        <item>Fahrenheit (°F)</item>
+        <item>Auto</item>
+    </string-array>
+    <string-array name="weather_unit_values" translatable="false">
+        <item>true</item>
+        <item>false</item>
+        <item></item>
+    </string-array>
+    <string-array name="xhttp_mode" translatable="false">
+        <item>auto</item>
+        <item>packet-up</item>
+        <item>stream-up</item>
+        <item>stream-one</item>
+    </string-array>
 </resources>
