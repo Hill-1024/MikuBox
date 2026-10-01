@@ -103,7 +103,13 @@ object MikuRayProfileSync {
     fun refreshRowDetails(context: Context) {
         val selected = MihomoProfileStore.selected(context)?.id ?: return
         if (!com.miku.ray.MikuCoreBridge.isRunning()) return
-        val testUrl = MihomoCoreSettings.testUrl(context)
+        // Follow the endpoint the home card uses (pref_delay_test_url) when the
+        // user set one. The fallback stays the app's cp.cloudflare.com default —
+        // deliberately NOT SettingsManager.getDelayTestUrl()'s gstatic fallback —
+        // so users who configured neither keep today's measurement conditions.
+        val testUrl = MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL)
+            ?.trim()?.takeIf { it.isNotEmpty() }
+            ?: MihomoCoreSettings.DEFAULT_TEST_URL
         // The measurement is a request through the core, so it stays off the
         // caller's thread — this is reached from the service's checkpoint handler.
         Thread {

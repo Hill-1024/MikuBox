@@ -12,6 +12,11 @@ import android.content.SharedPreferences
  * no `dns:` mapping; [DnsSource.APP] always replaces it; [DnsSource.CONFIG]
  * always keeps it.
  *
+ * This is a read-only store at runtime: the user-facing DNS controls are the
+ * structured [DnsOverrides] panel (pref_core_settings.xml `dns.*`), and the
+ * per-call write API (setSource/setYaml/resetYaml/resetAll) was removed as
+ * dead code — nothing wired a source-mode or custom-YAML editor to it.
+ *
  * The YAML stored here represents the content inside Mihomo's top-level
  * `dns:` mapping. Callers are responsible for inserting it under `dns:`.
  */
@@ -148,19 +153,6 @@ object MihomoDnsSettings {
     }
 
     /**
-     * Stores the combination mode.
-     *
-     * Uses [SharedPreferences.Editor.apply] because no caller needs to block
-     * until the preference has been synchronously written to disk.
-     */
-    fun setSource(context: Context, source: DnsSource) {
-        preferences(context)
-            .edit()
-            .putString(KEY_SOURCE, source.name)
-            .apply()
-    }
-
-    /**
      * Returns the user-defined YAML or [DEFAULT_YAML] when no valid custom
      * configuration is stored.
      */
@@ -171,44 +163,6 @@ object MihomoDnsSettings {
             ?.trim()
             ?.takeIf(String::isNotEmpty)
             ?: DEFAULT_YAML
-    }
-
-    /**
-     * Stores a custom Mihomo DNS mapping.
-     *
-     * Blank content is treated as a request to restore the default mapping.
-     */
-    fun setYaml(context: Context, yaml: String) {
-        val normalizedYaml = yaml.trim()
-
-        preferences(context).edit().apply {
-            if (normalizedYaml.isEmpty()) {
-                remove(KEY_OVERRIDE_YAML)
-            } else {
-                putString(KEY_OVERRIDE_YAML, normalizedYaml)
-            }
-        }.apply()
-    }
-
-    /**
-     * Removes the custom YAML while preserving the current source mode.
-     */
-    fun resetYaml(context: Context) {
-        preferences(context)
-            .edit()
-            .remove(KEY_OVERRIDE_YAML)
-            .apply()
-    }
-
-    /**
-     * Restores all DNS settings to their application defaults.
-     */
-    fun resetAll(context: Context) {
-        preferences(context)
-            .edit()
-            .remove(KEY_SOURCE)
-            .remove(KEY_OVERRIDE_YAML)
-            .apply()
     }
 
     /**

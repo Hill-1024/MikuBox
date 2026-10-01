@@ -1110,4 +1110,59 @@ you need."</string>
     <string name="policy_group_round_robin">Round Robin</string>
     <string name="config_backup_local">Local</string>
     <string name="config_backup_webdav">WebDAV</string>
+
+    <!-- MikuBox additions (2026-10-02, deliberate deviation from upstream
+         MikuRay): strings for MikuBox-specific surfaces — the routing screen,
+         group dialogs, the subscription editor's extra row, the VPN background
+         protection section and the profile-editor YAML precheck. Upstream
+         re-sync would remove them; they are documented in the fix notes. -->
+    <string name="mihomo_autoconnect_title">Auto-connect on start</string>
+    <string name="mihomo_autoconnect_summary">Connect the selected profile when the app starts, if VPN consent was already granted.</string>
+    <string name="mihomo_update_when_connected_only">Update only while connected</string>
+    <string name="mihomo_update_when_connected_only_summary">Subscription updates run only while the VPN is connected, so the provider is never contacted directly.</string>
+    <string name="mihomo_yaml_parse_failed">Failed to parse YAML: %1$s</string>
+    <string name="mihomo_config_parse_failed">Could not parse the profile — fix it in the raw YAML editor: %1$s</string>
+    <string name="mihomo_group_name_hint">Group name</string>
+    <string name="mihomo_group_create_title">Create group</string>
+    <string name="mihomo_group_manage_title">Manage groups</string>
+    <string name="mihomo_group_manage_empty">The default Miku group collects profiles and cannot be deleted. You can create new groups.</string>
+    <string name="mihomo_group_entry_count">%1$s · %2$d profiles</string>
+    <string name="mihomo_group_delete_title">Delete group “%1$s”?</string>
+    <string name="mihomo_group_delete_message">Profiles and subscriptions in this group move back to Miku. Their content, subscription settings and the current connection are kept.</string>
+    <string name="mihomo_group_delete_action">Delete group</string>
+    <string name="mihomo_group_choose_title">Groups</string>
+    <string name="mihomo_group_new_action">New group</string>
+    <string name="mihomo_group_name_required">Enter a group name</string>
+    <string name="mihomo_group_name_exists">This group name is already in use</string>
+    <string name="mihomo_group_default_undeletable">The default group cannot be deleted</string>
+    <string name="mihomo_group_missing">Unknown group</string>
+    <string name="mihomo_routing_title">Routing</string>
+    <string name="mihomo_routing_description">In rule mode traffic is split by profile and policy. Disabled rules take no part in matching; traffic matching no rule goes direct. Changes apply on the next connection, or reconnect right away.</string>
+    <string name="mihomo_routing_apply_now">Apply to the current connection</string>
+    <string name="mihomo_routing_saved_next_connect">Saved — applies on the next connection</string>
+    <string name="mihomo_routing_reconnecting">Reconnecting…</string>
+    <string name="mihomo_routing_reconnect_failed">Could not reconnect — retry manually</string>
+    <string name="mihomo_routing_empty">No profiles yet — import a profile or subscription first.</string>
+    <string name="mihomo_routing_no_rules">This file has no rules to split traffic</string>
+    <string name="mihomo_routing_parse_failed">Could not parse: %1$s</string>
+    <plurals name="mihomo_routing_rule_count">
+        <item quantity="one">%1$d rule</item>
+        <item quantity="other">%1$d rules</item>
+    </plurals>
+    <string name="mihomo_vpn_battery_ok">Android battery optimization is ignored; vendor-specific background and autostart permissions still need to be granted separately.</string>
+    <string name="mihomo_vpn_battery_off">Android battery optimization is not ignored yet — tap to request it. The decision is up to you and the system.</string>
+    <string name="mihomo_vpn_always_on_enabled">System Always-on VPN is on.\u0020</string>
+    <string name="mihomo_vpn_lockdown_on">Block connections without VPN is on; the system blocks the network during recovery.</string>
+    <string name="mihomo_vpn_lockdown_off">Block connections without VPN is off.</string>
+    <string name="mihomo_vpn_always_on_hint">Tap to open the system VPN settings. The system manages connection recovery — no need to pin the app in Recents; closing the app screens does not disconnect.</string>
+    <string name="mihomo_vpn_recovery_paused">Automatic recovery failed three times in a row and is paused. Check the profile and background permissions, then connect manually.</string>
+    <string name="mihomo_vpn_recovery_summary">Tries to recover after an unexpected interruption; repeated failures back off and pause instead of retaking the network. Force-stopping the app or revoking VPN permission interrupts the connection.</string>
+    <string name="mihomo_vpn_recovery_title">Connection recovery status</string>
+    <string name="mihomo_vpn_bg_category">Background connection protection</string>
+    <string name="mihomo_vpn_always_on_title">System VPN · Always-on</string>
+    <string name="mihomo_vpn_battery_title">Allow ignoring battery optimization</string>
+    <string name="mihomo_vpn_oem_title_coloros">ColorOS / OnePlus background settings</string>
+    <string name="mihomo_vpn_oem_title">App background settings</string>
+    <string name="mihomo_vpn_oem_summary">Allow background activity, autostart and related launching in the system app info (options vary by system). The app cannot grant these itself; a battery optimization exemption is not a vendor cleanup exemption.</string>
+    <string name="mihomo_vpn_open_settings_failed">Could not open system settings — open MikuBox app info from the system Settings.</string>
 </resources>
