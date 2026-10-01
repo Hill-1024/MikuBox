@@ -62,6 +62,55 @@
 #
 ##############################################################################
 
+# --- local: WSL -> Windows Gradle bridge --------------------------------------
+# Build automation on this machine invokes the wrapper as
+#   bash -c "export JAVA_HOME='D:\...JAVA21'; export PATH=/d/...; ./gradlew ..."
+# where `bash` resolves to WSL bash (System32\bash.exe). Inside WSL this POSIX
+# script cannot use a win32 JAVA_HOME ($JAVA_HOME/bin/java does not exist) and
+# the distro has no Linux JDK/Android SDK/Go. In exactly that case, hand the
+# build to the Windows wrapper through cmd.exe interop. The guard keeps stock
+# behavior everywhere else: CI/Linux never sets a drive-letter JAVA_HOME, and
+# Git Bash/MSYS handles this script natively.
+case "$JAVA_HOME" in
+[A-Za-z]:[\\]*)
+  if __cmdexe=$(command -v cmd.exe 2>/dev/null) && grep -qi microsoft /proc/version 2>/dev/null; then
+    # WSL interop passes NO environment to Windows children here (verified:
+    # `cmd /c set` does not see WSL exports), so JAVA_HOME and the extra PATH
+    # entries must be set inside the cmd command line. Convert POSIX drive
+    # entries (/d/x -> D:\x) so tools the build execs by bare name (`go`,
+    # see app/build.gradle.kts) resolve against the Windows PATH. %PATH% is
+    # expanded by cmd itself. Resolve cmd.exe first; exec looks it up in PATH.
+    __winpath=''
+    __oldIFS=$IFS
+    IFS=:
+    for __p in $PATH; do
+      case "$__p" in
+        /[A-Za-z]/?*)
+          __drive=$(printf '%s' "$__p" | sed -e 's|^/\([A-Za-z]\)/.*|\1|' | tr 'a-z' 'A-Z')
+          __rest=$(printf '%s' "$__p" | sed -e 's|^/[A-Za-z]/||' | tr '/' '\\')
+          if [ -n "$__winpath" ]; then
+            __winpath="$__winpath;$__drive:\\$__rest"
+          else
+            __winpath="$__drive:\\$__rest"
+          fi
+          ;;
+      esac
+    done
+    IFS=$__oldIFS
+    __pathset=''
+    if [ -n "$__winpath" ]; then
+      __pathset="set PATH=$__winpath;%PATH%&& "
+    fi
+    # NOTE: no quotes around the set values. WSL interop passes embedded
+    # quotes through as \" which cmd does not un-escape, so quoted values end
+    # up in variables with mangled names. `set VAR=value&& next` is safe: the
+    # value ends exactly at the && and JAVA_HOME/go paths carry no % or &&.
+    exec "$__cmdexe" /c "set JAVA_HOME=$JAVA_HOME&& ${__pathset}gradlew.bat $*"
+  fi
+  ;;
+esac
+# ------------------------------------------------------------------------------
+
 # Attempt to set APP_HOME
 
 # Resolve links: $0 may be a link
