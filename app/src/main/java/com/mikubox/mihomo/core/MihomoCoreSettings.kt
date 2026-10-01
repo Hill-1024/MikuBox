@@ -32,14 +32,11 @@ object MihomoCoreSettings {
     private const val KEY_ALLOW_LAN = "allow_lan"
     private const val KEY_TUN_STACK = "tun_stack"
     private const val KEY_IPV6 = "ipv6"
-    private const val KEY_TEST_URL = "test_url"
-    private const val KEY_TEST_TIMEOUT = "test_timeout"
     private const val KEY_AUTOCONNECT = "autoconnect_on_start"
     private const val KEY_UNIFIED_DELAY = "unified_delay"
     private const val KEY_TCP_CONCURRENT = "tcp_concurrent"
 
     const val DEFAULT_TEST_URL = "https://cp.cloudflare.com"
-    const val DEFAULT_TEST_TIMEOUT = 5000
 
     fun logLevel(context: Context): LogLevel = enumOr(prefs(context).getString(KEY_LOG, null), LogLevel.INFO)
     fun setLogLevel(context: Context, value: LogLevel) = putString(context, KEY_LOG, value.name)
@@ -68,17 +65,6 @@ object MihomoCoreSettings {
         )
         sessionMixedPort = if (dynamic) java.net.ServerSocket(0).use { it.localPort } else mixedPort(context)
     }
-
-    fun testUrl(context: Context): String =
-        prefs(context).getString(KEY_TEST_URL, null)?.ifBlank { null } ?: DEFAULT_TEST_URL
-
-    fun setTestUrl(context: Context, value: String) = putString(context, KEY_TEST_URL, value.trim())
-
-    fun testTimeout(context: Context): Int =
-        prefs(context).getInt(KEY_TEST_TIMEOUT, DEFAULT_TEST_TIMEOUT).coerceIn(1000, 30_000)
-
-    fun setTestTimeout(context: Context, value: Int) =
-        prefs(context).edit().putInt(KEY_TEST_TIMEOUT, value.coerceIn(1000, 30_000)).commit().let {}
 
     fun autoConnectOnStart(context: Context): Boolean = prefs(context).getBoolean(KEY_AUTOCONNECT, false)
     fun setAutoConnectOnStart(context: Context, value: Boolean) = putBool(context, KEY_AUTOCONNECT, value)

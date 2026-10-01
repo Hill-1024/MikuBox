@@ -14,7 +14,28 @@ class MihomoSettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_core_settings)
         MihomoPreferenceBindings(this).apply { bindCore(); styleTitles() }
+        addAutoConnectSwitch()
         CategoryStyleHelper.applyToFragment(this)
+    }
+
+    /**
+     * MikuBox's own switch, built in code so the vendored preference XML stays
+     * byte-for-byte with upstream MikuRay — the same pattern as the VPN
+     * screen's background-protection category.
+     */
+    private fun addAutoConnectSwitch() {
+        val autoConnect = androidx.preference.SwitchPreferenceCompat(requireContext()).apply {
+            key = "autoconnect_on_start"
+            isPersistent = false
+            title = getString(R.string.mihomo_autoconnect_title)
+            summary = getString(R.string.mihomo_autoconnect_summary)
+            isChecked = MihomoCoreSettings.autoConnectOnStart(requireContext())
+            setOnPreferenceChangeListener { _, newValue ->
+                MihomoCoreSettings.setAutoConnectOnStart(requireContext(), newValue as Boolean)
+                true
+            }
+        }
+        preferenceScreen.addPreference(autoConnect)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -30,28 +51,30 @@ class MihomoVpnSettingsFragment : com.miku.ray.ui.preference.activity.VpnSetting
         AutomationPreferences.refreshNetwork(this)
         val power = requireContext().getSystemService(android.os.PowerManager::class.java)
         findPreference<Preference>("background_battery_status")?.summary =
-            if (power.isIgnoringBatteryOptimizations(requireContext().packageName)) "已忽略 Android 电池优化；厂商的后台运行和自启动权限仍需单独允许。"
-            else "尚未忽略 Android 电池优化，点击申请允许。此权限由系统和你决定。"
+            if (power.isIgnoringBatteryOptimizations(requireContext().packageName)) getString(R.string.mihomo_vpn_battery_ok)
+            else getString(R.string.mihomo_vpn_battery_off)
         val service = com.miku.ray.core.CoreServiceManager.serviceControl as? android.net.VpnService
         findPreference<Preference>("background_always_on")?.summary = when {
             android.os.Build.VERSION.SDK_INT >= 29 && service?.isAlwaysOn == true ->
-                "系统始终开启 VPN 已启用。" + if (service.isLockdownEnabled) "已启用无 VPN 时阻止连接，恢复期间网络会被系统阻断。" else "未启用无 VPN 时阻止连接。"
-            else -> "点击系统 VPN 设置查看或开启。由系统管理连接恢复，无需锁定最近任务；关闭应用页面不会主动断开。"
+                getString(R.string.mihomo_vpn_always_on_enabled) +
+                    if (service.isLockdownEnabled) getString(R.string.mihomo_vpn_lockdown_on)
+                    else getString(R.string.mihomo_vpn_lockdown_off)
+            else -> getString(R.string.mihomo_vpn_always_on_hint)
         }
         findPreference<Preference>("background_recovery")?.summary =
             if (com.mikubox.mihomo.service.TunnelGuard.recoveryPaused(requireContext()))
-                "自动恢复已连续失败三次并暂停，请检查配置和后台权限后手动连接。"
-            else "意外中断后尝试恢复；连续失败会退避并暂停，避免反复接管网络。强行停止应用或撤销 VPN 权限会中断连接。"
+                getString(R.string.mihomo_vpn_recovery_paused)
+            else getString(R.string.mihomo_vpn_recovery_summary)
 
     }
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         super.onCreatePreferences(bundle, rootKey)
         MihomoPreferenceBindings(this).apply { bindVpn(); styleTitles() }
-        val category = PreferenceCategory(requireContext()).apply { title = "后台连接保护" }
+        val category = PreferenceCategory(requireContext()).apply { title = getString(R.string.mihomo_vpn_bg_category) }
         preferenceScreen.addPreference(category)
         category.addPreference(Preference(requireContext()).apply {
             key = "background_always_on"
-            title = "系统 VPN · 始终开启"
+            title = getString(R.string.mihomo_vpn_always_on_title)
             setOnPreferenceClickListener {
                 openSystemSettings(android.content.Intent(android.provider.Settings.ACTION_VPN_SETTINGS))
                 true
@@ -59,7 +82,7 @@ class MihomoVpnSettingsFragment : com.miku.ray.ui.preference.activity.VpnSetting
         })
         category.addPreference(Preference(requireContext()).apply {
             key = "background_battery_status"
-            title = "允许忽略电池优化"
+            title = getString(R.string.mihomo_vpn_battery_title)
             setOnPreferenceClickListener {
                 val power = requireContext().getSystemService(android.os.PowerManager::class.java)
                 val intent = if (power.isIgnoringBatteryOptimizations(requireContext().packageName))
@@ -71,14 +94,14 @@ class MihomoVpnSettingsFragment : com.miku.ray.ui.preference.activity.VpnSetting
             }
         })
         category.addPreference(Preference(requireContext()).apply {
-            title = if (android.os.Build.MANUFACTURER.lowercase() in setOf("oneplus", "oppo", "realme"))
-                "ColorOS / 一加后台运行设置" else "应用后台运行设置"
-            summary = "在系统应用信息中允许后台活动、自启动及关联启动（具体选项取决于系统）。这些权限无法由应用自行开启；电池优化豁免不等于获得厂商清理豁免。"
+            title = getString(if (android.os.Build.MANUFACTURER.lowercase() in setOf("oneplus", "oppo", "realme"))
+                R.string.mihomo_vpn_oem_title_coloros else R.string.mihomo_vpn_oem_title)
+            summary = getString(R.string.mihomo_vpn_oem_summary)
             setOnPreferenceClickListener { openSystemSettings(appDetailsIntent()); true }
         })
         category.addPreference(Preference(requireContext()).apply {
             key = "background_recovery"
-            title = "连接恢复状态"
+            title = getString(R.string.mihomo_vpn_recovery_title)
             isSelectable = false
         })
     }
@@ -88,7 +111,7 @@ class MihomoVpnSettingsFragment : com.miku.ray.ui.preference.activity.VpnSetting
 
     private fun openSystemSettings(intent: android.content.Intent) {
         runCatching { startActivity(intent) }.recoverCatching { startActivity(appDetailsIntent()) }
-            .onFailure { Toast.makeText(requireContext(), "无法打开系统设置，请从系统设置中进入 MikuBox 应用信息。", Toast.LENGTH_LONG).show() }
+            .onFailure { Toast.makeText(requireContext(), R.string.mihomo_vpn_open_settings_failed, Toast.LENGTH_LONG).show() }
 
     }
 }

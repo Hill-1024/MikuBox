@@ -51,6 +51,21 @@ class MikuApp : com.miku.ray.AngApplication() {
                 com.mikubox.mihomo.service.TunnelGuard.schedule(this)
             }
         }
+        // Opt-in cold-start auto connect. It only fires when the user both
+        // enabled the switch and granted VPN consent earlier, and the tunnel is
+        // neither running nor already owed by the guard — the guard stays the
+        // sole owner of resurrecting an expected tunnel. connect() swallows a
+        // rejected background start itself, so a process spun up from the
+        // background (sync job, broadcast) degrades to a log line, not a crash.
+        runCatching {
+            if (com.mikubox.mihomo.core.MihomoCoreSettings.autoConnectOnStart(this) &&
+                android.net.VpnService.prepare(this) == null &&
+                !com.mikubox.mihomo.service.MikuVpnService.running &&
+                !com.mikubox.mihomo.service.TunnelGuard.isExpected(this)
+            ) {
+                com.mikubox.mihomo.service.VpnController.connect(this)
+            }
+        }
         // Scheduling does not gate the first frame. The home screen refreshes
         // its persisted profile mirror on IO when resumed, instead of parsing
         // every configuration here and repeating it on the main thread there.

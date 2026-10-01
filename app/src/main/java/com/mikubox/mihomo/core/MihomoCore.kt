@@ -247,9 +247,6 @@ object MihomoCore {
         runCatching { JSONObject(nativeProxyDelay(name, url, timeoutMs)).optInt("delay", -1) }
             .getOrDefault(-1)
 
-    /** Validates a DNS override block; returns null when valid, or an error message. */
-    fun validateDns(yaml: String): String? = nativeValidateDns(yaml).ifBlank { null }
-
     /**
      * Effective core configuration and build facts (stack, MTU, DNS mode,
      * gVisor availability, last error) as a JSON object, for log exports.
@@ -330,7 +327,6 @@ object MihomoCore {
     private external fun nativeSelectProxy(group: String, name: String): Int
     private external fun nativeProxyEndpoint(name: String): String
     private external fun nativeProxyDelay(name: String, url: String, timeoutMs: Int): String
-    private external fun nativeValidateDns(dnsYaml: String): String
     private external fun nativeGroupOrder(): String
     private external fun nativeRules(): String
     private external fun nativeRuntimeInfo(): String
