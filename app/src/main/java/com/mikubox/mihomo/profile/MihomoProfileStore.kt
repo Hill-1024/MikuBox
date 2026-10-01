@@ -133,9 +133,11 @@ object MihomoProfileStore {
 
     /** Removing a group preserves profiles, selection and subscription settings atomically. */
     fun deleteGroup(context: Context, groupId: String) = synchronized(this) {
-        require(groupId != com.miku.ray.AppConfig.DEFAULT_SUBSCRIPTION_ID) { "默认配置组不能删除" }
+        require(groupId != com.miku.ray.AppConfig.DEFAULT_SUBSCRIPTION_ID) {
+            context.getString(R.string.mihomo_group_default_undeletable)
+        }
         val groups = ProfileGroups.list(context)
-        require(groups.any { it.id == groupId }) { "配置组不存在" }
+        require(groups.any { it.id == groupId }) { context.getString(R.string.mihomo_group_missing) }
         val remaining = JSONArray().also { array ->
             groups.filter { it.id != groupId && it.id != com.miku.ray.AppConfig.DEFAULT_SUBSCRIPTION_ID }
                 .forEach { array.put(JSONObject().put("id", it.id).put("name", it.name)) }

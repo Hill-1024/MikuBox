@@ -31,20 +31,21 @@ class RoutingSettingActivity : BaseActivity() {
         }
         root.addView(ScrollView(this).apply { addView(content) }, LinearLayout.LayoutParams(-1, 0, 1f))
         setContentView(root)
-        setupToolbar(toolbar, showHomeAsUp = true, title = "路由设置")
+        setupToolbar(toolbar, showHomeAsUp = true, title = getString(com.miku.ray.R.string.mihomo_routing_title))
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
             val bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
             insets
         }
         content.addView(MaterialTextView(this).apply {
-            text = "在规则模式下，按配置文件、策略控制分流。关闭的规则不会参与匹配；无匹配规则时直连。修改在下次连接时生效，也可立即重新连接。"
+            text = getString(com.miku.ray.R.string.mihomo_routing_description)
         })
         content.addView(MaterialButton(this).apply {
-            text = "应用到当前连接"
+            text = getString(com.miku.ray.R.string.mihomo_routing_apply_now)
             setOnClickListener {
-                val message = if (!MikuCoreBridge.isRunning()) "已保存，下次连接生效"
-                    else if (MikuCoreBridge.restart()) "正在重新连接" else "无法重新连接，请手动重试"
+                val message = if (!MikuCoreBridge.isRunning()) getString(com.miku.ray.R.string.mihomo_routing_saved_next_connect)
+                    else if (MikuCoreBridge.restart()) getString(com.miku.ray.R.string.mihomo_routing_reconnecting)
+                    else getString(com.miku.ray.R.string.mihomo_routing_reconnect_failed)
                 Toast.makeText(this@RoutingSettingActivity, message, Toast.LENGTH_SHORT).show()
             }
         })
@@ -53,7 +54,9 @@ class RoutingSettingActivity : BaseActivity() {
             val parsed = withContext(Dispatchers.IO) {
                 store.list().map { profile -> profile to runCatching { ConfigDocument.rules(ConfigDocument.parse(profile.config)) } }
             }
-            if (parsed.isEmpty()) content.addView(MaterialTextView(this@RoutingSettingActivity).apply { text = "暂无配置，请先导入配置或订阅。" })
+            if (parsed.isEmpty()) content.addView(MaterialTextView(this@RoutingSettingActivity).apply {
+                text = getString(com.miku.ray.R.string.mihomo_routing_empty)
+            })
             parsed.forEach { (profile, rules) ->
                 val section = LinearLayout(this@RoutingSettingActivity).apply { orientation = LinearLayout.VERTICAL }
                 val fileSwitch = MaterialSwitch(this@RoutingSettingActivity).apply { text = profile.name; isChecked = store.routingEnabled(profile.id) }
@@ -63,17 +66,25 @@ class RoutingSettingActivity : BaseActivity() {
                     val disabled = store.disabledPolicies(profile.id)
                     entries.groupBy(ConfigDocument::policy).forEach { (policy, matching) ->
                         section.addView(MaterialSwitch(this@RoutingSettingActivity).apply {
-                            text = "$policy · ${matching.size} 条规则"
+                            // The count is a plurals so word order survives
+                            // translation (Russian needs a different form).
+                            text = "$policy · " + resources.getQuantityString(
+                                com.miku.ray.R.plurals.mihomo_routing_rule_count, matching.size, matching.size,
+                            )
                             setPadding((24 * resources.displayMetrics.density).toInt(), 0, 0, 0)
                             isChecked = policy !in disabled
                             isEnabled = fileSwitch.isChecked
                             setOnCheckedChangeListener { _, checked -> store.setPolicyEnabled(profile.id, policy, checked) }
                         })
                     }
-                    if (entries.isEmpty()) section.addView(MaterialTextView(this@RoutingSettingActivity).apply { text = "此文件没有 rules 分流规则" })
+                    if (entries.isEmpty()) section.addView(MaterialTextView(this@RoutingSettingActivity).apply {
+                        text = getString(com.miku.ray.R.string.mihomo_routing_no_rules)
+                    })
                 }.onFailure { error ->
                     fileSwitch.isEnabled = false
-                    section.addView(MaterialTextView(this@RoutingSettingActivity).apply { text = "无法解析：${error.message}" })
+                    section.addView(MaterialTextView(this@RoutingSettingActivity).apply {
+                        text = getString(com.miku.ray.R.string.mihomo_routing_parse_failed, error.message.orEmpty())
+                    })
                 }
                 fileSwitch.setOnCheckedChangeListener { _, checked ->
                     store.setRoutingEnabled(profile.id, checked)
