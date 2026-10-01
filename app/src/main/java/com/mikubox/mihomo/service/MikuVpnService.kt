@@ -62,7 +62,6 @@ class MikuVpnService : VpnService(), ServiceControl {
     /** Core startup (config parse + GeoSite loads) can take seconds; keep it off the main thread. */
     private val startExecutor = CoreServiceRuntime.executor
     private val generation = java.util.concurrent.atomic.AtomicInteger()
-    private var starting = false
 
     /**
      * Set for the whole teardown, cleared when the next start begins. Stop
@@ -191,6 +190,11 @@ class MikuVpnService : VpnService(), ServiceControl {
         LogUtil.i(message = "service command action=${intent?.action} startId=$startId")
         val recovery = intent == null || intent.action == vpnAction(packageName, ACTION_RECOVER)
         if (recovery && (!TunnelGuard.isExpected(this) || TunnelGuard.recoveryPaused(this))) {
+            // Recovery reaches this service through startForegroundService, so
+            // the platform contract requires startForeground before this service
+            // may stop — returning without it is exactly the "did not call
+            // startForeground" watchdog crash. Promote first, then tear down.
+            startForegroundNotification()
             stopVpn()
             return START_NOT_STICKY
         }
@@ -271,6 +275,14 @@ class MikuVpnService : VpnService(), ServiceControl {
             // A tunnel is still registered: either it already serves this request,
             // or a teardown that was asked for a moment ago is queued behind it.
             // Replay the request after that queue drained instead of dropping it.
+            //
+            // This return must not outrun the startForegroundService contract
+            // (recovery and sticky starts arrive that way): promote — or, when
+            // the tunnel is already up, merely refresh — the notification before
+            // deferring, or the watchdog fires if the queued teardown outlasts
+            // its window. A false return is only logged by the helper: the
+            // request is still replayed below, and stopping here would drop it.
+            startForegroundNotification()
             if (startRequested && !startReplayQueued) {
                 LogUtil.i(message = "start deferred, tunnel still registered (running=$running)")
                 startReplayQueued = true
@@ -286,13 +298,21 @@ class MikuVpnService : VpnService(), ServiceControl {
         startRequested = false
         starting = true
         stopping = false
+        // A fresh start re-reads every setting (below, on the executor), so any
+        // restart queued by a previous session is obsolete by definition.
+        VpnController.clearPendingRestart()
         ConnectionStatus.update(this, ConnectionStatus.Phase.CONNECTING)
         val request = generation.incrementAndGet()
         MikuProxyService.stop(this)
         lastTunError = null
         // The foreground notification must appear promptly; the heavy work runs
         // after it. Never establish a tunnel without foreground protection.
-        if (!startForegroundNotification()) {
+        if (!startForegroundNotification() && !startForegroundNotification()) {
+            // The second call is a retry for transient failures (channel or
+            // notification build). A platform that refuses foreground promotion
+            // outright — a background start without an exemption — rejects both,
+            // and the FGS start-timeout may still fire; that residual window is
+            // a platform limit this retry narrows but cannot close.
             TunnelGuard.failed(this)
             stopVpn()
             return
@@ -377,6 +397,9 @@ class MikuVpnService : VpnService(), ServiceControl {
                     // The vendored screens hear about the tunnel the same way they
                     // used to hear about MikuRay's own service.
                     CoreServiceManager.announceTunnelStarted(this@MikuVpnService)
+                    // A settings change that landed while this tunnel was
+                    // connecting was queued, not dropped — apply it now.
+                    VpnController.onTunnelConnected(this@MikuVpnService)
                     TrafficController.start()
                     // Fresh baselines for the notification's speed line, and the
                     // first beat lands immediately so the readout is not blank.
@@ -645,6 +668,10 @@ class MikuVpnService : VpnService(), ServiceControl {
         if (stopping) return
         stopping = true
         LogUtil.i(message = "stop requested")
+        // The tunnel is going away: a restart request that was waiting for the
+        // connect to finish must not resurrect it (the debounce callback's own
+        // running check backs this up).
+        VpnController.clearPendingRestart()
         TrafficController.stop()
         // The probe scope belongs to this service instance alone: cancelled
         // here, the disconnected process holds nothing and stays free for the
@@ -894,6 +921,16 @@ class MikuVpnService : VpnService(), ServiceControl {
         /** Coarse running flag for the UI/controller to reflect state. */
         @Volatile
         var running: Boolean = false
+            private set
+
+        /**
+         * True while a start is being prepared — the CONNECTING phase the UI
+         * shows. Lives beside [running] so [VpnController] can tell a restart
+         * request made mid-connect (must be queued and replayed) from one made
+         * while disconnected (dropped; the next start re-reads everything).
+         */
+        @Volatile
+        var starting: Boolean = false
             private set
 
         /** Wall-clock start of the current session, 0 while stopped. */

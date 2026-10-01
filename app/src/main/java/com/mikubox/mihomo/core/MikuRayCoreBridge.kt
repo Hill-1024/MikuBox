@@ -62,7 +62,11 @@ object MikuRayCoreBridge : MikuCoreBridge.Impl {
 
     override fun restart(): Boolean {
         val context = MikuRayBridgeContext.application ?: return false
-        if (!VpnController.isRunning) return false
+        // Fully disconnected: nothing to reload, and the next start re-reads the
+        // settings anyway. CONNECTING is accepted — VpnController queues the
+        // reload and the service replays it once the tunnel is up, so the
+        // routing screen's "apply now" behaves like the settings pages'.
+        if (!VpnController.isRunning && !com.mikubox.mihomo.service.MikuVpnService.starting) return false
         // Reloading re-reads the selected profile, so the row the user picked on
         // MikuRay's list has to reach MikuBox's store first — without this the
         // tunnel restarts from the previous configuration and the switch looks

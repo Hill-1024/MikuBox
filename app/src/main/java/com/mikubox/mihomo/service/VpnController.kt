@@ -58,7 +58,16 @@ object VpnController {
      * disconnect instead of being resurrected by the stale request.
      */
     fun restart(context: Context) {
-        if (!MikuVpnService.running) return
+        if (!MikuVpnService.running) {
+            // The start task reads the settings the moment it runs, so a change
+            // made while the tunnel is connecting would silently apply to
+            // nothing. Queue it: the service calls [onTunnelConnected] once the
+            // tunnel is up and the request is replayed. While fully
+            // disconnected nothing is queued — the next start re-reads every
+            // setting anyway, so a replay would only bounce the tunnel.
+            if (MikuVpnService.starting) pendingRestartWhenConnected = true
+            return
+        }
         val app = context.applicationContext
         pendingRestart?.let(handler::removeCallbacks)
         val request = Runnable {
@@ -94,8 +103,28 @@ object VpnController {
         }
     }
 
+    /**
+     * The service reached CONNECTED: replay a restart request that landed
+     * while the tunnel was connecting. [MikuVpnService.starting] is re-checked
+     * inside [restart] via the debounce callback, so a disconnect that raced
+     * the replay still stays a disconnect.
+     */
+    fun onTunnelConnected(context: Context) {
+        if (!pendingRestartWhenConnected) return
+        pendingRestartWhenConnected = false
+        restart(context)
+    }
+
+    /** A new start or a teardown invalidates a queued mid-connect restart. */
+    fun clearPendingRestart() {
+        pendingRestartWhenConnected = false
+    }
+
     private val handler = Handler(Looper.getMainLooper())
     private var pendingRestart: Runnable? = null
+
+    @Volatile
+    private var pendingRestartWhenConnected = false
 
     private const val RESTART_DEBOUNCE_MS = 1200L
 }
