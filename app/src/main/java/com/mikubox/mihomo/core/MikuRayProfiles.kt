@@ -32,7 +32,10 @@ object MikuRayProfiles : MikuProfiles.Impl {
         }
 
     override fun save(id: String?, name: String, content: String): String {
-        val config = MihomoSubscriptionDecoder.toMihomoConfig(context, content)
+        // Editor content is a YAML document, not a subscription payload: a
+        // syntax error must surface as a YAML parse failure, not as the link
+        // fallback's "No Mihomo-compatible proxy links".
+        val config = MihomoSubscriptionDecoder.toMihomoConfig(context, content, validateYamlSyntax = true)
         com.miku.ray.ui.server.ConfigDocument.parse(config).let { com.miku.ray.ui.server.ConfigDocument.rules(it) }
         val previous = id?.takeIf { it.isNotBlank() }?.let { wanted ->
             requireNotNull(MihomoProfileStore.profiles(context).firstOrNull { it.id == wanted })
