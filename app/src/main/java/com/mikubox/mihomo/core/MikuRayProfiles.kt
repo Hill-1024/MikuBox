@@ -21,7 +21,11 @@ object MikuRayProfiles : MikuProfiles.Impl {
         com.miku.ray.handler.SettingsChangeManager.makeSetupGroupTab()
     }
     override fun moveToGroup(id: String, groupId: String) {
-        require(groups().any { it.id == groupId }) { "Unknown group" }
+        require(groups().any { it.id == groupId }) {
+            // Shown verbatim by SubEditActivity's save error field, so it must
+            // localize like the rest of the group messages.
+            context.getString(com.miku.ray.R.string.mihomo_group_missing)
+        }
         val profile = requireNotNull(MihomoProfileStore.profiles(context).firstOrNull { it.id == id })
         MihomoProfileStore.update(context, profile.copy(groupId = groupId))
         sync()

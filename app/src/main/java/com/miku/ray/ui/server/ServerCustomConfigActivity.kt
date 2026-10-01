@@ -88,7 +88,7 @@ class ServerCustomConfigActivity : BaseActivity() {
                 binding.rawEditorCard.visibility = android.view.View.VISIBLE
                 visualMode = false
                 binding.editorMode.check(R.id.mode_yaml)
-                snackbarError("无法解析配置，请在原始 YAML 中修正：${error.message}", title = getString(R.string.title_alerter_error))
+                snackbarError(getString(R.string.mihomo_config_parse_failed, error.message.orEmpty()), title = getString(R.string.title_alerter_error))
                 return
             }
         }

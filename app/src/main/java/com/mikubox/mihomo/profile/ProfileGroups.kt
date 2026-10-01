@@ -19,8 +19,10 @@ object ProfileGroups {
 
     fun create(context: Context, name: String): MikuProfiles.Group = synchronized(MihomoProfileStore) {
         val trimmed = name.trim()
-        require(trimmed.isNotEmpty()) { "请输入组名" }
-        require(list(context).none { it.name.equals(trimmed, ignoreCase = true) }) { "组名已存在" }
+        require(trimmed.isNotEmpty()) { context.getString(com.miku.ray.R.string.mihomo_group_name_required) }
+        require(list(context).none { it.name.equals(trimmed, ignoreCase = true) }) {
+            context.getString(com.miku.ray.R.string.mihomo_group_name_exists)
+        }
         val group = MikuProfiles.Group(UUID.randomUUID().toString(), trimmed)
         val saved = JSONArray(prefs(context).getString("groups", "[]"))
         saved.put(JSONObject().put("id", group.id).put("name", group.name))
