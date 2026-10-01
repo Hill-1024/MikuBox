@@ -347,6 +347,12 @@ object Utils {
         return false
     }
 
+    /**
+     * Flags for receivers that genuinely must be reachable from other apps.
+     * Same-app channels must register with [ContextCompat.RECEIVER_NOT_EXPORTED]
+     * instead: on API 33+ this helper returns RECEIVER_EXPORTED, which exposes
+     * the receiver to every installed application.
+     */
     fun receiverFlags(): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         ContextCompat.RECEIVER_EXPORTED
     } else {

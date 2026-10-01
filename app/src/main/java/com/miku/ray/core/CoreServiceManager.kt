@@ -215,7 +215,12 @@ object CoreServiceManager {
                 service,
                 controlReceiver,
                 IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE),
-                Utils.receiverFlags(),
+                // Same-app delivery only: the senders are sendMsg2Service, the
+                // notification's stop button and the widget — all in this
+                // package. receiverFlags() returns RECEIVER_EXPORTED on API
+                // 33+, which let any third-party app broadcast MSG_STATE_STOP
+                // (key=4) and silently tear the tunnel down.
+                ContextCompat.RECEIVER_NOT_EXPORTED,
             )
             receiverRegistered = true
         }.onFailure { LogUtil.e(AppConfig.TAG, "failed to register the control receiver", it) }
