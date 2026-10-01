@@ -28,6 +28,11 @@ jobs:
           submodules: recursive
           fetch-depth: 1
 
+      # Fails the build when a locale falls behind the base resources again
+      # (in/ru were 301/288 keys behind before the 2026-10-02 backfill).
+      - name: Check locale key coverage
+        run: python3 tools/locale-coverage.py --ci
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
