@@ -2927,30 +2927,17 @@
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
             </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="file" />
-                <data android:host="*" />
-                <data android:pathPattern=".*\\.mikutheme" />
-                <data android:pathPattern=".*\\.mikubackup" />
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="content" />
-                <data android:mimeType="application/octet-stream" />
-                <data android:mimeType="application/vnd.mikuray.theme+json" />
-                <data android:mimeType="application/vnd.mikuray.backup+json" />
-            </intent-filter>
+            <!-- MikuBox deviation from upstream MikuRay (2026-10-02): the two
+                 VIEW intent-filters for .mikutheme/.mikubackup files and the
+                 theme/backup MIME types were removed. MikuBox's app manifest
+                 forces this activity to exported=false, so those filters were
+                 unreachable dead config in release builds (any external
+                 "Open with" entry died at resolution). Note the QS tile
+                 settings filter above is equally unreachable while the
+                 activity stays non-exported — SystemUI cannot resolve it; a
+                 dedicated exported relay activity is the fix if either entry
+                 is ever wanted. Re-syncing this file from upstream restores
+                 the removed filters. -->
 
             <meta-data
                 android:name="android.app.shortcuts"

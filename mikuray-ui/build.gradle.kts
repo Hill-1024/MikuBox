@@ -37,12 +37,17 @@ android {
 
         // MikuRay's sources read these from its module's BuildConfig and R.
         // A library has no applicationId or version of its own, so the values
-        // mirror the app module's — the about screen prints them. They must
-        // honour the same -PversionNameOverride/-PversionCodeOverride the app
-        // module reads, or a tagged build shows the checked-in version while
-        // reporting itself as the tag.
-        val bannerVersionName = (findProperty("versionNameOverride") as? String?)?.takeIf { it.isNotBlank() } ?: "0.2.2"
-        val bannerVersionCode = (findProperty("versionCodeOverride") as? String?)?.toIntOrNull() ?: 202
+        // mirror the app module's — the about screen prints them. Both the tag
+        // overrides and the fallback come from the same properties the app
+        // module reads (-PversionNameOverride/-PversionCodeOverride, then
+        // appVersionName/appVersionCode in gradle.properties), so this module
+        // can no longer report a version the installed package does not carry.
+        val bannerVersionName = (findProperty("versionNameOverride") as? String?)?.takeIf { it.isNotBlank() }
+            ?: (findProperty("appVersionName") as? String?)?.takeIf { it.isNotBlank() }
+            ?: error("Set appVersionName in gradle.properties or pass -PversionNameOverride")
+        val bannerVersionCode = (findProperty("versionCodeOverride") as? String?)?.toIntOrNull()
+            ?: (findProperty("appVersionCode") as? String?)?.toIntOrNull()
+            ?: error("Set appVersionCode in gradle.properties or pass -PversionCodeOverride")
         buildConfigField("String", "APPLICATION_ID", "\"com.mikubox.mihomo\"")
         buildConfigField("String", "VERSION_NAME", "\"$bannerVersionName\"")
         buildConfigField("int", "VERSION_CODE", "$bannerVersionCode")

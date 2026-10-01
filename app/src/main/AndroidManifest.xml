@@ -48,8 +48,10 @@
             android:exported="false" />
 
         <!-- Ported MikuRay home screen, reached from the splash. The library
-             manifest exports it for its launcher aliases; this app launches it
-             only from its own splash, so the merged value must stay false. -->
+             manifest exports it for its own QS-tile/VIEW intent-filters (the
+             launcher aliases all target WelcomeActivity, not this activity),
+             and none of those entries are meant to launch the home screen from
+             outside, so the merged value must stay false. -->
         <activity
             android:name="com.miku.ray.ui.main.MainActivity"
             android:exported="false"
