@@ -21,6 +21,10 @@ object MikuSubscriptions {
         val autoUpdate: Boolean,
         val intervalMinutes: Long,
         val throughProxy: Boolean,
+        // MikuBox addition (2026-10-02, deliberate deviation from upstream
+        // MikuRay): the app-side profile store carries this flag and the
+        // subscription editor exposes it; upstream re-sync would drop it.
+        val updateWhenConnectedOnly: Boolean = false,
         val lastUpdatedMillis: Long,
     )
 
@@ -38,6 +42,8 @@ object MikuSubscriptions {
             autoUpdate: Boolean,
             intervalMinutes: Long,
             throughProxy: Boolean,
+            // MikuBox addition, same deviation note as [Subscription].
+            updateWhenConnectedOnly: Boolean = false,
         ): String?
 
         fun remove(id: String)
@@ -55,6 +61,7 @@ object MikuSubscriptions {
             autoUpdate: Boolean,
             intervalMinutes: Long,
             throughProxy: Boolean,
+            updateWhenConnectedOnly: Boolean,
         ): String? = null
 
         override fun remove(id: String) = Unit
@@ -77,16 +84,20 @@ object MikuSubscriptions {
         autoUpdate: Boolean,
         intervalMinutes: Long,
         throughProxy: Boolean,
-    ): String? = impl.upsert(id, name, url, autoUpdate, intervalMinutes, throughProxy)
+        updateWhenConnectedOnly: Boolean = false,
+    ): String? = impl.upsert(id, name, url, autoUpdate, intervalMinutes, throughProxy, updateWhenConnectedOnly)
 
     /** Saving a new/empty/repointed subscription includes its first download. */
     suspend fun saveAndRefresh(
         id: String?, name: String, url: String, autoUpdate: Boolean,
         intervalMinutes: Long, throughProxy: Boolean,
+        updateWhenConnectedOnly: Boolean = false,
         onSaved: (String) -> Unit = {},
     ): Boolean {
         val previous = id?.let { wanted -> list().firstOrNull { it.id == wanted } }
-        val saved = requireNotNull(upsert(id, name, url, autoUpdate, intervalMinutes, throughProxy))
+        val saved = requireNotNull(
+            upsert(id, name, url, autoUpdate, intervalMinutes, throughProxy, updateWhenConnectedOnly)
+        )
         // Give the editor its stable ID before starting cancellable network work.
         onSaved(saved)
         val needsFetch = previous == null || previous.lastUpdatedMillis == 0L || previous.url != url

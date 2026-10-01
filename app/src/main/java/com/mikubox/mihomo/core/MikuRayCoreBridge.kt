@@ -163,6 +163,7 @@ object MikuRaySubscriptions : com.miku.ray.MikuSubscriptions.Impl {
                     autoUpdate = profile.updateIntervalMinutes > 0,
                     intervalMinutes = profile.updateIntervalMinutes,
                     throughProxy = profile.updateThroughProxy,
+                    updateWhenConnectedOnly = profile.updateWhenConnectedOnly,
                     lastUpdatedMillis = profile.updatedAtMillis,
                 )
             }
@@ -175,6 +176,7 @@ object MikuRaySubscriptions : com.miku.ray.MikuSubscriptions.Impl {
         autoUpdate: Boolean,
         intervalMinutes: Long,
         throughProxy: Boolean,
+        updateWhenConnectedOnly: Boolean,
     ): String? {
         val context = MikuRayBridgeContext.application ?: return null
         // "Auto update off" is stored as no interval: the scheduler keys off it.
@@ -187,6 +189,7 @@ object MikuRaySubscriptions : com.miku.ray.MikuSubscriptions.Impl {
                     name = name,
                     url = url,
                     intervalMinutes = minutes,
+                    updateWhenConnectedOnly = updateWhenConnectedOnly,
                     updateThroughProxy = throughProxy,
                 ).id
             }.getOrNull()
@@ -201,6 +204,7 @@ object MikuRaySubscriptions : com.miku.ray.MikuSubscriptions.Impl {
                     updatedAtMillis = if (existing.subscriptionUrl == url) existing.updatedAtMillis else 0L,
                     updateIntervalMinutes = minutes,
                     updateThroughProxy = throughProxy,
+                    updateWhenConnectedOnly = updateWhenConnectedOnly,
                 ),
             )
             MihomoSubscriptionUpdater.reconfigure(context)

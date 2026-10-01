@@ -44,6 +44,7 @@ class SubEditActivity : HelperBaseActivity() {
     private lateinit var interval: AppCompatEditText
     private lateinit var autoUpdate: MaterialAutoCompleteTextView
     private lateinit var throughProxy: MaterialAutoCompleteTextView
+    private lateinit var updateWhenConnectedOnly: MaterialAutoCompleteTextView
 
     private val boolEntries: Array<out String> by lazy { resources.getStringArray(R.array.bool_dropdown_entries) }
     private val boolValues: Array<out String> by lazy { resources.getStringArray(R.array.bool_dropdown_values) }
@@ -67,6 +68,7 @@ class SubEditActivity : HelperBaseActivity() {
         interval = findViewById(R.id.et_update_interval)
         autoUpdate = findViewById(R.id.chk_enable)
         throughProxy = findViewById(R.id.auto_update_check)
+        updateWhenConnectedOnly = findViewById(R.id.update_when_connected_only)
 
         val entries = ArrayAdapter(this, android.R.layout.simple_list_item_1, boolEntries)
         autoUpdate.setAdapter(entries)
@@ -79,6 +81,14 @@ class SubEditActivity : HelperBaseActivity() {
         labelOf(throughProxy)?.apply {
             hint = getString(R.string.subscription_update_through_proxy)
             helperText = getString(R.string.subscription_update_through_proxy_summary)
+        }
+        updateWhenConnectedOnly.setAdapter(entries)
+        // The row itself is a MikuBox addition to the vendored layout (see the
+        // layout's deviation note); its wording is app-specific for the same
+        // reason as the row above.
+        labelOf(updateWhenConnectedOnly)?.apply {
+            hint = getString(R.string.mihomo_update_when_connected_only)
+            helperText = getString(R.string.mihomo_update_when_connected_only_summary)
         }
 
         hide(
@@ -101,7 +111,7 @@ class SubEditActivity : HelperBaseActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menu.add(0, 0x6d02, 0, "配置组")
+        menu.add(0, 0x6d02, 0, getString(R.string.mihomo_group_choose_title))
         menu.add(Menu.NONE, MENU_SAVE, Menu.NONE, android.R.string.ok)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
         return true
@@ -125,6 +135,7 @@ class SubEditActivity : HelperBaseActivity() {
             ?: run {
                 autoUpdate.setText(entryForBool(false), false)
                 throughProxy.setText(entryForBool(false), false)
+                updateWhenConnectedOnly.setText(entryForBool(false), false)
                 return
             }
         name.setText(existing.name)
@@ -132,6 +143,7 @@ class SubEditActivity : HelperBaseActivity() {
         interval.setText(existing.intervalMinutes.toString())
         autoUpdate.setText(entryForBool(existing.autoUpdate), false)
         throughProxy.setText(entryForBool(existing.throughProxy), false)
+        updateWhenConnectedOnly.setText(entryForBool(existing.updateWhenConnectedOnly), false)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -153,12 +165,13 @@ class SubEditActivity : HelperBaseActivity() {
         val title = name.text?.toString()?.trim().orEmpty()
         val automatic = boolValue(autoUpdate)
         val proxy = boolValue(throughProxy)
+        val onlyWhenConnected = boolValue(updateWhenConnectedOnly)
         saving = true
         showLoading()
         lifecycleScope.launch {
             try {
                 val fetched = MikuSubscriptions.saveAndRefresh(
-                    subscriptionId, title, address, automatic, minutes, proxy,
+                    subscriptionId, title, address, automatic, minutes, proxy, onlyWhenConnected,
                     onSaved = {
                         intent.putExtra("subId", it)
                         com.miku.ray.MikuProfiles.impl?.moveToGroup(it, selectedGroup)

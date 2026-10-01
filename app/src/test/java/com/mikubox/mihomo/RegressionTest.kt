@@ -803,7 +803,8 @@ class RegressionTest {
             autoUpdate: Boolean,
             intervalMinutes: Long,
             throughProxy: Boolean,
-        ) = delegate.upsert(id, name, url, autoUpdate, intervalMinutes, throughProxy)
+            updateWhenConnectedOnly: Boolean,
+        ) = delegate.upsert(id, name, url, autoUpdate, intervalMinutes, throughProxy, updateWhenConnectedOnly)
 
         override fun remove(id: String) = delegate.remove(id)
 

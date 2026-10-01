@@ -12,13 +12,30 @@ import java.nio.charset.StandardCharsets
 object MihomoSubscriptionDecoder {
 
     private const val PROXY_GROUP = "PROXY"
-    fun toMihomoConfig(context: Context, source: String): String {
+
+    /**
+     * Converts [source] into a Mihomo configuration.
+     *
+     * [validateYamlSyntax] is for the profile editor, whose input is expected to
+     * be a YAML document: when the text fails even snakeyaml, the link fallback
+     * below would only mask the real problem behind "No Mihomo-compatible proxy
+     * links", so the parser's own message (with its line information) is raised
+     * instead. Subscription import/refresh callers keep the default: a link
+     * list is a legal payload there and must keep parsing as one.
+     */
+    fun toMihomoConfig(context: Context, source: String, validateYamlSyntax: Boolean = false): String {
         val text = source.trim().removePrefix("\uFEFF")
         if (isMihomoConfig(text)) return text
 
         // Some providers Base64-encode the whole Mihomo/Clash YAML, not a link list.
         val decoded = if (text.contains("://")) text else decodeBase64Subscription(text)
         if (isMihomoConfig(decoded)) return decoded
+
+        if (validateYamlSyntax) {
+            yamlParseFailure(text)?.let { message ->
+                error(context.getString(com.miku.ray.R.string.mihomo_yaml_parse_failed, message))
+            }
+        }
 
         val links = decoded
             .lineSequence()
@@ -52,6 +69,18 @@ object MihomoSubscriptionDecoder {
         return document.keys.any { it in setOf("proxies", "proxy-providers", "proxy-groups",
             "rules", "rule-providers", "dns", "mixed-port", "mode") }
     }
+
+    /**
+     * Strict snakeyaml pass for the editor path: null when the text parses at
+     * all (valid YAML that simply is not a Mihomo config keeps falling through
+     * to link parsing), otherwise the parser's message. Line information comes
+     * from snakeyaml itself and is authoritative for this check only.
+     */
+    private fun yamlParseFailure(text: String): String? = runCatching {
+        org.yaml.snakeyaml.Yaml(org.yaml.snakeyaml.constructor.SafeConstructor(
+            org.yaml.snakeyaml.LoaderOptions())).load<Any>(text)
+        null
+    }.getOrElse { e -> e.message?.takeIf(String::isNotBlank) ?: e.javaClass.simpleName }
 
     private fun decodeBase64Subscription(text: String): String = runCatching {
         val normalized = text.replace("\\s".toRegex(), "")
