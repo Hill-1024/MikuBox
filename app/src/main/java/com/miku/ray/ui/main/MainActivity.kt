@@ -963,10 +963,14 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
             .show(supportFragmentManager, MoreMenuBottomSheet.TAG)
         }
 
-        binding.btnAddSub.contentDescription = "添加订阅或配置组"
+        binding.btnAddSub.contentDescription = getString(R.string.btn_add_sub_description)
         binding.btnAddSub.setOnClickListener {
-            MaterialAlertDialogBuilder(this).setTitle("添加")
-                .setItems(arrayOf("添加订阅", "创建配置组", "管理配置组")) { _, choice ->
+            MaterialAlertDialogBuilder(this).setTitle(R.string.menu_add_title)
+                .setItems(arrayOf(
+                    getString(R.string.menu_add_subscription),
+                    getString(R.string.mihomo_group_create_title),
+                    getString(R.string.mihomo_group_manage_title),
+                )) { _, choice ->
                     if (choice == 0) requestActivityLauncher.launch(Intent(this, SubEditActivity::class.java).putExtra("groupId", mainViewModel.subscriptionId))
                     else if (choice == 1) com.miku.ray.ui.server.ProfileGroupPicker.create(this) {
                         SettingsChangeManager.makeSetupGroupTab()
@@ -1293,6 +1297,11 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
 
                 launch {
                     mainViewModel.ipResultText.collect { ip ->
+                        // A probe that answers after the tunnel went down must
+                        // not repaint the exit line as if it were current —
+                        // the disconnected screen shows the unknown placeholder
+                        // until the next connection probes again.
+                        if (!mainViewModel.isRunning.value) return@collect
                         lastIpStateText = if (ip.isEmpty()) {
                             getString(R.string.ip_unknown)
                         } else {
@@ -1630,7 +1639,16 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
 
     private fun importManually(createConfigType: Int) {
         if (com.miku.ray.MikuProfiles.impl != null) {
-            startActivity(Intent(this, com.miku.ray.ui.server.ServerCustomConfigActivity::class.java).putExtra("groupId", mainViewModel.subscriptionId))
+            // MikuProfiles is installed unconditionally at startup, so every
+            // card below lands here. Forward the tapped protocol so the
+            // config editor can seed a matching template — otherwise the
+            // per-protocol cards all open the same blank editor and the
+            // labels promise forms that never appear.
+            startActivity(
+                Intent(this, com.miku.ray.ui.server.ServerCustomConfigActivity::class.java)
+                .putExtra("groupId", mainViewModel.subscriptionId)
+                .putExtra("createConfigType", createConfigType)
+            )
             return
         }
         if (createConfigType == EConfigType.POLICYGROUP.value) {

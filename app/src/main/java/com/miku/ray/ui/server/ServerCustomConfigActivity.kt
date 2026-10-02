@@ -40,6 +40,9 @@ class ServerCustomConfigActivity : BaseActivity() {
         && editGuid == MmkvManager.getSelectServer()
     }
 
+    /** The protocol card this editor was opened from, when it was a card. */
+    private val createConfigType by lazy { intent.getIntExtra("createConfigType", -1) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -47,8 +50,16 @@ class ServerCustomConfigActivity : BaseActivity() {
 
         binding.serverScrollContent.applyEdgeToEdgeListInsets()
 
+        // The per-protocol cards promise a per-protocol form; the honest title
+        // names the protocol instead of the generic editor when one was tapped.
+        val protocol = EConfigType.fromInt(createConfigType)
+        val title = when {
+            protocol != null && protocol != EConfigType.CUSTOM -> "${getString(R.string.profile_editor_title)} · ${protocol.name}"
+            com.miku.ray.MikuProfiles.impl != null -> getString(R.string.profile_editor_title)
+            else -> EConfigType.CUSTOM.toString()
+        }
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
-        setupToolbar(toolbar, showHomeAsUp = true, title = if (com.miku.ray.MikuProfiles.impl != null) getString(R.string.profile_editor_title) else EConfigType.CUSTOM.toString(), subtitle = getString(R.string.subtitle_server_config))
+        setupToolbar(toolbar, showHomeAsUp = true, title = title, subtitle = getString(R.string.subtitle_server_config))
 
         if (!Utils.getDarkModeStatus(this)) {
             binding.editor.colorScheme = EditorTheme.INTELLIJ_LIGHT
@@ -60,7 +71,7 @@ class ServerCustomConfigActivity : BaseActivity() {
             bindingServer(config)
         } else {
             clearServer()
-            binding.editor.setTextContent(Utils.getEditable("mode: rule\nrules:\n  - MATCH,DIRECT\n"))
+            binding.editor.setTextContent(Utils.getEditable(templateFor(protocol) ?: DEFAULT_TEMPLATE))
         }
         savedInstanceState?.getString("yamlDraft")?.let { binding.editor.setTextContent(Utils.getEditable(it)) }
         savedInstanceState?.getString("nameDraft")?.let { binding.etRemarks.setText(it) }
@@ -219,6 +230,155 @@ class ServerCustomConfigActivity : BaseActivity() {
         }
 
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private companion object {
+        const val DEFAULT_TEMPLATE = "mode: rule\nrules:\n  - MATCH,DIRECT\n"
+
+        /**
+         * Per-protocol seeds for the add-config cards. Each card used to open
+         * the same blank editor, so the label promised a form that never
+         * appeared; now the editor opens on a valid Mihomo document shaped
+         * for the tapped protocol and the user fills in the server specifics.
+         */
+        fun templateFor(type: EConfigType?): String? = when (type) {
+            EConfigType.VMESS -> """
+                # VMess outbound — fill in server, port and uuid.
+                proxies:
+                  - name: vmess
+                    type: vmess
+                    server: example.com
+                    port: 443
+                    uuid: 00000000-0000-0000-0000-000000000000
+                    alterId: 0
+                    cipher: auto
+                    tls: true
+                    servername: example.com
+                mode: rule
+                rules:
+                  - MATCH,DIRECT
+            """.trimIndent() + "\n"
+            EConfigType.VLESS -> """
+                # VLESS outbound — fill in server, port and uuid.
+                proxies:
+                  - name: vless
+                    type: vless
+                    server: example.com
+                    port: 443
+                    uuid: 00000000-0000-0000-0000-000000000000
+                    tls: true
+                    servername: example.com
+                    flow: xtls-rprx-vision
+                mode: rule
+                rules:
+                  - MATCH,DIRECT
+            """.trimIndent() + "\n"
+            EConfigType.TROJAN -> """
+                # Trojan outbound — fill in server, port and password.
+                proxies:
+                  - name: trojan
+                    type: trojan
+                    server: example.com
+                    port: 443
+                    password: password
+                    sni: example.com
+                mode: rule
+                rules:
+                  - MATCH,DIRECT
+            """.trimIndent() + "\n"
+            EConfigType.SHADOWSOCKS -> """
+                # Shadowsocks outbound — fill in server, port, cipher and password.
+                proxies:
+                  - name: shadowsocks
+                    type: ss
+                    server: example.com
+                    port: 8388
+                    cipher: aes-256-gcm
+                    password: password
+                mode: rule
+                rules:
+                  - MATCH,DIRECT
+            """.trimIndent() + "\n"
+            EConfigType.SOCKS -> """
+                # SOCKS5 outbound — fill in server and port; auth is optional.
+                proxies:
+                  - name: socks
+                    type: socks5
+                    server: example.com
+                    port: 1080
+                    # username: user
+                    # password: pass
+                mode: rule
+                rules:
+                  - MATCH,DIRECT
+            """.trimIndent() + "\n"
+            EConfigType.HTTP -> """
+                # HTTP outbound — fill in server and port; auth and TLS optional.
+                proxies:
+                  - name: http
+                    type: http
+                    server: example.com
+                    port: 8080
+                    # username: user
+                    # password: pass
+                    # tls: true
+                mode: rule
+                rules:
+                  - MATCH,DIRECT
+            """.trimIndent() + "\n"
+            EConfigType.WIREGUARD -> """
+                # WireGuard outbound — fill in server, keys and the local address.
+                proxies:
+                  - name: wireguard
+                    type: wireguard
+                    server: example.com
+                    port: 51820
+                    ip: 172.16.0.2
+                    private-key: private-key
+                    public-key: peer-public-key
+                mode: rule
+                rules:
+                  - MATCH,DIRECT
+            """.trimIndent() + "\n"
+            EConfigType.HYSTERIA2 -> """
+                # Hysteria2 outbound — fill in server, port and password.
+                proxies:
+                  - name: hysteria2
+                    type: hysteria2
+                    server: example.com
+                    port: 443
+                    password: password
+                mode: rule
+                rules:
+                  - MATCH,DIRECT
+            """.trimIndent() + "\n"
+            EConfigType.POLICYGROUP -> """
+                # Proxy group — list the proxies or groups it should choose from.
+                proxies: []
+                proxy-groups:
+                  - name: my-group
+                    type: select
+                    proxies:
+                      - DIRECT
+                mode: rule
+                rules:
+                  - MATCH,my-group
+            """.trimIndent() + "\n"
+            EConfigType.PROXYCHAIN -> """
+                # Relay chain — traffic passes through each listed proxy in order.
+                proxies: []
+                proxy-groups:
+                  - name: relay-chain
+                    type: relay
+                    proxies:
+                      - first-hop
+                      - second-hop
+                mode: rule
+                rules:
+                  - MATCH,relay-chain
+            """.trimIndent() + "\n"
+            else -> null
+        }
     }
 
 }

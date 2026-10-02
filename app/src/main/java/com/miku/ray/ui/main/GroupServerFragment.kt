@@ -95,6 +95,17 @@ class GroupServerFragment : BaseFragment<FragmentGroupServerBinding>() {
             }
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // A connect/disconnect flips how the rows render their stored
+                // delay/traffic readings (dimmed while the tunnel is down, so
+                // a stale number never reads as current) — repaint on the flip.
+                mainViewModel.isRunning.collect {
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        }
+
         val animator = binding.recyclerView.itemAnimator
         if (animator is SimpleItemAnimator) {
             animator.supportsChangeAnimations = false
