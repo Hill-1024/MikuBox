@@ -143,7 +143,14 @@ class ServerVlessActivity : BaseActivity() {
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId.orEmpty()
         }
-        MmkvManager.encodeServerConfig(editGuid, config)
+        val saveError = MikuProfileFormSaver.save(this, editGuid, config)
+        if (saveError != null) {
+            snackbarError(
+                getString(R.string.mihomo_config_parse_failed, saveError),
+                title = getString(R.string.title_alerter_error)
+            )
+            return false
+        }
         toastSuccess(R.string.toast_success)
         finish()
         return true
