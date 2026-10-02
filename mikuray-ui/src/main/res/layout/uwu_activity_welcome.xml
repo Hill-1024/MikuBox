@@ -97,6 +97,9 @@
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
             android:orientation="horizontal">
+            <!-- Deviation from upstream MikuRay (F37): the NEXT buttons drop
+                 textAllCaps so NEXT/Skip read with one casing style in every
+                 locale instead of shouting next to the title-case Skip. -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/page_1button"
                 style="@style/Widget.Material3Expressive.Button"
@@ -105,7 +108,7 @@
                 android:layout_weight="1.0"
                 android:padding="16dp"
                 android:text="@string/uwu_next"
-                android:textAllCaps="true" />
+                android:textAllCaps="false" />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/page_1_skip"
                 style="@style/Widget.Material3Expressive.Button.OutlinedButton"
@@ -196,7 +199,7 @@
                 android:layout_weight="1.0"
                 android:padding="16dp"
                 android:text="@string/uwu_next"
-                android:textAllCaps="true" />
+                android:textAllCaps="false" />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/page_2_skip"
                 style="@style/Widget.Material3Expressive.Button.OutlinedButton"
@@ -286,7 +289,7 @@
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:text="@string/uwu_start"
-                android:textAllCaps="true" />
+                android:textAllCaps="false" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

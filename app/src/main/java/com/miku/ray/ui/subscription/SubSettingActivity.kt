@@ -71,7 +71,7 @@ class SubSettingActivity : HelperBaseActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.action_sub_setting, menu)
-        menu.add(0, 0x6d01, 0, "管理配置组")
+        menu.add(0, 0x6d01, 0, getString(R.string.mihomo_group_manage_title))
         // Sorting subscriptions would need an order this store does not keep.
         menu.findItem(R.id.sub_sort)?.isVisible = false
         (menu.findItem(R.id.search_view)?.actionView as? SearchView)?.setOnQueryTextListener(
@@ -133,15 +133,18 @@ class SubSettingActivity : HelperBaseActivity() {
     }
 
     private fun confirmRemove(id: String, name: String) {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.del_config_dialog_comfirm_message)
-            .setMessage(name)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                MikuSubscriptions.remove(id)
-                reload()
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
+        // F17: this screen built its own dialog with the whole warning as the
+        // TITLE, so the text was cut off at the dialog edge and the shared
+        // scrollable delete-confirm layout never reached it. Route through the
+        // shared builder: the name is the title, the warning scrolls in full.
+        com.miku.ray.util.showDeleteConfirmDialog(
+            context = this,
+            message = getString(R.string.del_config_dialog_comfirm_message),
+            titleRes = R.string.del_config_comfirm,
+        ) {
+            MikuSubscriptions.remove(id)
+            reload()
+        }
     }
 
     private fun share(url: String) {

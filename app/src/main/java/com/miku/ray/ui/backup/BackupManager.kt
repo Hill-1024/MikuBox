@@ -155,6 +155,21 @@ object BackupManager {
         }
 
         val restoreDir = File(context.cacheDir, "mikubackup_restore_${System.nanoTime()}").also { it.mkdirs() }
+        // The restore is destructive from the moment MMKV is swapped, but the
+        // native (SharedPreferences-side) backup import that follows can still
+        // fail — leaving new MMKV data under old SP data. Snapshot the current
+        // MMKV stores so that window can roll back. The native backup itself
+        // was already fully parsed above (validateBackup runs before any of
+        // this), so its own apply is the only step expected to fail here.
+        val snapshotDir = File(context.cacheDir, "mikubackup_snapshot_${System.nanoTime()}").also { it.mkdirs() }
+        // backupAllToDirectory reports the number of instances it persisted,
+        // so "taken" means at least one store made it into the snapshot.
+        val snapshotTaken: Boolean = try {
+            MMKV.backupAllToDirectory(snapshotDir.absolutePath) > 0
+        } catch (error: Throwable) {
+            LogUtil.e(AppConfig.TAG, "MMKV snapshot before restore failed; continuing without rollback", error)
+            false
+        }
         try {
             for (i in 0 until files.length()) {
                 val entry = files.optJSONObject(i) ?: continue
@@ -175,7 +190,20 @@ object BackupManager {
 
             val count = MMKV.restoreAllFromDirectory(restoreDir.absolutePath)
             if (count <= 0) return ImportResult.Error("MMKV restore produced no data.")
-            nativeBackup?.let { com.miku.ray.MikuProfiles.impl?.restoreBackup(it) }
+            try {
+                nativeBackup?.let { com.miku.ray.MikuProfiles.impl?.restoreBackup(it) }
+            } catch (error: Exception) {
+                // Put the pre-restore MMKV stores back so the failure does not
+                // leave a half-restored installation behind. The SP-side import
+                // may have partially applied — that store has no snapshot — but
+                // a restart flag still follows so the service rebuilds from a
+                // coherent MMKV state.
+                if (snapshotTaken) {
+                    runCatching { MMKV.restoreAllFromDirectory(snapshotDir.absolutePath) }
+                        .onFailure { LogUtil.e(AppConfig.TAG, "MMKV rollback after failed restore also failed", it) }
+                }
+                throw error
+            }
             SettingsChangeManager.makeSetupGroupTab()
             SettingsChangeManager.makeRestartService()
 
@@ -186,12 +214,10 @@ object BackupManager {
 
             applyRestoredUi(context)
             SettingsManager.initApp(context)
-            if (count <= 0) {
-                return ImportResult.Error("MMKV restore produced no data.")
-            }
             return ImportResult.Success(count.toInt())
         } finally {
             restoreDir.deleteRecursively()
+            snapshotDir.deleteRecursively()
         }
     }
 

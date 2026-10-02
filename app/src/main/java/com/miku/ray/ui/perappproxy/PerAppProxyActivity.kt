@@ -66,6 +66,11 @@ class PerAppProxyActivity : BaseActivity() {
             isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY, false)
             setOnCheckedChangeListener { _, isChecked ->
                 MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY, isChecked)
+                // The running tunnel reads the per-app mode when its interface
+                // is built; flag the rebuild or the chip change would silently
+                // wait for the next reconnect (same contract as the save
+                // button and the view model's list updates).
+                SettingsChangeManager.makeRestartService()
             }
         }
 
@@ -73,6 +78,7 @@ class PerAppProxyActivity : BaseActivity() {
             isChecked = MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS, false)
             setOnCheckedChangeListener { _, isChecked ->
                 MmkvManager.encodeSettings(AppConfig.PREF_BYPASS_APPS, isChecked)
+                SettingsChangeManager.makeRestartService()
             }
         }
     }
