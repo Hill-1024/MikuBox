@@ -17,11 +17,17 @@ class PreferenceParser {
     private static final String NS_SEARCH = "http://schemas.android.com/apk/com.miku.ray.ui.preference";
     private static final List<String> BLACKLIST = Arrays.asList(SearchPreference.class.getName());
     private static final List<String> CONTAINERS = Arrays.asList("PreferenceCategory", "PreferenceScreen");
+
     private Context context;
+    private SummaryResolver summaryResolver;
     private ArrayList<PreferenceItem> allEntries = new ArrayList<>();
 
     PreferenceParser(Context context) {
         this.context = context;
+    }
+
+    void setSummaryResolver(@Nullable SummaryResolver resolver) {
+        this.summaryResolver = resolver;
     }
 
     void addResourceFile(SearchConfiguration.SearchIndexItem item) {
@@ -129,9 +135,51 @@ class PreferenceParser {
         result.key = readString(getAttribute(xpp, "key"));
         result.entries = readStringArray(getAttribute(xpp, "entries"));
         result.keywords = readString(getAttribute(xpp, NS_SEARCH, "keywords"));
+        resolveListPreferenceSummaryPlaceholder(xpp, result);
 
         Log.d("PreferenceParser", "Found: " + xpp.getName() + "/" + result);
         return result;
+    }
+
+    /**
+     * "%s" is the standard ListPreference summary placeholder: the runtime
+     * renders the current entry's label there, and the search results used to
+     * show the bare placeholder instead (it read like a broken format string).
+     * Resolve it the way the real screen would; when the current value cannot
+     * be determined, drop the summary rather than index the placeholder.
+     */
+    private void resolveListPreferenceSummaryPlaceholder(XmlPullParser xpp, PreferenceItem result) {
+        if (!"%s".equals(result.summary)) {
+            return;
+        }
+        String current = result.key == null || summaryResolver == null ? null : summaryResolver.resolve(result.key);
+        String[] labels = readStringArrayValues(getAttribute(xpp, "entries"));
+        String[] values = readStringArrayValues(getAttribute(xpp, "entryValues"));
+        if (current != null && labels != null && values != null) {
+            int pairs = Math.min(labels.length, values.length);
+            for (int i = 0; i < pairs; i++) {
+                if (values[i].equals(current)) {
+                    result.summary = labels[i];
+                    return;
+                }
+            }
+        }
+        result.summary = null;
+    }
+
+    private String[] readStringArrayValues(@Nullable String s) {
+        if (s == null) {
+            return null;
+        }
+        if (s.startsWith("@")) {
+            try {
+                int id = Integer.parseInt(s.substring(1));
+                return context.getResources().getStringArray(id);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return s.isEmpty() ? new String[0] : new String[]{s};
     }
 
     private String readStringArray(@Nullable String s) {

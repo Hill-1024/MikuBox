@@ -55,7 +55,15 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.math.abs
 
-class SettingsActivity : HelperBaseActivity(), SearchPreferenceResultListener {
+class SettingsActivity : HelperBaseActivity(), SearchPreferenceResultListener,
+com.miku.ray.ui.preference.preferencesearch.SummaryResolver {
+
+    /**
+     * The search index reads stored preference values through the same MMKV
+     * store the preference data store writes, so a ListPreference's "%s"
+     * summary placeholder can be shown as the entry the user actually has.
+     */
+    override fun resolve(key: String): String? = MmkvManager.decodeSettingsString(key)
 
     private lateinit var searchActionView: SearchPreferenceActionView
     private lateinit var btnClearHistory: com.google.android.material.button.MaterialButton
