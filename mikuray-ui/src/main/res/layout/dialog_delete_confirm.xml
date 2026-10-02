@@ -45,15 +45,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_title">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/dialog_message"
+        <!-- F17: the destructive-action warning was cut off at the dialog's
+             height with no way to read the rest. Bound the card and let the
+             message scroll instead of ellipsizing or truncating it. -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/message_scroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="20"
-            android:padding="12dp"
-            android:textAppearance="?attr/textAppearanceTitleMedium"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="17sp" />
+            android:maxHeight="220dp"
+            android:scrollbars="vertical">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/dialog_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="17sp" />
+
+        </androidx.core.widget.NestedScrollView>
 
     </com.google.android.material.card.MaterialCardView>
 

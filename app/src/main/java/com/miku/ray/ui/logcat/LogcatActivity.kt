@@ -62,7 +62,16 @@ class LogcatActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
 
         binding.refreshLayout.setOnRefreshListener(this)
 
-        snackbarDefault(getString(R.string.pull_down_to_refresh), title = getString(R.string.title_alerter_info))
+        // F32: the screen used to open empty with only a "pull down to
+        // refresh" banner. Load the log once on entry instead; the swipe
+        // handler stays for manual refreshes. Pulling again on every resume
+        // was rejected — onCreate only.
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel.loadLogcat()
+            withContext(Dispatchers.Main) {
+                refreshData()
+            }
+        }
     }
 
     private fun onLogLongClick(log: String): Boolean {

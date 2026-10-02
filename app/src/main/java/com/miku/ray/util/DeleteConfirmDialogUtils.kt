@@ -17,11 +17,30 @@ fun showDeleteConfirmDialog(
     @StringRes positiveTextRes: Int = R.string.del_button_dialog_comfirm,
     @StringRes negativeTextRes: Int = android.R.string.cancel,
     onConfirm: () -> Unit
+) = showDeleteConfirmDialog(
+    context = context,
+    message = context.getString(messageRes),
+    titleRes = titleRes,
+    iconRes = iconRes,
+    positiveTextRes = positiveTextRes,
+    negativeTextRes = negativeTextRes,
+    onConfirm = onConfirm,
+)
+
+/** Same dialog for dynamic message text (e.g. a name the caller appends). */
+fun showDeleteConfirmDialog(
+    context: Context,
+    message: CharSequence,
+    @StringRes titleRes: Int = R.string.del_config_comfirm,
+    @DrawableRes iconRes: Int = RemixR.drawable.rmx_system_alert_line,
+    @StringRes positiveTextRes: Int = R.string.del_button_dialog_comfirm,
+    @StringRes negativeTextRes: Int = android.R.string.cancel,
+    onConfirm: () -> Unit
 ) {
     val binding = DialogDeleteConfirmBinding.inflate(LayoutInflater.from(context))
     binding.dialogIcon.setImageResource(iconRes)
     binding.dialogTitle.setText(titleRes)
-    binding.dialogMessage.setText(messageRes)
+    binding.dialogMessage.text = message
 
     val dialog = MaterialAlertDialogBuilder(context)
     .setView(binding.root)
