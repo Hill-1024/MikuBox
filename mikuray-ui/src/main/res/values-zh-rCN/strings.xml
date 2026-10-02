@@ -1099,6 +1099,7 @@
     <string name="mihomo_routing_no_rules">此文件没有 rules 分流规则</string>
     <string name="mihomo_routing_parse_failed">无法解析：%1$s</string>
     <plurals name="mihomo_routing_rule_count">
+        <item quantity="one">%1$d 条规则</item>
         <item quantity="other">%1$d 条规则</item>
     </plurals>
     <string name="mihomo_vpn_battery_ok">已忽略 Android 电池优化；厂商的后台运行和自启动权限仍需单独允许。</string>
