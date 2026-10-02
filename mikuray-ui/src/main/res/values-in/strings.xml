@@ -178,6 +178,7 @@
     <string name="menu_item_import_proxy_app">Paste dari Clipboard</string>
     <string name="per_app_proxy_settings">Settingan per-aplikasi</string>
     <string name="per_app_proxy_settings_enable">Aktifin per-aplikasi</string>
+    <string name="per_app_system_app_name">%1$s (Sistem)</string>
     <string name="app_picker_unknown_app">Aplikasi ga jelas (UID ga ketahuan)</string>
 
     <string name="title_settings">Settingan</string>
@@ -466,7 +467,7 @@ Nama Paket — cuma bisa kalo kamu pake Xray TUN, routeOnly aktif, dan Android 1
     <string name="connection_test_testing">Lagi ngecek…</string>
     <string name="connection_test_testing_count">Ngecek %d konfig…</string>
     <string name="connection_test_available">Sukses konek: %dms</string>
-    <string name="connection_test_error">Error: %s</string>
+    <string name="connection_test_error">Tes delay gagal: %s tidak dapat dijangkau</string>
     <string name="connection_test_fail">Gak ada internet</string>
     <string name="connection_test_error_status_code">Kode error: #%d</string>
     <string name="connection_connected">Udah konek. Tap buat tes</string>
@@ -956,11 +957,7 @@ yang kamu butuhin."</string>
     <string name="uwu_next">Lanjut</string>
     <string name="uwu_start">Mulai</string>
     <string name="uwu_welcome_title">Met dateng di</string>
-    <string name="uwu_welcome_summary_1">MikuRay,</string>
-    <string name="uwu_welcome_summary_2">Klien V2Ray/Xray buat Android sama gaya UI Miku.</string>
     <string name="uwu_welcome_summary_3">Dibikin sama Cinta, Kotlin, kode Java, dan lainnya.</string>
-    <string name="uwu_welcome_page1_desc">Klien V2Ray/Xray Android gratis dan open source ya.</string>
-    <string name="uwu_welcome_page2_desc">Support VLESS, VMess, Trojan, Shadowsocks, dan lain-lain.</string>
     <string name="uwu_welcome_page3_desc">Nikmatin internet cepet dan aman sama balutan desain imut ala Miku.</string>
 
     <string name="sub_setting_tab_icon">Ikon tab</string>
@@ -1066,6 +1063,10 @@ yang kamu butuhin."</string>
     <string name="mihomo_group_name_hint">Nama grup</string>
     <string name="mihomo_group_create_title">Buat grup</string>
     <string name="mihomo_group_manage_title">Kelola grup</string>
+    <string name="subscription_update_requires_connection">Perbarui hanya saat terhubung: tunnel sedang mati, jadi langganan tidak diambil. Sambungkan dulu, lalu perbarui lagi.</string>
+    <string name="btn_add_sub_description">Tambahkan langganan atau grup konfigurasi</string>
+    <string name="menu_add_subscription">Tambah langganan</string>
+    <string name="menu_add_title">Tambah</string>
     <string name="mihomo_group_manage_empty">Grup Miku bawaan menampung profil dan tidak dapat dihapus. Anda dapat membuat grup baru.</string>
     <string name="mihomo_group_entry_count">%1$s · %2$d profil</string>
     <string name="mihomo_group_delete_title">Hapus grup “%1$s”?</string>
@@ -1181,7 +1182,6 @@ yang kamu butuhin."</string>
         <item>cinnamiku</item>
         <item>retryNow</item>
     </string-array>
-    <string name="app_name">MikuRay</string>
     <string-array name="app_name_entries" translatable="false">
         <item>@string/app_name</item>
         <item>@string/app_name_variant_miku1</item>
@@ -1563,36 +1563,36 @@ yang kamu butuhin."</string>
     <string name="mihomo_section_vpn_routing">Routing &amp; split tunneling</string>
     <string name="mihomo_section_vpn_tun">Antarmuka TUN</string>
     <string name="mihomo_select_exit">Pilih proxy</string>
-    <string name="mihomo_setting_allow_lan">allow-lan</string>
-    <string name="mihomo_setting_disable_keep_alive">disable-keep-alive</string>
-    <string name="mihomo_setting_dns_cache_algorithm">dns.cache-algorithm</string>
-    <string name="mihomo_setting_dns_default_nameserver">dns.default-nameserver</string>
-    <string name="mihomo_setting_dns_direct_nameserver">dns.direct-nameserver</string>
-    <string name="mihomo_setting_dns_direct_nameserver_follow_policy">dns.direct-nameserver-follow-policy</string>
-    <string name="mihomo_setting_dns_enhanced_mode">dns.enhanced-mode</string>
-    <string name="mihomo_setting_dns_fake_ip_filter">dns.fake-ip-filter</string>
-    <string name="mihomo_setting_dns_fake_ip_range">dns.fake-ip-range</string>
-    <string name="mihomo_setting_dns_fallback">dns.fallback</string>
-    <string name="mihomo_setting_dns_ipv6">dns.ipv6</string>
-    <string name="mihomo_setting_dns_nameserver">dns.nameserver</string>
-    <string name="mihomo_setting_dns_prefer_h3">dns.prefer-h3</string>
-    <string name="mihomo_setting_dns_proxy_server_nameserver">dns.proxy-server-nameserver</string>
-    <string name="mihomo_setting_dns_respect_rules">dns.respect-rules</string>
-    <string name="mihomo_setting_dns_use_hosts">dns.use-hosts</string>
-    <string name="mihomo_setting_dns_use_system_hosts">dns.use-system-hosts</string>
-    <string name="mihomo_setting_find_process_mode">find-process-mode</string>
-    <string name="mihomo_setting_geodata_loader">geodata-loader</string>
-    <string name="mihomo_setting_geodata_mode">geodata-mode</string>
-    <string name="mihomo_setting_ipv6">ipv6</string>
-    <string name="mihomo_setting_keep_alive_idle">keep-alive-idle</string>
-    <string name="mihomo_setting_keep_alive_interval">keep-alive-interval</string>
-    <string name="mihomo_setting_log_level">log-level</string>
-    <string name="mihomo_setting_mixed_port">mixed-port</string>
-    <string name="mihomo_setting_sniffer_enable">sniffer.enable</string>
-    <string name="mihomo_setting_sniffer_override_destination">sniffer.override-destination</string>
-    <string name="mihomo_setting_tcp_concurrent">tcp-concurrent</string>
-    <string name="mihomo_setting_tun_stack">tun.stack</string>
-    <string name="mihomo_setting_unified_delay">unified-delay</string>
+    <string name="mihomo_setting_allow_lan">Izinkan LAN · allow-lan</string>
+    <string name="mihomo_setting_disable_keep_alive">Nonaktifkan keep-alive · disable-keep-alive</string>
+    <string name="mihomo_setting_dns_cache_algorithm">Algoritma cache DNS · dns-cache-algorithm</string>
+    <string name="mihomo_setting_dns_default_nameserver">Server nama DNS bootstrap · dns-default-nameserver</string>
+    <string name="mihomo_setting_dns_direct_nameserver">Server nama DNS trafik langsung · dns-direct-nameserver</string>
+    <string name="mihomo_setting_dns_direct_nameserver_follow_policy">Server nama langsung mengikuti kebijakan · dns-direct-nameserver-follow-policy</string>
+    <string name="mihomo_setting_dns_enhanced_mode">Mode DNS yang disempurnakan · dns-enhanced-mode</string>
+    <string name="mihomo_setting_dns_fake_ip_filter">Daftar filter Fake-IP · dns-fake-ip-filter</string>
+    <string name="mihomo_setting_dns_fake_ip_range">Rentang Fake-IP · dns-fake-ip-range</string>
+    <string name="mihomo_setting_dns_fallback">Server DNS cadangan · dns-fallback</string>
+    <string name="mihomo_setting_dns_ipv6">Resolusi DNS IPv6 · dns-ipv6</string>
+    <string name="mihomo_setting_dns_nameserver">Server nama DNS · dns-nameserver</string>
+    <string name="mihomo_setting_dns_prefer_h3">Utamakan HTTP/3 · dns-prefer-h3</string>
+    <string name="mihomo_setting_dns_proxy_server_nameserver">Server nama DNS domain proksi · dns-proxy-server-nameserver</string>
+    <string name="mihomo_setting_dns_respect_rules">DNS mengikuti aturan routing · dns-respect-rules</string>
+    <string name="mihomo_setting_dns_use_hosts">Gunakan hosts · dns-use-hosts</string>
+    <string name="mihomo_setting_dns_use_system_hosts">Gunakan hosts sistem · dns-use-system-hosts</string>
+    <string name="mihomo_setting_find_process_mode">Pencocokan proses · find-process-mode</string>
+    <string name="mihomo_setting_geodata_loader">Pemuat geodata · geodata-loader</string>
+    <string name="mihomo_setting_geodata_mode">Mode geodata · geodata-mode</string>
+    <string name="mihomo_setting_ipv6">IPv6 · ipv6</string>
+    <string name="mihomo_setting_keep_alive_idle">Keep-alive idle (detik) · keep-alive-idle</string>
+    <string name="mihomo_setting_keep_alive_interval">Interval keep-alive (detik) · keep-alive-interval</string>
+    <string name="mihomo_setting_log_level">Level log · log-level</string>
+    <string name="mihomo_setting_mixed_port">Port campuran · mixed-port</string>
+    <string name="mihomo_setting_sniffer_enable">Pengendusan domain · sniffer-enable</string>
+    <string name="mihomo_setting_sniffer_override_destination">Penimpaan tujuan pengendusan · sniffer-override-destination</string>
+    <string name="mihomo_setting_tcp_concurrent">Konkurensi TCP · tcp-concurrent</string>
+    <string name="mihomo_setting_tun_stack">Tumpukan TUN · tun-stack</string>
+    <string name="mihomo_setting_unified_delay">Delay terpadu · unified-delay</string>
     <string name="mihomo_settings_hint">Sambungkan ulang untuk menerapkan; ikuti profil mempertahankan nilainya</string>
     <string name="mihomo_settings_title">mihomo settings</string>
     <string name="mihomo_skip_tls">Lewati verifikasi sertifikat</string>
@@ -1917,4 +1917,15 @@ yang kamu butuhin."</string>
         <item>stream-up</item>
         <item>stream-one</item>
     </string-array>
+    <!-- Accessibility labels for controls that carry no visible text
+         (N1/N7/N10-N11/N22/N27/N29 of the 2026-10-02 a11y pass). -->
+    <string name="a11y_open_main_menu">Buka menu utama</string>
+    <string name="a11y_more_options">Opsi lainnya</string>
+    <string name="subscription_import_url_hint">URL langganan</string>
+    <string name="a11y_selected">Dipilih</string>
+    <string name="a11y_status_card_test_action">Uji kecepatan profil terpilih</string>
+    <string name="qr_code_description">Kode QR konfigurasi</string>
+    <string name="qr_flashlight_toggle">Buka/matikan senter</string>
+    <string name="profile_editor_edit_row">Edit %1$s</string>
+    <string name="a11y_navigate_back">Kembali</string>
 </resources>

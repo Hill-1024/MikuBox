@@ -25,7 +25,6 @@
     <string name="vpn_notification_exit_ip">Exit %1$s</string>
     <string name="vpn_action_stop">Stop</string>
     <string name="vpn_tile_title">MikuBox VPN</string>
-    <string name="local_proxy_notification_running">Local Mihomo proxy is running</string>
     <string name="subscription_channel_name">Subscription updates</string>
     <string name="subscription_update_title">Updating subscriptions</string>
 
@@ -41,6 +40,16 @@
     <string name="profile_default_name">Profile</string>
     <string name="profile_imported_default_name">Imported profile</string>
     <string name="profile_subscription_default_name">Subscription</string>
+
+    <!-- The add-config dialog and its screen-reader labels (these were
+         hard-coded Chinese and are now localizable like the rest). -->
+
+    <!-- The per-app picker marks system apps in the row label itself, so the
+         marker reads out loud with the name. -->
+
+    <!-- The bridge always enables the DNS module in VPN mode; the DNS screen
+         has to say so or dns.enable=false looks broken. -->
+    <string name="mihomo_dns_vpn_forced_hint">VPN mode always enables the DNS module (a profile dns.enable=false is overridden). To answer DNS without hijacking, clear the TUN DNS-hijack list.</string>
 
     <!-- The per-app picker MikuRay's screen does not have. -->
     <string name="apps_search">Search apps</string>

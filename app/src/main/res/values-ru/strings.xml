@@ -16,7 +16,6 @@
     <string name="vpn_notification_exit_ip">Выход %1$s</string>
     <string name="vpn_action_stop">Остановить</string>
     <string name="vpn_tile_title">MikuBox VPN</string>
-    <string name="local_proxy_notification_running">Локальный прокси Mihomo запущен</string>
     <string name="subscription_channel_name">Обновления подписок</string>
     <string name="subscription_update_title">Обновление подписок</string>
 
@@ -31,6 +30,16 @@
     <string name="profile_default_name">Профиль</string>
     <string name="profile_imported_default_name">Импортированный профиль</string>
     <string name="profile_subscription_default_name">Подписка</string>
+
+    <!-- Диалог добавления и подписи для скринридера (раньше были жёстко
+         заданным китайским текстом, теперь локализуются как остальное). -->
+
+    <!-- Селектор per-app помечает системные приложения прямо в названии
+         строки, чтобы метка читалась вслух вместе с именем. -->
+
+    <!-- Мост всегда включает DNS-модуль в режиме VPN; экран DNS обязан об
+         этом говорить, иначе dns.enable=false выглядит сломанным. -->
+    <string name="mihomo_dns_vpn_forced_hint">В режиме VPN DNS-модуль включён всегда (dns.enable=false в профиле переопределяется). Чтобы DNS отвечал без перехвата, очистите список DNS-hijack TUN.</string>
 
     <string name="apps_search">Поиск приложений</string>
     <string name="apps_select_all">Выбрать все</string>

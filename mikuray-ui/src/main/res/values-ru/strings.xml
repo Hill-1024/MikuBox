@@ -178,6 +178,7 @@
     <string name="menu_item_import_proxy_app">Импортировать из буфера обмена</string>
     <string name="per_app_proxy_settings">Настройки для каждого приложения</string>
     <string name="per_app_proxy_settings_enable">Включить для каждого приложения</string>
+    <string name="per_app_system_app_name">%1$s (системное)</string>
     <string name="app_picker_unknown_app">Неизвестное приложение (неопознанный UID)</string>
 
     <string name="title_settings">Настройки</string>
@@ -466,7 +467,7 @@
     <string name="connection_test_testing">Тестирование…</string>
     <string name="connection_test_testing_count">Тестирование %d конфигураций…</string>
     <string name="connection_test_available">Подключение успешно: %d мс</string>
-    <string name="connection_test_error">Ошибка: %s</string>
+    <string name="connection_test_error">Не удалось проверить задержку: %s недоступен</string>
     <string name="connection_test_fail">Нет интернета</string>
     <string name="connection_test_error_status_code">Код ошибки: #%d</string>
     <string name="connection_connected">Подключено. Нажмите для теста</string>
@@ -968,11 +969,7 @@
     <string name="uwu_next">Далее</string>
     <string name="uwu_start">Начать</string>
     <string name="uwu_welcome_title">Добро пожаловать в</string>
-    <string name="uwu_welcome_summary_1">MikuRay,</string>
-    <string name="uwu_welcome_summary_2">Клиент V2Ray/Xray для Android в стиле Miku UI.</string>
     <string name="uwu_welcome_summary_3">Создано с любовью, на Kotlin, Java и не только.</string>
-    <string name="uwu_welcome_page1_desc">Бесплатный клиент V2Ray/Xray с открытым исходным кодом.</string>
-    <string name="uwu_welcome_page2_desc">Поддерживает VLESS, VMess, Trojan, Shadowsocks и другие.</string>
     <string name="uwu_welcome_page3_desc">Ощутите быстрый и безопасный интернет в милом дизайне в стиле Мику.</string>
 
     <string name="sub_setting_tab_icon">Иконка вкладки</string>
@@ -1078,6 +1075,10 @@
     <string name="mihomo_group_name_hint">Название группы</string>
     <string name="mihomo_group_create_title">Создать группу</string>
     <string name="mihomo_group_manage_title">Управление группами</string>
+    <string name="subscription_update_requires_connection">Обновлять только при подключении: туннель не поднят, подписка не загружена. Сначала подключитесь, затем обновите снова.</string>
+    <string name="btn_add_sub_description">Добавить подписку или группу конфигураций</string>
+    <string name="menu_add_subscription">Добавить подписку</string>
+    <string name="menu_add_title">Добавить</string>
     <string name="mihomo_group_manage_empty">Группа Miku по умолчанию служит хранилищем профилей и не может быть удалена. Вы можете создать новые группы.</string>
     <string name="mihomo_group_entry_count">%1$s · профилей: %2$d</string>
     <string name="mihomo_group_delete_title">Удалить группу «%1$s»?</string>
@@ -1195,7 +1196,6 @@
         <item>cinnamiku</item>
         <item>retryNow</item>
     </string-array>
-    <string name="app_name">MikuRay</string>
     <string-array name="app_name_entries" translatable="false">
         <item>@string/app_name</item>
         <item>@string/app_name_variant_miku1</item>
@@ -1576,36 +1576,36 @@
     <string name="mihomo_section_vpn_routing">Маршрутизация и раздельное туннелирование</string>
     <string name="mihomo_section_vpn_tun">Интерфейс TUN</string>
     <string name="mihomo_select_exit">Выбрать прокси</string>
-    <string name="mihomo_setting_allow_lan">allow-lan</string>
-    <string name="mihomo_setting_disable_keep_alive">disable-keep-alive</string>
-    <string name="mihomo_setting_dns_cache_algorithm">dns.cache-algorithm</string>
-    <string name="mihomo_setting_dns_default_nameserver">dns.default-nameserver</string>
-    <string name="mihomo_setting_dns_direct_nameserver">dns.direct-nameserver</string>
-    <string name="mihomo_setting_dns_direct_nameserver_follow_policy">dns.direct-nameserver-follow-policy</string>
-    <string name="mihomo_setting_dns_enhanced_mode">dns.enhanced-mode</string>
-    <string name="mihomo_setting_dns_fake_ip_filter">dns.fake-ip-filter</string>
-    <string name="mihomo_setting_dns_fake_ip_range">dns.fake-ip-range</string>
-    <string name="mihomo_setting_dns_fallback">dns.fallback</string>
-    <string name="mihomo_setting_dns_ipv6">dns.ipv6</string>
-    <string name="mihomo_setting_dns_nameserver">dns.nameserver</string>
-    <string name="mihomo_setting_dns_prefer_h3">dns.prefer-h3</string>
-    <string name="mihomo_setting_dns_proxy_server_nameserver">dns.proxy-server-nameserver</string>
-    <string name="mihomo_setting_dns_respect_rules">dns.respect-rules</string>
-    <string name="mihomo_setting_dns_use_hosts">dns.use-hosts</string>
-    <string name="mihomo_setting_dns_use_system_hosts">dns.use-system-hosts</string>
-    <string name="mihomo_setting_find_process_mode">find-process-mode</string>
-    <string name="mihomo_setting_geodata_loader">geodata-loader</string>
-    <string name="mihomo_setting_geodata_mode">geodata-mode</string>
-    <string name="mihomo_setting_ipv6">ipv6</string>
-    <string name="mihomo_setting_keep_alive_idle">keep-alive-idle</string>
-    <string name="mihomo_setting_keep_alive_interval">keep-alive-interval</string>
-    <string name="mihomo_setting_log_level">log-level</string>
-    <string name="mihomo_setting_mixed_port">mixed-port</string>
-    <string name="mihomo_setting_sniffer_enable">sniffer.enable</string>
-    <string name="mihomo_setting_sniffer_override_destination">sniffer.override-destination</string>
-    <string name="mihomo_setting_tcp_concurrent">tcp-concurrent</string>
-    <string name="mihomo_setting_tun_stack">tun.stack</string>
-    <string name="mihomo_setting_unified_delay">unified-delay</string>
+    <string name="mihomo_setting_allow_lan">Разрешить LAN · allow-lan</string>
+    <string name="mihomo_setting_disable_keep_alive">Отключить keep-alive · disable-keep-alive</string>
+    <string name="mihomo_setting_dns_cache_algorithm">Алгоритм кэша DNS · dns-cache-algorithm</string>
+    <string name="mihomo_setting_dns_default_nameserver">Стартовые DNS-серверы · dns-default-nameserver</string>
+    <string name="mihomo_setting_dns_direct_nameserver">DNS-серверы прямого трафика · dns-direct-nameserver</string>
+    <string name="mihomo_setting_dns_direct_nameserver_follow_policy">Прямые серверы следуют политике · dns-direct-nameserver-follow-policy</string>
+    <string name="mihomo_setting_dns_enhanced_mode">Расширенный режим DNS · dns-enhanced-mode</string>
+    <string name="mihomo_setting_dns_fake_ip_filter">Список исключений Fake-IP · dns-fake-ip-filter</string>
+    <string name="mihomo_setting_dns_fake_ip_range">Диапазон Fake-IP · dns-fake-ip-range</string>
+    <string name="mihomo_setting_dns_fallback">Резервные DNS-серверы · dns-fallback</string>
+    <string name="mihomo_setting_dns_ipv6">Разрешение DNS по IPv6 · dns-ipv6</string>
+    <string name="mihomo_setting_dns_nameserver">DNS-серверы · dns-nameserver</string>
+    <string name="mihomo_setting_dns_prefer_h3">Предпочитать HTTP/3 · dns-prefer-h3</string>
+    <string name="mihomo_setting_dns_proxy_server_nameserver">DNS-серверы для доменов прокси · dns-proxy-server-nameserver</string>
+    <string name="mihomo_setting_dns_respect_rules">DNS следует правилам маршрутизации · dns-respect-rules</string>
+    <string name="mihomo_setting_dns_use_hosts">Использовать hosts · dns-use-hosts</string>
+    <string name="mihomo_setting_dns_use_system_hosts">Использовать системные hosts · dns-use-system-hosts</string>
+    <string name="mihomo_setting_find_process_mode">Сопоставление процессов · find-process-mode</string>
+    <string name="mihomo_setting_geodata_loader">Загрузчик geodata · geodata-loader</string>
+    <string name="mihomo_setting_geodata_mode">Режим geodata · geodata-mode</string>
+    <string name="mihomo_setting_ipv6">IPv6 · ipv6</string>
+    <string name="mihomo_setting_keep_alive_idle">Keep-alive idle (секунды) · keep-alive-idle</string>
+    <string name="mihomo_setting_keep_alive_interval">Интервал keep-alive (секунды) · keep-alive-interval</string>
+    <string name="mihomo_setting_log_level">Уровень логирования · log-level</string>
+    <string name="mihomo_setting_mixed_port">Смешанный порт · mixed-port</string>
+    <string name="mihomo_setting_sniffer_enable">Сниффинг доменов · sniffer-enable</string>
+    <string name="mihomo_setting_sniffer_override_destination">Подмена адреса по сниффингу · sniffer-override-destination</string>
+    <string name="mihomo_setting_tcp_concurrent">Параллельные TCP-соединения · tcp-concurrent</string>
+    <string name="mihomo_setting_tun_stack">Стек TUN · tun-stack</string>
+    <string name="mihomo_setting_unified_delay">Единая задержка · unified-delay</string>
     <string name="mihomo_settings_hint">Переподключитесь, чтобы применить; «как в профиле» сохраняет значения профиля</string>
     <string name="mihomo_settings_title">mihomo settings</string>
     <string name="mihomo_skip_tls">Пропускать проверку сертификатов</string>
@@ -1920,4 +1920,15 @@
         <item>stream-up</item>
         <item>stream-one</item>
     </string-array>
+    <!-- Accessibility labels for controls that carry no visible text
+         (N1/N7/N10-N11/N22/N27/N29 of the 2026-10-02 a11y pass). -->
+    <string name="a11y_open_main_menu">Открыть главное меню</string>
+    <string name="a11y_more_options">Ещё</string>
+    <string name="subscription_import_url_hint">URL подписки</string>
+    <string name="a11y_selected">Выбрано</string>
+    <string name="a11y_status_card_test_action">Проверить задержку выбранного профиля</string>
+    <string name="qr_code_description">QR-код конфигурации</string>
+    <string name="qr_flashlight_toggle">Включить или выключить фонарик</string>
+    <string name="profile_editor_edit_row">Изменить «%1$s»</string>
+    <string name="a11y_navigate_back">Назад</string>
 </resources>

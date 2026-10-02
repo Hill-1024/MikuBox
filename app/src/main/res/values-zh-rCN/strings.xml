@@ -17,7 +17,6 @@
     <string name="vpn_notification_exit_ip">出口 %1$s</string>
     <string name="vpn_action_stop">停止</string>
     <string name="vpn_tile_title">MikuBox VPN</string>
-    <string name="local_proxy_notification_running">本地 Mihomo 代理正在运行</string>
     <string name="subscription_channel_name">订阅更新</string>
     <string name="subscription_update_title">正在更新订阅</string>
 
@@ -33,6 +32,13 @@
     <string name="profile_default_name">配置文件</string>
     <string name="profile_imported_default_name">导入的配置文件</string>
     <string name="profile_subscription_default_name">订阅</string>
+
+    <!-- 添加对话框与读屏标签(原先为硬编码中文,现与其它文案一样可本地化)。 -->
+
+    <!-- 分应用选择器直接在行名称里标注系统应用,读屏会连名字一起读出。 -->
+
+    <!-- 桥接在 VPN 模式下始终启用 DNS 模块,DNS 页必须说明,否则 dns.enable=false 看起来像失效。 -->
+    <string name="mihomo_dns_vpn_forced_hint">VPN 模式下 DNS 模块始终开启(配置文件中的 dns.enable=false 会被覆盖)。若要不劫持 DNS,可清空 TUN DNS 劫持列表。</string>
 
     <!-- MikuRay 界面里没有的分应用选择器。 -->
     <string name="apps_search">搜索应用</string>
