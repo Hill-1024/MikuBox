@@ -243,7 +243,7 @@ val testMihomoBridge by tasks.registering {
 
 val buildMihomoBridge by tasks.registering {
     group = "build"
-    description = "Builds the bundled HSSkyBoy/mihomo Alpha JNI bridge for every Android ABI."
+    description = "Builds the bundled MetaCubeX/mihomo JNI bridge for every Android ABI."
     dependsOn(prepareMihomoOverlay)
     inputs.dir(mihomoBridgeDir)
     inputs.dir(rootProject.file("core/patches"))
@@ -302,7 +302,9 @@ val buildMihomoBridge by tasks.registering {
                     "go", "build", "-modfile=${mihomoPatchedMod.get().asFile.absolutePath}",
                     "-overlay=${overlay.absolutePath}", "-trimpath", "-buildmode=c-shared",
                     "-tags", "with_gvisor cmfa",
-                    "-ldflags=-s -w", "-o", output.absolutePath, "."
+                    // MetaCubeX tags carry a placeholder in constant.Version; stamp the
+                    // pinned core release so MihomoVersion() reports what actually shipped.
+                    "-ldflags=-s -w -X github.com/metacubex/mihomo/constant.Version=1.19.32", "-o", output.absolutePath, "."
                 )
             }
         }
