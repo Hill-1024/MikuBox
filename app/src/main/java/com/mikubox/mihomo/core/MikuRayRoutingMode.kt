@@ -63,19 +63,32 @@ object MikuRayRoutingMode : MikuRouting.Impl {
 
     override fun mode(value: String): Boolean {
         val mode = MihomoCoreSettings.ProxyMode.entries.firstOrNull { it.value == value } ?: return false
-        val appliedLive = com.miku.ray.MikuCoreBridge.isRunning() && MihomoCore.setMode(value)
-        if (com.miku.ray.MikuCoreBridge.isRunning() && !appliedLive) return false
+        val runningAtCheck = com.miku.ray.MikuCoreBridge.isRunning()
+        val appliedLive = runningAtCheck && MihomoCore.setMode(value)
+        if (runningAtCheck && !appliedLive) return false
         MihomoCoreSettings.setMode(context, mode)
-        if (appliedLive) notifyTunnelRechosen(context)
+        // Connect race: onStarted (executor thread) can read the stored value
+        // before the persist above lands, and the live-apply check ran while
+        // the core was still down. If the core is up now, apply the
+        // just-persisted value once or the core keeps the previous mode until
+        // the next reconnect.
+        val applied = appliedLive ||
+            (com.miku.ray.MikuCoreBridge.isRunning() && MihomoCore.setMode(value))
+        if (applied) notifyTunnelRechosen(context)
         return true
     }
 
     override fun exit(name: String): Boolean {
         val profile = MihomoProfileStore.selected(context) ?: return false
         if (state().options.none { it.name == name }) return false
-        if (profile.id == activeProfileId && com.miku.ray.MikuCoreBridge.isRunning() && !RoutingMode.selectGlobalExit(name)) return false
+        val runningAtCheck = profile.id == activeProfileId && com.miku.ray.MikuCoreBridge.isRunning()
+        if (runningAtCheck && !RoutingMode.selectGlobalExit(name)) return false
         val stored = prefs(context).edit().putString("exit:${profile.id}", name).commit()
-        if (profile.id == activeProfileId && com.miku.ray.MikuCoreBridge.isRunning()) notifyTunnelRechosen(context)
+        // Same connect race as mode(): re-select once when the core is up now
+        // but the live selection above did not happen.
+        val applied = runningAtCheck ||
+            (profile.id == activeProfileId && com.miku.ray.MikuCoreBridge.isRunning() && RoutingMode.selectGlobalExit(name))
+        if (applied) notifyTunnelRechosen(context)
         return stored
     }
 

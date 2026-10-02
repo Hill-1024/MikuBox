@@ -122,6 +122,14 @@ class MikuVpnService : VpnService(), ServiceControl {
     @Volatile
     private var exitIpEpoch = 0
 
+    /**
+     * Name of the profile the running tunnel was built from, for the
+     * notification title. Set on the executor when the start reads the profile;
+     * null until then (the connecting notification falls back to the app name).
+     */
+    @Volatile
+    private var activeProfileName: String? = null
+
     private var wakeLock: android.os.PowerManager.WakeLock? = null
     private val wakeLockLock = Any()
 
@@ -268,6 +276,13 @@ class MikuVpnService : VpnService(), ServiceControl {
         // A stop cancels this scope, and the system may reuse this very
         // instance for the next start before the destroy lands — recreate it
         // or every notification probe would silently no-op.
+        // A stop cancels this scope, and the system may reuse this very
+        // instance for the next start before the destroy lands — recreate it
+        // or every notification probe would silently no-op. A restart reaches
+        // here without a stop in between (stopCore does not cancel), so cancel
+        // the previous scope explicitly: its probe coroutines would otherwise
+        // linger until their own generation guards expire.
+        statsScope.cancel()
         statsScope = kotlinx.coroutines.CoroutineScope(
             kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.IO,
         )
@@ -302,6 +317,13 @@ class MikuVpnService : VpnService(), ServiceControl {
         // restart queued by a previous session is obsolete by definition.
         VpnController.clearPendingRestart()
         ConnectionStatus.update(this, ConnectionStatus.Phase.CONNECTING)
+        // The guard watches the connecting phase too: a process kill while the
+        // core is still coming up must leave the expectation behind, or the
+        // sticky restart lands on the quick-exit branch and nothing ever
+        // retries the start. The failure backoff is deliberately NOT reset
+        // here (expectRunningWhileConnecting) — only the connected checkpoint
+        // below resets it, so a bad profile still trips the breaker.
+        TunnelGuard.expectRunningWhileConnecting(this)
         val request = generation.incrementAndGet()
         lastTunError = null
         // The foreground notification must appear promptly; the heavy work runs
@@ -327,6 +349,7 @@ class MikuVpnService : VpnService(), ServiceControl {
             try {
                 MihomoCoreSettings.prepareMixedPort(this)
                 val profile = MihomoProfileStore.selected(this)
+                activeProfileName = profile?.name
                 val config = profile?.let { com.mikubox.mihomo.profile.ProfileRouting.apply(this, it) } ?: MihomoConfigStore.activeConfig(this)
                 require(config.isNotBlank()) { "Update the subscription before connecting" }
                 // The routing rules the core is about to be given come from this
@@ -390,8 +413,10 @@ class MikuVpnService : VpnService(), ServiceControl {
                             "(${AndroidVpnSettings.bypassLanRaw(this@MikuVpnService)})" +
                             ", apps=${AndroidVpnSettings.perAppMode(this@MikuVpnService)})",
                     )
-                    // From here on the tunnel must survive the process being
-                    // killed, so the guard starts watching it.
+                    // From here on the tunnel has survived the start, so the
+                    // connected checkpoint resets the failure backoff — the
+                    // expectation itself was already armed at startVpn entry,
+                    // which is what makes the connecting phase recoverable.
                     TunnelGuard.expectRunning(this@MikuVpnService, true)
                     // The vendored screens hear about the tunnel the same way they
                     // used to hear about MikuRay's own service.
@@ -826,7 +851,11 @@ class MikuVpnService : VpnService(), ServiceControl {
             // The monochrome silhouette renders cleanly in the status bar; the
             // full-colour launcher icon becomes an opaque blob there.
             .setSmallIcon(R.mipmap.ic_launcher_monochrome)
-            .setContentTitle(getString(R.string.app_name))
+            // The title repeats what the shade's app header already says when
+            // it is the app name; the profile the tunnel was built from is the
+            // informative line, so prefer it and fall back for the connecting
+            // notification that precedes the start's profile read.
+            .setContentTitle(activeProfileName?.takeIf { it.isNotBlank() } ?: getString(R.string.app_name))
             .setContentText(contentText)
             .setContentIntent(configurePendingIntent())
             .addAction(0, getString(R.string.vpn_action_stop), stopIntent)

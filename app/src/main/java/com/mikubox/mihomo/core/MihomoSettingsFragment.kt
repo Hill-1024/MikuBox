@@ -168,6 +168,15 @@ private class MihomoPreferenceBindings(private val fragment: PreferenceFragmentC
         fragment.findPreference<EditTextPreference>("authentication")?.summaryProvider = Preference.SummaryProvider<EditTextPreference> { if (it.text.isNullOrBlank()) getString(R.string.mihomo_follow_profile) else "••••••" }
 
         choice("dns.enhanced-mode", DnsOverrides.EnhancedMode.entries.map { it.name }, DnsOverrides.EnhancedMode.entries.map { it.value ?: getString(R.string.mihomo_follow_profile) }, DnsOverrides.enhancedMode(ctx).name) { DnsOverrides.setEnhancedMode(ctx, DnsOverrides.EnhancedMode.valueOf(it)) }
+        // F43: the bridge force-enables the DNS module in VPN mode (the
+        // profile's dns.enable=false cannot turn it off there), and the only
+        // way out of DNS hijacking is an empty TUN dns-hijack list. Say both
+        // here, or a disabled-in-profile DNS reads as broken. The string is an
+        // app-layer key: this file's R is the vendored layer's, so qualify.
+        // ListPreference is a DialogPreference, which carries dialogMessage.
+        fragment.findPreference<ListPreference>("dns.enhanced-mode")?.apply {
+            dialogMessage = getString(com.mikubox.mihomo.R.string.mihomo_dns_vpn_forced_hint)
+        }
         text("dns.fake-ip-range", DnsOverrides.fakeIpRange(ctx), { true }) { DnsOverrides.setFakeIpRange(ctx, it) }
         text("dns.fake-ip-filter", DnsOverrides.fakeIpFilter(ctx), { true }) { DnsOverrides.setFakeIpFilter(ctx, it) }
         choice("dns.ipv6", listOf("-1", "1", "0"), listOf(getString(R.string.mihomo_follow_profile), getString(R.string.mihomo_enabled), getString(R.string.mihomo_disabled)), DnsOverrides.ipv6(ctx).toString()) { DnsOverrides.setIpv6(ctx, it.toInt()) }
@@ -187,6 +196,10 @@ private class MihomoPreferenceBindings(private val fragment: PreferenceFragmentC
             summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
             setOnPreferenceChangeListener { _, newValue ->
                 com.miku.ray.handler.MmkvManager.encodeSettings(com.miku.ray.AppConfig.PREF_GEO_FILES_SOURCES, newValue as String)
+                // Every other core setting funnels through applyChange so a
+                // connected tunnel rebuilds with the new value; this key was
+                // the one holdover that silently waited for the next reconnect.
+                applyChange(com.miku.ray.AppConfig.PREF_GEO_FILES_SOURCES)
                 true
             }
         }
