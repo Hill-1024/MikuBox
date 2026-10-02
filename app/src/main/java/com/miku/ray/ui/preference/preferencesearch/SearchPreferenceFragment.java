@@ -45,12 +45,19 @@ public class SearchPreferenceFragment extends Fragment implements SearchPreferen
     private SearchPreferenceAdapter adapter;
     private HistoryClickListener historyClickListener;
     private CharSequence searchTermPreset = null;
+    /** True between a non-empty query and the next empty one; drives the auto-exit on clear. */
+    private boolean hadActiveQuery = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         prefs = getContext().getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE);
         searcher = new PreferenceParser(getContext());
+        if (getActivity() instanceof SummaryResolver) {
+            // The parser needs stored preference values to expand a
+            // ListPreference's "%s" summary into the current entry label.
+            searcher.setSummaryResolver((SummaryResolver) getActivity());
+        }
 
         searchConfiguration = SearchConfiguration.fromBundle(getArguments());
         ArrayList<SearchConfiguration.SearchIndexItem> files = searchConfiguration.getFiles();
@@ -259,14 +266,45 @@ public class SearchPreferenceFragment extends Fragment implements SearchPreferen
         adapter.setKeyword(keyword);
 
         if (TextUtils.isEmpty(keyword)) {
+            // A query the user cleared must not park the screen on the "no
+            // results" state (previously only BACK recovered it): leave the
+            // search when there is no history to fall back to. The guard keeps
+            // the very first, still-empty pass from dismissing itself.
+            boolean wasSearching = hadActiveQuery;
+            hadActiveQuery = false;
+            if (wasSearching && !hasValidHistory()) {
+                exitSearch();
+                return;
+            }
             showHistory();
             return;
         }
 
+        hadActiveQuery = true;
         results = searcher.searchFor(keyword);
         adapter.setContent(new ArrayList<>(results));
 
         setEmptyViewShown(results.isEmpty());
+    }
+
+    private boolean hasValidHistory() {
+        for (HistoryItem item : history) {
+            if (!searcher.searchFor(item.getTerm()).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Leaves the search state, restoring the settings screen underneath. */
+    private void exitSearch() {
+        androidx.fragment.app.FragmentActivity activity = getActivity();
+        if (activity == null || !isAdded()) {
+            return;
+        }
+        androidx.fragment.app.FragmentManager fm = activity.getSupportFragmentManager();
+        fm.beginTransaction().remove(this).commit();
+        fm.popBackStack(TAG, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
     private void setEmptyViewShown(boolean shown) {
