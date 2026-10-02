@@ -63,11 +63,6 @@
             android:exported="false"
             android:parentActivityName="com.miku.ray.ui.main.MainActivity" />
 
-        <activity
-            android:name="com.miku.ray.ui.routing.RoutingEditActivity"
-            android:exported="false"
-            android:parentActivityName="com.miku.ray.ui.routing.RoutingSettingActivity" />
-
         <!-- Ported MikuRay subscription screens. -->
         <activity
             android:name="com.miku.ray.ui.subscription.SubSettingActivity"
@@ -198,15 +193,6 @@
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="vpn" />
-        </service>
-
-        <service
-            android:name=".service.MikuProxyService"
-            android:exported="false"
-            android:foregroundServiceType="specialUse">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="local proxy" />
         </service>
 
         <service android:name=".service.OnDemandService" android:exported="false" android:foregroundServiceType="specialUse">
