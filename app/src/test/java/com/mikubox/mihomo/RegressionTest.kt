@@ -20,6 +20,7 @@ import com.mikubox.mihomo.core.AndroidVpnSettings
 import com.mikubox.mihomo.profile.MihomoProfileStore
 import com.mikubox.mihomo.profile.MihomoTrafficStore
 import com.mikubox.mihomo.profile.MihomoSubscriptionDecoder
+import com.mikubox.mihomo.profile.MihomoSubscriptionUpdater
 import com.mikubox.mihomo.service.CoreOwnership
 
 @RunWith(RobolectricTestRunner::class)
@@ -219,6 +220,29 @@ class RegressionTest {
         assertEquals(1, result.successCount)
         assertEquals(1, requests.get())
         assertTrue(MihomoProfileStore.profiles(context).first { it.id == profile.id }.config.isNotBlank())
+    }
+
+    @Test fun updateOnlyWhileConnectedGateBlocksDirectFetchWhenDisconnected() = withSubscriptionServer { url, requests, _ ->
+        MikuRayBridgeContext.attach(context)
+        // The Robolectric environment has no tunnel, so VpnController.isRunning
+        // is false here — exactly the state the gate must refuse to fetch in.
+        val gated = MihomoProfileStore.createSubscription(context, "Gated", url, 0, updateWhenConnectedOnly = true)
+        val gatedProfile = MihomoProfileStore.profiles(context).first { it.id == gated.id }
+        assertTrue(MihomoSubscriptionUpdater.blockedWhileDisconnected(gatedProfile))
+        val blocked = runCatching { MihomoSubscriptionUpdater.update(context, gatedProfile) }
+        assertTrue(blocked.exceptionOrNull() is MihomoSubscriptionUpdater.BlockedWhileDisconnected)
+        // The flag promises the provider is never contacted directly: no
+        // request, and the stored config stays empty until a connected update.
+        assertEquals(0, requests.get())
+        assertTrue(MihomoProfileStore.profiles(context).first { it.id == gated.id }.config.isBlank())
+
+        // Without the flag the same entry point still fetches normally.
+        val open = MihomoProfileStore.createSubscription(context, "Open", url, 0)
+        val openProfile = MihomoProfileStore.profiles(context).first { it.id == open.id }
+        assertFalse(MihomoSubscriptionUpdater.blockedWhileDisconnected(openProfile))
+        MihomoSubscriptionUpdater.update(context, openProfile)
+        assertEquals(1, requests.get())
+        assertTrue(MihomoProfileStore.profiles(context).first { it.id == open.id }.config.isNotBlank())
     }
 
     private fun withSubscriptionServer(test: (String, java.util.concurrent.atomic.AtomicInteger, java.util.concurrent.atomic.AtomicInteger) -> Unit) {
