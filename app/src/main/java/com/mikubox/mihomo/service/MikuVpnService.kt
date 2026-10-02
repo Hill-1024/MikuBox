@@ -303,7 +303,6 @@ class MikuVpnService : VpnService(), ServiceControl {
         VpnController.clearPendingRestart()
         ConnectionStatus.update(this, ConnectionStatus.Phase.CONNECTING)
         val request = generation.incrementAndGet()
-        MikuProxyService.stop(this)
         lastTunError = null
         // The foreground notification must appear promptly; the heavy work runs
         // after it. Never establish a tunnel without foreground protection.
