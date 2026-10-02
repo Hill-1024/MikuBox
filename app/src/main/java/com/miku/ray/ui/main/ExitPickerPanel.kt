@@ -20,6 +20,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.ViewCompat
 import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -258,6 +259,9 @@ class ExitPickerPanel(
         gravity = Gravity.CENTER_VERTICAL
         setPadding(dp(12), dp(12), dp(12), dp(4))
         setTypeface(typeface, Typeface.BOLD)
+        // N12: section titles must be real headings so screen-reader users can
+        // jump between them instead of wading through the whole list.
+        ViewCompat.setAccessibilityHeading(this, true)
     }
 
     private inner class HeaderHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -329,6 +333,16 @@ class ExitPickerPanel(
             delay.visibility = if (exit.delay > 0) VISIBLE else GONE
             delay.text = "${exit.delay}ms"
             delay.setTextColor(delayGreen)
+            // N11: selection used to be announced only through the bold
+            // typeface and the bare checkmark image — invisible to a screen
+            // reader. Carry it as a real state, and drop the redundant
+            // unlabeled checkmark image from the tree.
+            row.isSelected = selected
+            ViewCompat.setStateDescription(
+                row,
+                if (selected) context.getString(R.string.a11y_selected) else null,
+            )
+            check.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
             lead.removeAllViews()
             when {
                 exit.group -> lead.addView(icon(RemixR.drawable.rmx_group_line))

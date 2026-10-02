@@ -16,6 +16,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.NonNull
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -229,6 +230,17 @@ com.miku.ray.ui.preference.preferencesearch.SummaryResolver {
             } else {
                 false
             }
+        }
+
+        // N13: the chip is 32dp tall — under the 48dp minimum touch target.
+        // Keep the visual size and extend the hit area through a delegate on
+        // the parent instead of inflating the layout.
+        layoutWeatherChip.doOnLayout { view ->
+            val extra = (8 * resources.displayMetrics.density).toInt()
+            val area = android.graphics.Rect()
+            view.getHitRect(area)
+            area.inset(-extra, -extra)
+            (view.parent as? View)?.touchDelegate = android.view.TouchDelegate(area, view)
         }
     }
 

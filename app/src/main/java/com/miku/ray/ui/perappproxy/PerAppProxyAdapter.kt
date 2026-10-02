@@ -55,8 +55,14 @@ class PerAppProxyAdapter(
             this.appInfo = appInfo
 
             itemBypassBinding.icon.setImageDrawable(appInfo.appIcon)
+            // A system app is marked with a localized suffix instead of the
+            // bare "** " prefix, which read like a leaked placeholder and had
+            // no legend anywhere on the screen.
             itemBypassBinding.name.text = if (appInfo.isSystemApp) {
-                String.format("** %s", appInfo.appName)
+                itemBypassBinding.name.context.getString(
+                    com.miku.ray.R.string.per_app_system_app_name,
+                    appInfo.appName,
+                )
             } else {
                 appInfo.appName
             }
@@ -64,6 +70,10 @@ class PerAppProxyAdapter(
             itemBypassBinding.packageName.text = appInfo.packageName
 
             itemBypassBinding.switchButton.isChecked = viewModel.contains(appInfo.packageName)
+            // N17: the row's switch is not separately focusable (the row click
+            // toggles it), so label it with the app name — an unlabeled switch
+            // used to read as a bare "on/off" with no subject.
+            itemBypassBinding.switchButton.contentDescription = appInfo.appName
 
             itemView.setOnClickListener(this)
         }

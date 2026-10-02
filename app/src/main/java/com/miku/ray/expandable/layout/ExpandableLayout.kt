@@ -69,6 +69,10 @@ class ExpandableLayout(context: Context, attrs: AttributeSet?) : LinearLayout(co
                 null
             )
             isClickable = true
+            // N19: the header card carries the text and the click, so the
+            // arrow is a decorative duplicate button to a screen reader —
+            // exclude it instead of announcing an unlabeled toggle.
+            importantForAccessibility = android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO
 
             rotation = if (expandableContent?.isExpanded == true) 90.0f else 0.0f
         }

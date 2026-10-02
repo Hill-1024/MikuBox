@@ -60,6 +60,14 @@ class RoutingModeView @JvmOverloads constructor(context: Context, attrs: Attribu
             val label = TextView(context).apply {
                 setText(title); gravity = Gravity.CENTER; textSize = 14f
                 setTextColor(textColor); isClickable = true; isFocusable = true
+                // N15: these tabs are created in code, so without an id they
+                // only ever appear in screen-reader trees and uiautomator
+                // dumps as anonymous text — give them stable ones.
+                id = when (index) {
+                    0 -> R.id.routing_mode_tab_rule
+                    1 -> R.id.routing_mode_tab_global
+                    else -> R.id.routing_mode_tab_direct
+                }
                 setOnClickListener { chooseMode(modes[index]) }
             }
             labels += label
@@ -154,7 +162,9 @@ class RoutingModeView @JvmOverloads constructor(context: Context, attrs: Attribu
     }
 
     private fun setExpanded(expanded: Boolean, animate: Boolean) {
-        val expandedHeight = dp(28)
+        // N13: the expanded exit row is the panel's tap target; 28dp fell
+        // short of the 48dp minimum touch-target size.
+        val expandedHeight = dp(48)
         val end = if (expanded) expandedHeight else 0
         val start = exit.layoutParams.height
         exit.isEnabled = expanded
