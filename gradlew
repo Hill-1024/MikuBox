@@ -101,10 +101,34 @@ case "$JAVA_HOME" in
     if [ -n "$__winpath" ]; then
       __pathset="set PATH=$__winpath;%PATH%&& "
     fi
+    # N25: the arguments are parsed twice — POSIX sh split them above, and
+    # cmd.exe parses the assembled command line again. Interop also mangles
+    # embedded quotes (see NOTE below), so an argument holding whitespace or a
+    # cmd metacharacter cannot be delivered faithfully: it splits into two
+    # arguments or changes meaning. Refuse those loudly instead of silently
+    # corrupting the invocation; cmd.exe/PowerShell take any arguments.
+    for __arg in "$@"; do
+      case "$__arg" in
+        # Allowlist: alphanumerics plus the punctuation gradle invocations
+        # actually carry (- + . / : = _ @ * ? and Windows path backslashes).
+        *[!-+./:=_@*?A-Za-z0-9\\]*)
+          printf '%s\n' \
+            "gradlew: refusing to pass this argument through the WSL cmd.exe bridge:" \
+            "  $__arg" \
+            "It contains whitespace or a cmd metacharacter, and the interop cannot" \
+            "deliver quoting intact (cmd re-parses the assembled command line). Run" \
+            "the invocation from cmd.exe or PowerShell, or use a form without spaces" \
+            "or special characters, e.g. -PappVersionName=0.2.3-beta." >&2
+          exit 2
+          ;;
+      esac
+    done
     # NOTE: no quotes around the set values. WSL interop passes embedded
     # quotes through as \" which cmd does not un-escape, so quoted values end
     # up in variables with mangled names. `set VAR=value&& next` is safe: the
     # value ends exactly at the && and JAVA_HOME/go paths carry no % or &&.
+    # The allowlist above is what makes passing the arguments through "$*"
+    # safe: no argument can hold a space or a cmd separator anymore.
     exec "$__cmdexe" /c "set JAVA_HOME=$JAVA_HOME&& ${__pathset}gradlew.bat $*"
   fi
   ;;
