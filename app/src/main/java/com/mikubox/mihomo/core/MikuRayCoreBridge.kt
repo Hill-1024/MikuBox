@@ -26,7 +26,19 @@ object MikuRayCoreBridge : MikuCoreBridge.Impl {
         if (android.net.VpnService.prepare(context) != null) return false
         MikuRayProfileSync.selectedProfileId()?.let { MihomoProfileStore.select(context, it) }
         if (MihomoProfileStore.selected(context) == null) return false
-        com.mikubox.mihomo.service.MikuVpnService.start(context)
+        // BOOT_COMPLETED is a background foreground-service-start context: the
+        // platform can refuse the start outright, and an exception here would
+        // crash the process inside the boot broadcast (every other caller of
+        // MikuVpnService.start wraps this). Fall back to arming the tunnel
+        // guard, which retries in the next window the platform allows.
+        runCatching { com.mikubox.mihomo.service.MikuVpnService.start(context) }
+            .onFailure {
+                com.miku.ray.util.LogUtil.w(
+                    message = "startOnBoot could not start the VPN service; falling back to the tunnel guard",
+                    throwable = it,
+                )
+                com.mikubox.mihomo.service.TunnelGuard.schedule(context)
+            }
         return true
     }
 

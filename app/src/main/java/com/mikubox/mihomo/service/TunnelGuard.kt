@@ -48,10 +48,36 @@ object TunnelGuard {
      * it tears down, so a deliberate disconnect never resurrects.
      */
     fun expectRunning(context: Context, expected: Boolean) {
-        runCatching { MmkvManager.encodeSettings(AppConfig.PREF_TUNNEL_EXPECTED, expected) }
-            .onFailure { LogUtil.w(message = "Could not record the tunnel expectation", throwable = it) }
+        recordExpectation(context, expected)
         resetFailures(context)
         if (expected) schedule(context) else cancel(context)
+    }
+
+    /**
+     * Arms the guard for a start that has not connected yet, without touching
+     * the failure backoff: resetting it here would let every recovery retry
+     * clear the count on its way through the service entry, and a bad profile
+     * would then retry forever instead of tripping the three-failure breaker
+     * (see [recoveryPaused]). The connected checkpoint still calls
+     * [expectRunning], whose reset is the "the start succeeded" signal.
+     */
+    fun expectRunningWhileConnecting(context: Context) {
+        recordExpectation(context, true)
+        schedule(context)
+    }
+
+    private fun recordExpectation(context: Context, expected: Boolean) {
+        val recorded = runCatching { MmkvManager.encodeSettings(AppConfig.PREF_TUNNEL_EXPECTED, expected) }
+            .getOrElse { failure ->
+                LogUtil.w(message = "Could not record the tunnel expectation", throwable = failure)
+                false
+            }
+        if (!recorded) {
+            // encodeSettings reports a failed write by returning false, not by
+            // throwing (MmkvManager.encodeSettings): an unrecorded expectation
+            // silently leaves the guard disarmed, so it has to reach the log.
+            LogUtil.w(message = "Tunnel expectation was not persisted; the guard stays disarmed")
+        }
     }
 
     /** Arms the next check; the receiver re-arms it after every firing. */
