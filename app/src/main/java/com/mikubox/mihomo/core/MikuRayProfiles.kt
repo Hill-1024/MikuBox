@@ -52,6 +52,13 @@ object MikuRayProfiles : MikuProfiles.Impl {
         return result.id
     }
 
+    override fun saveShareLink(id: String?, name: String, shareLink: String, groupId: String?): String {
+        val content = MihomoSubscriptionDecoder.toMihomoConfig(context, shareLink, validateYamlSyntax = true)
+        val savedId = save(id, name, content)
+        groupId?.takeIf { it.isNotBlank() }?.let { moveToGroup(savedId, it) }
+        return savedId
+    }
+
     override fun importContent(content: String, groupId: String): Pair<Int, Int> {
         val destination = groups().firstOrNull { it.id == groupId }?.id ?: com.miku.ray.AppConfig.DEFAULT_SUBSCRIPTION_ID
         return try { importProfileContent(content, destination) } finally { sync() }

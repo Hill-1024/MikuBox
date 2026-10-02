@@ -16,6 +16,15 @@ object MikuProfiles {
         fun moveToGroup(id: String, groupId: String)
         fun get(id: String): Profile?
         fun save(id: String?, name: String, content: String): String
+
+        /**
+         * Persists a shared node link (vmess://, trojan://, …) as a profile and
+         * returns its id. The per-protocol forms build one of these from their
+         * fields; converting the link into a mihomo configuration lives in the
+         * app module (the decoder), behind this interface. Throws when the link
+         * cannot be converted.
+         */
+        fun saveShareLink(id: String?, name: String, shareLink: String, groupId: String?): String
         fun importContent(content: String, groupId: String = AppConfig.DEFAULT_SUBSCRIPTION_ID): Pair<Int, Int>
         fun remove(id: String)
         fun select(id: String)

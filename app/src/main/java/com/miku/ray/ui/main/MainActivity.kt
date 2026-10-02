@@ -78,9 +78,7 @@ import com.miku.ray.ui.logcat.LogcatActivity
 import com.miku.ray.ui.preference.activity.SettingsActivity
 import com.miku.ray.ui.routing.RoutingSettingActivity
 import com.miku.ray.ui.scanner.QrCaptureActivity
-import com.miku.ray.ui.server.ServerGroupActivity
 import com.miku.ray.ui.server.ServerHysteria2Activity
-import com.miku.ray.ui.server.ServerProxyChainActivity
 import com.miku.ray.ui.server.ServerShadowsocksActivity
 import com.miku.ray.ui.server.ServerSocksActivity
 import com.miku.ray.ui.server.ServerTrojanActivity
@@ -1638,49 +1636,27 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
     }
 
     private fun importManually(createConfigType: Int) {
-        if (com.miku.ray.MikuProfiles.impl != null) {
-            // MikuProfiles is installed unconditionally at startup, so every
-            // card below lands here. Forward the tapped protocol so the
-            // config editor can seed a matching template — otherwise the
-            // per-protocol cards all open the same blank editor and the
-            // labels promise forms that never appear.
-            startActivity(
-                Intent(this, com.miku.ray.ui.server.ServerCustomConfigActivity::class.java)
-                .putExtra("groupId", mainViewModel.subscriptionId)
-                .putExtra("createConfigType", createConfigType)
-            )
-            return
+        val targetActivity = when (EConfigType.fromInt(createConfigType)) {
+            // Policy groups and proxy chains describe multi-profile structures the
+            // per-protocol forms do not model; their cards keep opening the config
+            // editor with a matching template.
+            EConfigType.POLICYGROUP, EConfigType.PROXYCHAIN, EConfigType.CUSTOM, null ->
+                com.miku.ray.ui.server.ServerCustomConfigActivity::class.java
+            EConfigType.VLESS -> ServerVlessActivity::class.java
+            EConfigType.TROJAN -> ServerTrojanActivity::class.java
+            EConfigType.SHADOWSOCKS -> ServerShadowsocksActivity::class.java
+            EConfigType.SOCKS, EConfigType.HTTP -> ServerSocksActivity::class.java
+            EConfigType.WIREGUARD -> ServerWireguardActivity::class.java
+            EConfigType.HYSTERIA2 -> ServerHysteria2Activity::class.java
+            else -> ServerVmessActivity::class.java
         }
-        if (createConfigType == EConfigType.POLICYGROUP.value) {
-            startActivity(
-                Intent()
-                .putExtra("subscriptionId", mainViewModel.subscriptionId)
-                .setClass(this, ServerGroupActivity::class.java)
-            )
-        } else if (createConfigType == EConfigType.PROXYCHAIN.value) {
-            startActivity(
-                Intent()
-                .putExtra("subscriptionId", mainViewModel.subscriptionId)
-                .setClass(this, ServerProxyChainActivity::class.java)
-            )
-        } else {
-            val targetActivity = when (EConfigType.fromInt(createConfigType)) {
-                EConfigType.VLESS -> ServerVlessActivity::class.java
-                EConfigType.TROJAN -> ServerTrojanActivity::class.java
-                EConfigType.SHADOWSOCKS -> ServerShadowsocksActivity::class.java
-                EConfigType.SOCKS, EConfigType.HTTP -> ServerSocksActivity::class.java
-                EConfigType.WIREGUARD -> ServerWireguardActivity::class.java
-                EConfigType.HYSTERIA2 -> ServerHysteria2Activity::class.java
-                else -> ServerVmessActivity::class.java
-            }
 
-            startActivity(
-                Intent()
+        startActivity(
+            Intent(this, targetActivity)
                 .putExtra("createConfigType", createConfigType)
+                .putExtra("groupId", mainViewModel.subscriptionId)
                 .putExtra("subscriptionId", mainViewModel.subscriptionId)
-                .setClass(this, targetActivity)
-            )
-        }
+        )
     }
 
     private fun importQRcode(): Boolean {
