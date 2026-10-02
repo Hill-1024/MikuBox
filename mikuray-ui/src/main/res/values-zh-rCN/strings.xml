@@ -176,6 +176,7 @@
     <string name="menu_item_import_proxy_app">从剪贴板导入</string>
     <string name="per_app_proxy_settings">分应用设置</string>
     <string name="per_app_proxy_settings_enable">启用分应用</string>
+    <string name="per_app_system_app_name">%1$s（系统）</string>
 
     <string name="title_settings">设置</string>
     <string name="title_advanced">进阶设置</string>
@@ -475,7 +476,7 @@
     <string name="connection_test_testing">测试中…</string>
     <string name="connection_test_testing_count">正在测试 %d 个配置…</string>
     <string name="connection_test_available">连接成功：%dms</string>
-    <string name="connection_test_error">错误：%s</string>
+    <string name="connection_test_error">测速失败:%s 不可达</string>
     <string name="connection_test_fail">无网络</string>
     <string name="connection_test_error_status_code">错误代码：#%d</string>
     <string name="connection_connected">已连接。点击测试</string>
@@ -970,11 +971,7 @@
     <string name="uwu_next">继续</string>
     <string name="uwu_start">开始</string>
     <string name="uwu_welcome_title">欢迎来到</string>
-    <string name="uwu_welcome_summary_1">MikuRay,</string>
-    <string name="uwu_welcome_summary_2">Android 上的 V2Ray/Xray 客户端，采用 Miku UI 风格。</string>
     <string name="uwu_welcome_summary_3">用爱、Kotlin、Java 代码等精心打造。</string>
-    <string name="uwu_welcome_page1_desc">免费开源的 Android V2Ray/Xray 客户端。</string>
-    <string name="uwu_welcome_page2_desc">支持 VLESS、VMess、Trojan、Shadowsocks 等协议。</string>
     <string name="uwu_welcome_page3_desc">在可爱的 Miku 风格设计中，体验快速且安全的网络连接。</string>
 
     <string name="sub_setting_tab_icon">标签页图标</string>
@@ -1077,6 +1074,10 @@
     <string name="mihomo_group_name_hint">组名</string>
     <string name="mihomo_group_create_title">创建配置组</string>
     <string name="mihomo_group_manage_title">管理配置组</string>
+    <string name="subscription_update_requires_connection">仅连接时更新:当前未连接,已跳过订阅抓取;请先连接后再更新。</string>
+    <string name="btn_add_sub_description">添加订阅或配置组</string>
+    <string name="menu_add_subscription">添加订阅</string>
+    <string name="menu_add_title">添加</string>
     <string name="mihomo_group_manage_empty">默认 Miku 组用于收纳配置，不能删除。你可以创建新的配置组。</string>
     <string name="mihomo_group_entry_count">%1$s · %2$d 个配置</string>
     <string name="mihomo_group_delete_title">删除配置组“%1$s”？</string>
@@ -1191,7 +1192,6 @@
         <item>cinnamiku</item>
         <item>retryNow</item>
     </string-array>
-    <string name="app_name">MikuRay</string>
     <string-array name="app_name_entries" translatable="false">
         <item>@string/app_name</item>
         <item>@string/app_name_variant_miku1</item>
@@ -1732,4 +1732,15 @@
         <item>stream-up</item>
         <item>stream-one</item>
     </string-array>
+    <!-- Accessibility labels for controls that carry no visible text
+         (N1/N7/N10-N11/N22/N27/N29 of the 2026-10-02 a11y pass). -->
+    <string name="a11y_open_main_menu">打开主菜单</string>
+    <string name="a11y_more_options">更多选项</string>
+    <string name="subscription_import_url_hint">订阅地址</string>
+    <string name="a11y_selected">已选中</string>
+    <string name="a11y_status_card_test_action">测速当前选中配置</string>
+    <string name="qr_code_description">配置二维码</string>
+    <string name="qr_flashlight_toggle">开关手电筒</string>
+    <string name="profile_editor_edit_row">编辑 %1$s</string>
+    <string name="a11y_navigate_back">返回</string>
 </resources>

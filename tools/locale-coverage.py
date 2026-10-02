@@ -23,7 +23,7 @@ import xml.etree.ElementTree as ET
 RES = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "mikuray-ui", "src", "main", "res"))
 NAME_RE = re.compile(r'name="([^"]+)"')
 
-def collect(directory):
+def collect(directory, skip_untranslatable=False):
     """Return {resource_name: (kind, file_path)} for one res directory."""
     keys = {}
     for path in sorted(glob.glob(os.path.join(directory, "*.xml"))):
@@ -38,12 +38,50 @@ def collect(directory):
             name = element.get("name")
             if not name:
                 continue
+            # Untranslatable keys are deliberate brand/technical values the
+            # app layer overrides; they are not part of the per-locale
+            # contract, so they neither require nor forbid locale copies.
+            if skip_untranslatable and element.get("translatable") == "false":
+                continue
             if element.tag in ("string", "plurals", "string-array", "integer-array"):
                 kind = "plurals" if element.tag == "plurals" else "string"
                 if element.tag in ("string-array", "integer-array"):
                     kind = "array"
                 keys[name] = (kind, path)
     return keys
+
+
+# F33/N4 regression gate: a settings title whose whole value is the bare
+# config key it edits ("sniffer.enable", "keep-alive-interval") is a leak, not
+# a translation. Titles must be human-readable; the key stays visible via the
+# "Label · key" pattern. Plain single words ("address", "port") are legitimate
+# form labels, so the heuristic only flags key-shaped compounds: dotted or
+# hyphenated all-lowercase tokens.
+BARE_KEY_RE = re.compile(r"^[a-z0-9][a-z0-9.\-]*$")
+BARE_KEY_ALLOWED = {
+    # Input-format hints, not config keys: the field wants a "min-max" range.
+    "title_pref_fragment_interval_tip",
+    "title_pref_fragment_length_tip",
+}
+
+def bare_key_offenders():
+    """Default-locale <string> values that read as bare config keys."""
+    offenders = {}
+    for path in sorted(glob.glob(os.path.join(RES, "values", "*.xml"))):
+        try:
+            root = ET.parse(path).getroot()
+        except ET.ParseError:
+            continue
+        for element in root:
+            if element.tag != "string":
+                continue
+            name = element.get("name")
+            if not name or element.get("translatable") == "false":
+                continue
+            value = (element.text or "").strip()
+            if value and BARE_KEY_RE.match(value) and ("." in value or "-" in value) and name not in BARE_KEY_ALLOWED:
+                offenders[name] = value
+    return offenders
 
 def base_value(name, kind):
     """Best-effort base text for a key, for translation reference dumps."""
@@ -70,7 +108,7 @@ def main():
     parser.add_argument("--ci", action="store_true", help="exit 1 on any missing key")
     args = parser.parse_args()
 
-    base = collect(os.path.join(RES, "values"))
+    base = collect(os.path.join(RES, "values"), skip_untranslatable=True)
     locales = sorted(
         os.path.basename(d) for d in glob.glob(os.path.join(RES, "values-*"))
         if os.path.basename(d) not in ("values-night",)
@@ -121,6 +159,12 @@ def main():
         for name in missing:
             print("  %s" % name)
 
+    offenders = bare_key_offenders()
+    if offenders:
+        print("bare config-key titles in the default locale:")
+        for name, value in sorted(offenders.items()):
+            print("  %s = %s" % (name, value))
+
     if args.dump:
         if not args.locale:
             parser.error("--dump needs --locale")
@@ -135,6 +179,9 @@ def main():
         total = sum(len(v) for v in missing_all.values())
         if total:
             print("CI FAIL: %d keys missing across locales" % total, file=sys.stderr)
+            return 1
+        if offenders:
+            print("CI FAIL: %d default-locale strings are bare config keys" % len(offenders), file=sys.stderr)
             return 1
         print("locale coverage OK")
     return 0

@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">MikuRay</string>
+    <!-- F26: the brand strings are the one place the app layer deliberately
+         overrides this layer (the product is MikuBox, not MikuRay), so they
+         are marked untranslatable here and carry no locale copies — the app
+         layer owns the wording in every locale. -->
+    <string name="uwu_welcome_summary_1" translatable="false">MikuRay,</string>
+    <string name="uwu_welcome_summary_2" translatable="false">V2Ray/Xray client for Android with a Miku UI style.</string>
+    <string name="uwu_welcome_page1_desc" translatable="false">Free and open source V2Ray/Xray client for Android.</string>
+    <string name="uwu_welcome_page2_desc" translatable="false">Supports VLESS, VMess, Trojan, Shadowsocks, and more.</string>
     <string name="test_build_info_title">Test build</string>
     <string name="test_build_info_message">This is a test build of MikuRay. If you find a bug, please notify the owner or report it in the Telegram group by tagging the owner.\n\nTelegram channel: %1$s</string>
     <string name="test_build_info_channel">@uwuowoumuchannel</string>
@@ -161,11 +169,7 @@
     <string name="uwu_next">Next</string>
     <string name="uwu_start">Start</string>
     <string name="uwu_welcome_title">Welcome to</string>
-    <string name="uwu_welcome_summary_1">MikuRay,</string>
-    <string name="uwu_welcome_summary_2">V2Ray/Xray client for Android with a Miku UI style.</string>
     <string name="uwu_welcome_summary_3">Made with Heart, Kotlin, Java code and more.</string>
-    <string name="uwu_welcome_page1_desc">Free and open source V2Ray/Xray client for Android.</string>
-    <string name="uwu_welcome_page2_desc">Supports VLESS, VMess, Trojan, Shadowsocks, and more.</string>
     <string name="uwu_welcome_page3_desc">Experience fast, secure internet wrapped in a cute Miku-inspired design.</string>
 
     <string name="toast_asset_copy_failed">File copy failed, please use File Manager</string>
@@ -192,6 +196,9 @@
     <string name="menu_item_import_proxy_app">Import from Clipboard</string>
     <string name="per_app_proxy_settings">Per-app settings</string>
     <string name="per_app_proxy_settings_enable">Enable per-app</string>
+    <!-- The picker marks system apps in the row label itself, so the marker
+         reads out loud with the name (was a bare "** " prefix). -->
+    <string name="per_app_system_app_name">%1$s (System)</string>
     <string name="app_picker_unknown_app">Unknown app (unidentified UID)</string>
 
     <string name="title_settings">Settings</string>
@@ -501,7 +508,9 @@ Package Name — only supported when using Xray TUN, routeOnly enabled, and Andr
     <string name="connection_test_testing">Testing…</string>
     <string name="connection_test_testing_count">Testing %d configs…</string>
     <string name="connection_test_available">Success connected: %dms</string>
-    <string name="connection_test_error">Error: %s</string>
+    <!-- F16: the line names what failed — the delay-test endpoint, not the
+         tunnel — so a connected card no longer contradicts itself. -->
+    <string name="connection_test_error">Delay test failed: %s unreachable</string>
     <string name="connection_test_fail">No Internet</string>
     <string name="connection_test_error_status_code">Error code: #%d</string>
     <string name="connection_connected">Connected. Tap to test</string>
@@ -1131,6 +1140,15 @@ you need."</string>
     <string name="mihomo_group_delete_message">Profiles and subscriptions in this group move back to Miku. Their content, subscription settings and the current connection are kept.</string>
     <string name="mihomo_group_delete_action">Delete group</string>
     <string name="mihomo_group_choose_title">Groups</string>
+    <!-- The home screen's add-config dialog and its screen-reader labels
+         (hard-coded Chinese before; the create/manage entries reuse the
+         mihomo_group_* strings above). -->
+    <string name="menu_add_title">Add</string>
+    <string name="menu_add_subscription">Add subscription</string>
+    <string name="btn_add_sub_description">Add a subscription or config group</string>
+    <!-- The subscription gate: updateWhenConnectedOnly refuses to contact the
+         provider while the tunnel is down, and the editor says so. -->
+    <string name="subscription_update_requires_connection">Update only while connected: the tunnel is down, so the subscription was not fetched. Connect first, then update again.</string>
     <string name="mihomo_group_new_action">New group</string>
     <string name="mihomo_group_name_required">Enter a group name</string>
     <string name="mihomo_group_name_exists">This group name is already in use</string>
@@ -1165,4 +1183,15 @@ you need."</string>
     <string name="mihomo_vpn_oem_title">App background settings</string>
     <string name="mihomo_vpn_oem_summary">Allow background activity, autostart and related launching in the system app info (options vary by system). The app cannot grant these itself; a battery optimization exemption is not a vendor cleanup exemption.</string>
     <string name="mihomo_vpn_open_settings_failed">Could not open system settings — open MikuBox app info from the system Settings.</string>
+    <!-- Accessibility labels for controls that carry no visible text
+         (N1/N7/N10-N11/N22/N27/N29 of the 2026-10-02 a11y pass). -->
+    <string name="a11y_open_main_menu">Open main menu</string>
+    <string name="a11y_more_options">More options</string>
+    <string name="subscription_import_url_hint">Subscription URL</string>
+    <string name="a11y_selected">Selected</string>
+    <string name="a11y_status_card_test_action">Speed-test the selected profile</string>
+    <string name="qr_code_description">Configuration QR code</string>
+    <string name="qr_flashlight_toggle">Toggle flashlight</string>
+    <string name="profile_editor_edit_row">Edit %1$s</string>
+    <string name="a11y_navigate_back">Back</string>
 </resources>

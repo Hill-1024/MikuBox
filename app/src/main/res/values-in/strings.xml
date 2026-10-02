@@ -16,7 +16,6 @@
     <string name="vpn_notification_exit_ip">Keluar %1$s</string>
     <string name="vpn_action_stop">Berhenti</string>
     <string name="vpn_tile_title">VPN MikuBox</string>
-    <string name="local_proxy_notification_running">Proksi Mihomo lokal sedang berjalan</string>
     <string name="subscription_channel_name">Pembaruan langganan</string>
     <string name="subscription_update_title">Memperbarui langganan</string>
 
@@ -31,6 +30,16 @@
     <string name="profile_default_name">Profil</string>
     <string name="profile_imported_default_name">Profil yang diimpor</string>
     <string name="profile_subscription_default_name">Langganan</string>
+
+    <!-- Dialog tambah dan label pembaca layar (sebelumnya teks Mandarin yang
+         di-hardcode, kini dapat dilokalkan seperti lainnya). -->
+
+    <!-- Pemilih per-app menandai aplikasi sistem di label barisnya, agar
+         tandanya terbaca bersama namanya. -->
+
+    <!-- Bridge selalu mengaktifkan modul DNS pada mode VPN; halaman DNS harus
+         mengatakannya, atau dns.enable=false terlihat seperti rusak. -->
+    <string name="mihomo_dns_vpn_forced_hint">Mode VPN selalu mengaktifkan modul DNS (dns.enable=false pada profil akan ditimpa). Agar DNS dijawab tanpa pembajakan, kosongkan daftar hijack DNS TUN.</string>
 
     <string name="apps_search">Cari aplikasi</string>
     <string name="apps_select_all">Pilih semua</string>
