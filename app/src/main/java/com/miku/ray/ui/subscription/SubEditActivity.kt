@@ -1,5 +1,6 @@
 package com.miku.ray.ui.subscription
 
+import android.content.Context
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
@@ -70,10 +71,10 @@ class SubEditActivity : HelperBaseActivity() {
         throughProxy = findViewById(R.id.auto_update_check)
         updateWhenConnectedOnly = findViewById(R.id.update_when_connected_only)
 
-        val entries = ArrayAdapter(this, android.R.layout.simple_list_item_1, boolEntries)
+        val entries = NonFilteringAdapter(this, boolEntries.toList())
         autoUpdate.setAdapter(entries)
         labelOf(autoUpdate)?.hint = getString(R.string.sub_auto_update)
-        throughProxy.setAdapter(entries)
+        throughProxy.setAdapter(NonFilteringAdapter(this, boolEntries.toList()))
         // The second dropdown is MikuRay's own "auto update" switch; here it
         // carries the one Clash flag its editor has no other place for. Its wording
         // is app-specific, so it is set here rather than taken from the vendored
@@ -82,7 +83,7 @@ class SubEditActivity : HelperBaseActivity() {
             hint = getString(R.string.subscription_update_through_proxy)
             helperText = getString(R.string.subscription_update_through_proxy_summary)
         }
-        updateWhenConnectedOnly.setAdapter(entries)
+        updateWhenConnectedOnly.setAdapter(NonFilteringAdapter(this, boolEntries.toList()))
         // The row itself is a MikuBox addition to the vendored layout (see the
         // layout's deviation note); its wording is app-specific for the same
         // reason as the row above.
@@ -133,7 +134,12 @@ class SubEditActivity : HelperBaseActivity() {
         val existing = subscriptionId
             ?.let { id -> MikuSubscriptions.list().firstOrNull { it.id == id } }
             ?: run {
-                autoUpdate.setText(entryForBool(false), false)
+                // Match the deep-link importer's defaults (auto-update on,
+                // 24 hours): a manually created subscription used to start
+                // disabled with a blank interval, so the same source reached
+                // the scheduler differently depending on the entry door.
+                interval.setText((24 * 60L).toString())
+                autoUpdate.setText(entryForBool(true), false)
                 throughProxy.setText(entryForBool(false), false)
                 updateWhenConnectedOnly.setText(entryForBool(false), false)
                 return
@@ -180,7 +186,12 @@ class SubEditActivity : HelperBaseActivity() {
                 )
                 if (fetched) finish()
                 else android.widget.Toast.makeText(this@SubEditActivity,
-                    R.string.subscription_initial_fetch_failed, android.widget.Toast.LENGTH_LONG).show()
+                    // The gate in MihomoSubscriptionUpdater skips the fetch
+                    // when this flag is on and the tunnel is down; say why
+                    // instead of the generic fetch-failed line.
+                    if (onlyWhenConnected && !com.miku.ray.MikuCoreBridge.isRunning()) R.string.subscription_update_requires_connection
+                    else R.string.subscription_initial_fetch_failed,
+                    android.widget.Toast.LENGTH_LONG).show()
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: Exception) {
@@ -193,6 +204,31 @@ class SubEditActivity : HelperBaseActivity() {
     }
 
     // region field helpers
+
+    /**
+     * N18: a plain ArrayAdapter filters by whatever text the field already
+     * shows, so a dropdown currently displaying "Disable" offered only
+     * "Disable" — the user had to clear the text or poke the end icon to see
+     * "Enable". This adapter's filter always publishes the full list.
+     */
+    private class NonFilteringAdapter(
+        context: Context,
+        private val items: List<String>,
+    ) : ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, items) {
+        private val fullListFilter = object : android.widget.Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults =
+                FilterResults().apply {
+                    values = items
+                    count = items.size
+                }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                notifyDataSetChanged()
+            }
+        }
+
+        override fun getFilter(): android.widget.Filter = fullListFilter
+    }
 
     private fun hide(vararg ids: Int) {
         ids.forEach { id ->

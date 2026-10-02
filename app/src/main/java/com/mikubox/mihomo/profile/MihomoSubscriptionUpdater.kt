@@ -63,7 +63,30 @@ object MihomoSubscriptionUpdater {
         }
     }
 
+    /**
+     * The user asked for this subscription to be fetched only while the tunnel
+     * is up ("the provider is never contacted directly"). Raised by [update]
+     * when a fetch would have to go out directly; callers surface it as a
+     * failed update instead of silently contacting the provider.
+     */
+    class BlockedWhileDisconnected(message: String) : IllegalStateException(message)
+
+    /** True when this subscription must not be contacted in the current state. */
+    fun blockedWhileDisconnected(profile: MihomoProfileStore.Profile): Boolean =
+        profile.updateWhenConnectedOnly && !VpnController.isRunning
+
     fun update(context: Context, profile: MihomoProfileStore.Profile): UpdateResult {
+        // The gate lives at the entry, not only in the worker loop: the
+        // editor's save (including a first fetch), the subscription list's
+        // update, the home-screen refresh and the importer all funnel through
+        // here, and the flag promises the provider is never contacted
+        // directly. Skipping is a failure the caller can show, not a silent
+        // direct fetch.
+        if (blockedWhileDisconnected(profile)) {
+            throw BlockedWhileDisconnected(
+                "updateWhenConnectedOnly is set and the tunnel is down; not contacting ${profile.subscriptionUrl}",
+            )
+        }
         val url = requireNotNull(profile.subscriptionUrl)
         val routeThroughProxy = profile.updateThroughProxy &&
             (profile.config.isNotBlank() || VpnController.isRunning)
@@ -179,7 +202,7 @@ object MihomoSubscriptionUpdater {
                 // One broken subscription must not stop the others, and the
                 // ongoing notification has to leave even when some fail.
                 profiles.forEach { profile ->
-                    if (profile.updateWhenConnectedOnly && !VpnController.isRunning) return@forEach
+                    if (blockedWhileDisconnected(profile)) return@forEach
                     val age = System.currentTimeMillis() - profile.updatedAtMillis
                     if (age < profile.updateIntervalMinutes.coerceAtLeast(15) * 60_000L) return@forEach
                     attempted = true
