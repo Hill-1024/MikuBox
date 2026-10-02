@@ -3026,9 +3026,6 @@
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
             android:exported="false"
-            android:name="com.miku.ray.ui.apppicker.AppPickerActivity" />
-        <activity
-            android:exported="false"
             android:name="com.miku.ray.ui.userasset.UserAssetActivity" />
         <activity
             android:exported="false"
