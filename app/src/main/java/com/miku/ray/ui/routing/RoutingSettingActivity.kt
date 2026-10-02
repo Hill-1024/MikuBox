@@ -43,7 +43,10 @@ class RoutingSettingActivity : BaseActivity() {
         content.addView(MaterialButton(this).apply {
             text = getString(com.miku.ray.R.string.mihomo_routing_apply_now)
             setOnClickListener {
-                val message = if (!MikuCoreBridge.isRunning()) getString(com.miku.ray.R.string.mihomo_routing_saved_next_connect)
+                // CONNECTING counts as live: the bridge queues the reload and the
+                // service replays it once the tunnel is up, exactly like the
+                // settings pages that consume SettingsChangeManager.
+                val message = if (!MikuCoreBridge.isRunning() && !MikuCoreBridge.isConnecting()) getString(com.miku.ray.R.string.mihomo_routing_saved_next_connect)
                     else if (MikuCoreBridge.restart()) getString(com.miku.ray.R.string.mihomo_routing_reconnecting)
                     else getString(com.miku.ray.R.string.mihomo_routing_reconnect_failed)
                 Toast.makeText(this@RoutingSettingActivity, message, Toast.LENGTH_SHORT).show()

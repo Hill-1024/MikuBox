@@ -44,6 +44,8 @@ object MikuRayCoreBridge : MikuCoreBridge.Impl {
 
     override fun isRunning(): Boolean = VpnController.isRunning
 
+    override fun isConnecting(): Boolean = com.mikubox.mihomo.service.MikuVpnService.starting
+
     /**
      * Starts the tunnel. The Xray config MikuRay would pass is not used: MikuBox
      * starts the core from the profile the user selected, and the Android VPN
