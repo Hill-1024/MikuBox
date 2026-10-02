@@ -628,6 +628,17 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
                 false
             }
         }
+
+        // N13: the chip is 32dp tall — under the 48dp minimum touch target.
+        // Keep the visual size and extend the hit area through a delegate on
+        // the parent instead of inflating the layout.
+        binding.layoutWeatherChip.doOnLayout { view ->
+            val extra = (8 * resources.displayMetrics.density).toInt()
+            val area = android.graphics.Rect()
+            view.getHitRect(area)
+            area.inset(-extra, -extra)
+            (view.parent as? View)?.touchDelegate = android.view.TouchDelegate(area, view)
+        }
     }
 
     private fun isWeatherChipSelected(): Boolean {
@@ -912,6 +923,32 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
         binding.fab.shrink()
 
         binding.blurBottomStatus.setOnClickListener { mainViewModel.onLayoutTestClicked() }
+        // N10: the whole card is one big tap-to-test button, but nothing said
+        // so — to a screen reader it was an unlabeled clickable rectangle.
+        // The node itself carries the action as its description (the audit's
+        // strict "every clickable is labeled" bar), the click action is named,
+        // and a disconnected tunnel makes the tap a no-op. The IP/state texts
+        // inside stay separately focusable for their live values.
+        binding.blurBottomStatus.contentDescription =
+            getString(R.string.a11y_status_card_test_action)
+        ViewCompat.setAccessibilityDelegate(binding.blurBottomStatus, object :
+            androidx.core.view.AccessibilityDelegateCompat() {
+            override fun onInitializeAccessibilityNodeInfo(
+                host: View,
+                info: androidx.core.view.accessibility.AccessibilityNodeInfoCompat,
+            ) {
+                super.onInitializeAccessibilityNodeInfo(host, info)
+                val connected = mainViewModel.isRunning.value
+                info.isEnabled = connected
+                info.removeAction(androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CLICK)
+                info.addAction(
+                    androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                        androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_CLICK,
+                        getString(R.string.a11y_status_card_test_action),
+                    )
+                )
+            }
+        })
 
         binding.btnHome.setOnClickListener {
             MainMenuBottomSheet().show(supportFragmentManager, MainMenuBottomSheet.TAG)
@@ -2098,7 +2135,7 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
                 try {
                     val ivBinding = ItemQrcodeBinding.inflate(LayoutInflater.from(this))
                     ivBinding.ivQcode.setImageBitmap(AngConfigManager.share2QRCode(guid))
-                    ivBinding.ivQcode.contentDescription = "QR Code"
+                    ivBinding.ivQcode.contentDescription = getString(R.string.qr_code_description)
                     MaterialAlertDialogBuilder(this)
                     .setTitle(R.string.title_qr_code)
                     .setIcon(RemixR.drawable.rmx_qr_code_line)

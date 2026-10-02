@@ -67,6 +67,7 @@
                             style="@style/Widget.Material3Expressive.Button.IconButton.Filled"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:contentDescription="@string/a11y_open_main_menu"
                             android:minHeight="55dp"
                             android:minWidth="55dp"
                             app:backgroundTint="?attr/colorCard"
@@ -80,6 +81,7 @@
                             style="@style/Widget.Material3Expressive.Button.IconButton.Filled"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:contentDescription="@string/a11y_more_options"
                             android:minHeight="55dp"
                             android:minWidth="55dp"
                             app:backgroundTint="?attr/colorCard"
@@ -151,6 +153,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="4dp"
+                        android:contentDescription="@string/menu_item_add_config"
                         android:minHeight="55dp"
                         android:minWidth="55dp"
                         app:backgroundTint="?attr/colorCard"
@@ -179,7 +182,7 @@
                             <ImageView
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"
-                                android:src="@drawable/ic_aim_color" />
+                                android:src="@drawable/ic_aim_color" android:importantForAccessibility="no" />
 
                             <androidx.appcompat.widget.SearchView
                                 android:id="@+id/search_view_inline"
@@ -401,6 +404,7 @@
                     android:id="@+id/tv_test_state"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:accessibilityLiveRegion="polite"
                     android:ellipsize="marquee"
                     android:focusable="true"
                     android:focusableInTouchMode="true"

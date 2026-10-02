@@ -755,4 +755,8 @@
     <color name="blueGrey_surfaceContainerHigh">#292A2B</color>
     <color name="blueGrey_surfaceContainerHighest">#343536</color>
 
+    <!-- N9: dark cards keep the original bright green; the darker
+         light-theme shade would lose its pop on them. -->
+    <color name="colorPing">#009966</color>
+
 </resources>

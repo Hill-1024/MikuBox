@@ -18,6 +18,7 @@ import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textview.MaterialTextView
+import androidx.core.view.ViewCompat
 import com.miku.ray.R
 
 /** Section cards and editable preference rows over the complete YAML document. */
@@ -63,6 +64,9 @@ class VisualConfigEditor(context: Context, private val changed: (String) -> Unit
         addView(label(title, true).apply {
             setTextColor(color(R.attr.colorPrimary))
             setPadding(dp(8), dp(16), dp(8), dp(12))
+            // N12: programmatic section titles must still be headings, so
+            // screen-reader users can jump between General/Configuration/etc.
+            ViewCompat.setAccessibilityHeading(this, true)
         })
         val rows = LinearLayout(context).apply { orientation = VERTICAL; setPadding(0, dp(4), 0, dp(4)) }
         val card = MaterialCardView(context).apply {
@@ -125,7 +129,11 @@ class VisualConfigEditor(context: Context, private val changed: (String) -> Unit
                 addView(ImageView(context).apply {
                     setImageResource(if (nested) R.drawable.rmx_arrows_arrow_right_s_line else R.drawable.rmx_edit_line)
                     imageTintList = ColorStateList.valueOf(color(com.google.android.material.R.attr.colorOnSurfaceVariant))
-                    importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+                    // N29: this icon is itself clickable, so instead of hiding
+                    // it from the tree it now carries a spoken edit action and
+                    // a generated id, so audits can target it too.
+                    id = View.generateViewId()
+                    contentDescription = context.getString(R.string.profile_editor_edit_row, title)
                     setOnClickListener { action() }
                 }, LayoutParams(dp(24), dp(24)))
             }

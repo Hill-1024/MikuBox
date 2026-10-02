@@ -151,7 +151,11 @@ object AppConfig {
     const val PREF_BLUR_BOTTOM_RADIUS = "pref_blur_bottom_radius"
     const val DEFAULT_BLUR_BOTTOM_RADIUS = 2.5f
     const val PREF_BLUR_BOTTOM_ALPHA = "pref_blur_bottom_alpha"
-    const val DEFAULT_BLUR_BOTTOM_ALPHA = 25
+    // N14: 25% glass over an arbitrary wallpaper could not guarantee any
+    // minimum contrast for the status text. 60% keeps the glass look while
+    // giving the foreground a fighting chance on every backdrop; users who
+    // saved a preference keep theirs.
+    const val DEFAULT_BLUR_BOTTOM_ALPHA = 60
     const val PREF_BLUR_BOTTOM_BLOB_ANIM = "pref_blur_bottom_blob_anim"
     const val PREF_ICON_SHAPE = "pref_icon_shape"
     const val PREF_ICON_SHAPE_DEFAULT = "uwu_shape_cookie_9"

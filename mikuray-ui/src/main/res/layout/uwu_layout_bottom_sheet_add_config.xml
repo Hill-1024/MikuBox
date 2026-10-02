@@ -94,7 +94,7 @@
                                         android:layout_height="60dp"
                                         android:src="@drawable/uwu_banner_profile"
                                         app:siBorderColor="?attr/colorPrimary"
-                                        app:siBorderWidth="3dp" />
+                                        app:siBorderWidth="3dp" android:importantForAccessibility="no" />
                                 </LinearLayout>
                                 <RelativeLayout
                                     android:layout_width="wrap_content"
@@ -209,13 +209,13 @@
                                     android:layout_height="45dp"
                                     android:scaleType="centerCrop"
                                     app:shapeBackgroundColor="?attr/colorPrimary"
-                                    app:shapeTarget="icon" />
+                                    app:shapeTarget="icon" android:importantForAccessibility="no" />
                                 <ImageView
                                     android:layout_width="25dp"
                                     android:layout_height="25dp"
                                     android:layout_gravity="center"
                                     android:src="@drawable/rmx_qr_code_line"
-                                    android:tint="?attr/colorOnPrimary" />
+                                    android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                         </FrameLayout>
                     </LinearLayout>
                     <LinearLayout
@@ -251,14 +251,14 @@
                                 android:layout_height="28dp"
                                 android:scaleType="centerCrop"
                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                app:shapeTarget="arrow" />
+                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                             <ImageView
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                android:tint="?attr/colorOnSurfaceVariant" />
+                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                         </FrameLayout>
                     </LinearLayout>
                 </LinearLayout>
@@ -309,13 +309,13 @@
                                     android:layout_height="45dp"
                                     android:scaleType="centerCrop"
                                     app:shapeBackgroundColor="?attr/colorPrimary"
-                                    app:shapeTarget="icon" />
+                                    app:shapeTarget="icon" android:importantForAccessibility="no" />
                                 <ImageView
                                     android:layout_width="25dp"
                                     android:layout_height="25dp"
                                     android:layout_gravity="center"
                                     android:src="@drawable/rmx_clipboard_line"
-                                    android:tint="?attr/colorOnPrimary" />
+                                    android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                         </FrameLayout>
                     </LinearLayout>
                     <LinearLayout
@@ -351,14 +351,14 @@
                                 android:layout_height="28dp"
                                 android:scaleType="centerCrop"
                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                app:shapeTarget="arrow" />
+                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                             <ImageView
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                android:tint="?attr/colorOnSurfaceVariant" />
+                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                         </FrameLayout>
                     </LinearLayout>
                 </LinearLayout>
@@ -409,13 +409,13 @@
                                     android:layout_height="45dp"
                                     android:scaleType="centerCrop"
                                     app:shapeBackgroundColor="?attr/colorPrimary"
-                                    app:shapeTarget="icon" />
+                                    app:shapeTarget="icon" android:importantForAccessibility="no" />
                                 <ImageView
                                     android:layout_width="25dp"
                                     android:layout_height="25dp"
                                     android:layout_gravity="center"
                                     android:src="@drawable/rmx_file_line"
-                                    android:tint="?attr/colorOnPrimary" />
+                                    android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                         </FrameLayout>
                     </LinearLayout>
                     <LinearLayout
@@ -451,14 +451,14 @@
                                 android:layout_height="28dp"
                                 android:scaleType="centerCrop"
                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                app:shapeTarget="arrow" />
+                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                             <ImageView
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                android:tint="?attr/colorOnSurfaceVariant" />
+                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                         </FrameLayout>
                     </LinearLayout>
                 </LinearLayout>
@@ -546,7 +546,7 @@
                                         android:layout_marginTop="7dp"
                                         android:scaleType="centerInside"
                                         android:src="@drawable/rmx_file_add_line"
-                                        app:tint="?attr/colorOnPrimary" />
+                                        app:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                     <com.google.android.material.card.MaterialCardView
                                         android:layout_width="20dp"
                                         android:layout_height="3dp"
@@ -629,7 +629,7 @@
                                         android:layout_marginTop="7dp"
                                         android:scaleType="centerInside"
                                         android:src="@drawable/rmx_file_add_line"
-                                        app:tint="?attr/colorOnPrimary" />
+                                        app:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                     <com.google.android.material.card.MaterialCardView
                                         android:layout_width="20dp"
                                         android:layout_height="3dp"
@@ -712,7 +712,7 @@
                                         android:layout_marginTop="7dp"
                                         android:scaleType="centerInside"
                                         android:src="@drawable/rmx_file_add_line"
-                                        app:tint="?attr/colorOnPrimary" />
+                                        app:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                     <com.google.android.material.card.MaterialCardView
                                         android:layout_width="20dp"
                                         android:layout_height="3dp"
@@ -795,7 +795,7 @@
                                         android:layout_marginTop="7dp"
                                         android:scaleType="centerInside"
                                         android:src="@drawable/rmx_file_add_line"
-                                        app:tint="?attr/colorOnPrimary" />
+                                        app:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                     <com.google.android.material.card.MaterialCardView
                                         android:layout_width="20dp"
                                         android:layout_height="3dp"
@@ -878,7 +878,7 @@
                                         android:layout_marginTop="7dp"
                                         android:scaleType="centerInside"
                                         android:src="@drawable/rmx_file_add_line"
-                                        app:tint="?attr/colorOnPrimary" />
+                                        app:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                     <com.google.android.material.card.MaterialCardView
                                         android:layout_width="20dp"
                                         android:layout_height="3dp"
@@ -961,7 +961,7 @@
                                         android:layout_marginTop="7dp"
                                         android:scaleType="centerInside"
                                         android:src="@drawable/rmx_file_add_line"
-                                        app:tint="?attr/colorOnPrimary" />
+                                        app:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                     <com.google.android.material.card.MaterialCardView
                                         android:layout_width="20dp"
                                         android:layout_height="3dp"
@@ -1044,7 +1044,7 @@
                                         android:layout_marginTop="7dp"
                                         android:scaleType="centerInside"
                                         android:src="@drawable/rmx_file_add_line"
-                                        app:tint="?attr/colorOnPrimary" />
+                                        app:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                     <com.google.android.material.card.MaterialCardView
                                         android:layout_width="20dp"
                                         android:layout_height="3dp"
@@ -1127,7 +1127,7 @@
                                         android:layout_marginTop="7dp"
                                         android:scaleType="centerInside"
                                         android:src="@drawable/rmx_file_add_line"
-                                        app:tint="?attr/colorOnPrimary" />
+                                        app:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                     <com.google.android.material.card.MaterialCardView
                                         android:layout_width="20dp"
                                         android:layout_height="3dp"
@@ -1210,7 +1210,7 @@
                                         android:layout_marginTop="7dp"
                                         android:scaleType="centerInside"
                                         android:src="@drawable/rmx_file_add_line"
-                                        app:tint="?attr/colorOnPrimary" />
+                                        app:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                     <com.google.android.material.card.MaterialCardView
                                         android:layout_width="20dp"
                                         android:layout_height="3dp"
@@ -1292,7 +1292,7 @@
                                         android:layout_marginTop="7dp"
                                         android:scaleType="centerInside"
                                         android:src="@drawable/rmx_file_add_line"
-                                        app:tint="?attr/colorOnPrimary" />
+                                        app:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                     <com.google.android.material.card.MaterialCardView
                                         android:layout_width="20dp"
                                         android:layout_height="3dp"

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPing">#009966</color>
+    <!-- N9: the light-theme card is near-white (#FFF0EE); #009966 measured
+         3.30:1 against it — below the 4.5:1 AA bar for 12sp text. #007A50
+         measures 4.87:1. The dark theme keeps the brighter green via
+         values-night/colors.xml. -->
+    <color name="colorPing">#007A50</color>
     <color name="colorPingRed">#FF0099</color>
     <color name="colorConfigType">#f97910</color>
     <color name="colorWhite">#FFFFFF</color>

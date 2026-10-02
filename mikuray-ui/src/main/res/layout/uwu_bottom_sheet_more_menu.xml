@@ -94,7 +94,7 @@
                                         android:layout_height="60dp"
                                         android:src="@drawable/uwu_banner_profile"
                                         app:siBorderColor="?attr/colorPrimary"
-                                        app:siBorderWidth="3dp" />
+                                        app:siBorderWidth="3dp" android:importantForAccessibility="no" />
                                 </LinearLayout>
                                 <RelativeLayout
                                     android:layout_width="wrap_content"
@@ -196,6 +196,7 @@
                             android:layout_marginEnd="16dp"
                             android:layout_marginStart="16dp"
                             android:layout_marginTop="0dp"
+                            android:accessibilityHeading="true"
                             android:clickable="true"
                             android:focusable="true"
                             app:cardBackgroundColor="?attr/colorCard"
@@ -233,14 +234,14 @@
                                             android:layout_height="45dp"
                                             android:scaleType="centerCrop"
                                             app:shapeBackgroundColor="?attr/colorPrimary"
-                                            app:shapeTarget="icon" />
+                                            app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                         <ImageView
                                             android:layout_width="25dp"
                                             android:layout_height="25dp"
                                             android:layout_gravity="center"
                                             android:src="@drawable/rmx_lightbulb_line"
-                                            android:tint="?attr/colorOnPrimary" />
+                                            android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                     </FrameLayout>
                                 </LinearLayout>
 
@@ -284,7 +285,7 @@
                                             android:layout_height="28dp"
                                             android:scaleType="centerCrop"
                                             app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                            app:shapeTarget="arrow" />
+                                            app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                         <ImageView
                                         android:id="@+id/quick_actions_arrow"
@@ -358,14 +359,14 @@
                                                 android:layout_height="45dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorPrimary"
-                                                app:shapeTarget="icon" />
+                                                app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="25dp"
                                                 android:layout_height="25dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_crosshair_line"
-                                                android:tint="?attr/colorOnPrimary" />
+                                                android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
 
@@ -409,14 +410,14 @@
                                                 android:layout_height="28dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                                app:shapeTarget="arrow" />
+                                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="24dp"
                                                 android:layout_height="24dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                                android:tint="?attr/colorOnSurfaceVariant" />
+                                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
                                 </LinearLayout>
@@ -467,14 +468,14 @@
                                                 android:layout_height="45dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorPrimary"
-                                                app:shapeTarget="icon" />
+                                                app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="25dp"
                                                 android:layout_height="25dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_refresh_line"
-                                                android:tint="?attr/colorOnPrimary" />
+                                                android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
 
@@ -518,14 +519,14 @@
                                                 android:layout_height="28dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                                app:shapeTarget="arrow" />
+                                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="24dp"
                                                 android:layout_height="24dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                                android:tint="?attr/colorOnSurfaceVariant" />
+                                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
                                 </LinearLayout>
@@ -576,14 +577,14 @@
                                                 android:layout_height="45dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorPrimary"
-                                                app:shapeTarget="icon" />
+                                                app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="25dp"
                                                 android:layout_height="25dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_cloud_line"
-                                                android:tint="?attr/colorOnPrimary" />
+                                                android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
 
@@ -627,14 +628,14 @@
                                                 android:layout_height="28dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                                app:shapeTarget="arrow" />
+                                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="24dp"
                                                 android:layout_height="24dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                                android:tint="?attr/colorOnSurfaceVariant" />
+                                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
                                 </LinearLayout>
@@ -685,14 +686,14 @@
                                                 android:layout_height="45dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorPrimary"
-                                                app:shapeTarget="icon" />
+                                                app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="25dp"
                                                 android:layout_height="25dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_global_line"
-                                                android:tint="?attr/colorOnPrimary" />
+                                                android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
 
@@ -736,14 +737,14 @@
                                                 android:layout_height="28dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                                app:shapeTarget="arrow" />
+                                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="24dp"
                                                 android:layout_height="24dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                                android:tint="?attr/colorOnSurfaceVariant" />
+                                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
                                 </LinearLayout>
@@ -794,14 +795,14 @@
                                                 android:layout_height="45dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorPrimary"
-                                                app:shapeTarget="icon" />
+                                                app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="25dp"
                                                 android:layout_height="25dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_wifi_line"
-                                                android:tint="?attr/colorOnPrimary" />
+                                                android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
 
@@ -845,14 +846,14 @@
                                                 android:layout_height="28dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                                app:shapeTarget="arrow" />
+                                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="24dp"
                                                 android:layout_height="24dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                                android:tint="?attr/colorOnSurfaceVariant" />
+                                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
                                 </LinearLayout>
@@ -903,14 +904,14 @@
                                                 android:layout_height="45dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorPrimary"
-                                                app:shapeTarget="icon" />
+                                                app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="25dp"
                                                 android:layout_height="25dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_speed_line"
-                                                android:tint="?attr/colorOnPrimary" />
+                                                android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
 
@@ -954,14 +955,14 @@
                                                 android:layout_height="28dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                                app:shapeTarget="arrow" />
+                                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="24dp"
                                                 android:layout_height="24dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                                android:tint="?attr/colorOnSurfaceVariant" />
+                                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
                                 </LinearLayout>
@@ -989,6 +990,7 @@
                             android:layout_marginEnd="16dp"
                             android:layout_marginStart="16dp"
                             android:layout_marginTop="0dp"
+                            android:accessibilityHeading="true"
                             android:clickable="true"
                             android:focusable="true"
                             app:cardBackgroundColor="?attr/colorCard"
@@ -1026,14 +1028,14 @@
                                             android:layout_height="45dp"
                                             android:scaleType="centerCrop"
                                             app:shapeBackgroundColor="?attr/colorPrimary"
-                                            app:shapeTarget="icon" />
+                                            app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                         <ImageView
                                             android:layout_width="25dp"
                                             android:layout_height="25dp"
                                             android:layout_gravity="center"
                                             android:src="@drawable/rmx_user_settings_line"
-                                            android:tint="?attr/colorOnPrimary" />
+                                            android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                     </FrameLayout>
                                 </LinearLayout>
 
@@ -1077,7 +1079,7 @@
                                             android:layout_height="28dp"
                                             android:scaleType="centerCrop"
                                             app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                            app:shapeTarget="arrow" />
+                                            app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                         <ImageView
                                         android:id="@+id/management_arrow"
@@ -1150,14 +1152,14 @@
                                                 android:layout_height="45dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorPrimary"
-                                                app:shapeTarget="icon" />
+                                                app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="25dp"
                                                 android:layout_height="25dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_share_line"
-                                                android:tint="?attr/colorOnPrimary" />
+                                                android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
 
@@ -1201,14 +1203,14 @@
                                                 android:layout_height="28dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                                app:shapeTarget="arrow" />
+                                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="24dp"
                                                 android:layout_height="24dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                                android:tint="?attr/colorOnSurfaceVariant" />
+                                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
                                 </LinearLayout>
@@ -1259,14 +1261,14 @@
                                                 android:layout_height="45dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorPrimary"
-                                                app:shapeTarget="icon" />
+                                                app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="25dp"
                                                 android:layout_height="25dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_file_line"
-                                                android:tint="?attr/colorOnPrimary" />
+                                                android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
 
@@ -1310,14 +1312,14 @@
                                                 android:layout_height="28dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                                app:shapeTarget="arrow" />
+                                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="24dp"
                                                 android:layout_height="24dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                                android:tint="?attr/colorOnSurfaceVariant" />
+                                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
                                 </LinearLayout>
@@ -1368,14 +1370,14 @@
                                                 android:layout_height="45dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorPrimary"
-                                                app:shapeTarget="icon" />
+                                                app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="25dp"
                                                 android:layout_height="25dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrow_go_back_line"
-                                                android:tint="?attr/colorOnPrimary" />
+                                                android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
 
@@ -1419,14 +1421,14 @@
                                                 android:layout_height="28dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                                app:shapeTarget="arrow" />
+                                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="24dp"
                                                 android:layout_height="24dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                                android:tint="?attr/colorOnSurfaceVariant" />
+                                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
                                 </LinearLayout>
@@ -1477,14 +1479,14 @@
                                                 android:layout_height="45dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorPrimary"
-                                                app:shapeTarget="icon" />
+                                                app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="25dp"
                                                 android:layout_height="25dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_delete_bin_line"
-                                                android:tint="?attr/colorOnPrimary" />
+                                                android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
 
@@ -1528,14 +1530,14 @@
                                                 android:layout_height="28dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                                app:shapeTarget="arrow" />
+                                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="24dp"
                                                 android:layout_height="24dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                                android:tint="?attr/colorOnSurfaceVariant" />
+                                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
                                 </LinearLayout>
@@ -1586,14 +1588,14 @@
                                                 android:layout_height="45dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorPrimary"
-                                                app:shapeTarget="icon" />
+                                                app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="25dp"
                                                 android:layout_height="25dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_delete_bin_line"
-                                                android:tint="?attr/colorOnPrimary" />
+                                                android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
 
@@ -1637,14 +1639,14 @@
                                                 android:layout_height="28dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                                app:shapeTarget="arrow" />
+                                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="24dp"
                                                 android:layout_height="24dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                                android:tint="?attr/colorOnSurfaceVariant" />
+                                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
                                 </LinearLayout>
@@ -1695,14 +1697,14 @@
                                                 android:layout_height="45dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorPrimary"
-                                                app:shapeTarget="icon" />
+                                                app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="25dp"
                                                 android:layout_height="25dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_delete_bin_line"
-                                                android:tint="?attr/colorOnPrimary" />
+                                                android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
 
@@ -1746,14 +1748,14 @@
                                                 android:layout_height="28dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                                app:shapeTarget="arrow" />
+                                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="24dp"
                                                 android:layout_height="24dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                                android:tint="?attr/colorOnSurfaceVariant" />
+                                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
                                 </LinearLayout>
@@ -1804,14 +1806,14 @@
                                                 android:layout_height="45dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorPrimary"
-                                                app:shapeTarget="icon" />
+                                                app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="25dp"
                                                 android:layout_height="25dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_delete_bin_line"
-                                                android:tint="?attr/colorOnPrimary" />
+                                                android:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
 
@@ -1855,14 +1857,14 @@
                                                 android:layout_height="28dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                                app:shapeTarget="arrow" />
+                                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="24dp"
                                                 android:layout_height="24dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                                android:tint="?attr/colorOnSurfaceVariant" />
+                                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
                                 </LinearLayout>
@@ -1913,14 +1915,14 @@
                                                 android:layout_height="45dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorError"
-                                                app:shapeTarget="icon" />
+                                                app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="25dp"
                                                 android:layout_height="25dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_delete_bin_line"
-                                                android:tint="?attr/colorOnError" />
+                                                android:tint="?attr/colorOnError" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
 
@@ -1964,14 +1966,14 @@
                                                 android:layout_height="28dp"
                                                 android:scaleType="centerCrop"
                                                 app:shapeBackgroundColor="?attr/colorSurfaceContainerHighest"
-                                                app:shapeTarget="arrow" />
+                                                app:shapeTarget="arrow" android:importantForAccessibility="no" />
 
                                             <ImageView
                                                 android:layout_width="24dp"
                                                 android:layout_height="24dp"
                                                 android:layout_gravity="center"
                                                 android:src="@drawable/rmx_arrows_arrow_right_double_line"
-                                                android:tint="?attr/colorOnSurfaceVariant" />
+                                                android:tint="?attr/colorOnSurfaceVariant" android:importantForAccessibility="no" />
                                         </FrameLayout>
                                     </LinearLayout>
                                 </LinearLayout>
@@ -2052,14 +2054,14 @@
                                     android:layout_height="45dp"
                                     android:scaleType="centerCrop"
                                     app:shapeBackgroundColor="?attr/colorPrimary"
-                                    app:shapeTarget="icon" />
+                                    app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                 <ImageView
                                     android:layout_width="25dp"
                                     android:layout_height="25dp"
                                     android:layout_gravity="center"
                                     android:src="@drawable/rmx_sort_number_asc"
-                                    app:tint="?attr/colorOnPrimary" />
+                                    app:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                             </FrameLayout>
 
                             <CheckedTextView
@@ -2114,14 +2116,14 @@
                                     android:layout_height="45dp"
                                     android:scaleType="centerCrop"
                                     app:shapeBackgroundColor="?attr/colorPrimary"
-                                    app:shapeTarget="icon" />
+                                    app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                 <ImageView
                                     android:layout_width="25dp"
                                     android:layout_height="25dp"
                                     android:layout_gravity="center"
                                     android:src="@drawable/rmx_sort_alphabet_asc"
-                                    app:tint="?attr/colorOnPrimary" />
+                                    app:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                             </FrameLayout>
 
                             <CheckedTextView
@@ -2175,14 +2177,14 @@
                                     android:layout_height="45dp"
                                     android:scaleType="centerCrop"
                                     app:shapeBackgroundColor="?attr/colorPrimary"
-                                    app:shapeTarget="icon" />
+                                    app:shapeTarget="icon" android:importantForAccessibility="no" />
 
                                 <ImageView
                                     android:layout_width="25dp"
                                     android:layout_height="25dp"
                                     android:layout_gravity="center"
                                     android:src="@drawable/rmx_sort_desc"
-                                    app:tint="?attr/colorOnPrimary" />
+                                    app:tint="?attr/colorOnPrimary" android:importantForAccessibility="no" />
                             </FrameLayout>
 
                             <CheckedTextView

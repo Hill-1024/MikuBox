@@ -84,7 +84,8 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="4dp"
-                android:clickable="true"
+                android:id="@+id/check_update_card"
+    android:clickable="true"
                 android:focusable="true"
                 app:cardBackgroundColor="?attr/colorCard"
                 app:cardElevation="0dp"
@@ -162,6 +163,7 @@
                             android:id="@+id/check_pre_release"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:contentDescription="@string/update_check_pre_release"
                             app:thumbIcon="@drawable/mtrl_ic_check" />
                     </LinearLayout>
                 </LinearLayout>

@@ -9,6 +9,7 @@
     android:layout_marginStart="?attr/listPreferredItemPaddingStart"
     android:layout_marginTop="4dp"
     android:backgroundTint="?attr/colorCard"
+    android:id="@+id/opensource_card"
     android:clickable="true"
     android:focusable="true"
     app:cardBackgroundColor="?attr/colorCard"

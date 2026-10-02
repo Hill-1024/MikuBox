@@ -200,6 +200,12 @@ abstract class BaseActivity : AppCompatActivity() {
         tb?.let {
             setSupportActionBar(it)
             supportActionBar?.setDisplayHomeAsUpEnabled(showHomeAsUp)
+            // The framework-generated nav (back) button has no id and no
+            // label of its own; give the action a name so a screen reader
+            // (and the a11y audit) can tell what this clickable node does.
+            if (showHomeAsUp) {
+                it.navigationContentDescription = it.context.getString(R.string.a11y_navigate_back)
+            }
             title?.let { t -> this.title = t }
 
             toolbarSubtitle = subtitle
