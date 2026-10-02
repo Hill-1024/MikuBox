@@ -206,6 +206,14 @@ FastScrollRecyclerView.SectionedAdapter {
             } else {
                 holder.views.tvTestResult.setTextColor(ContextCompat.getColor(context, R.color.colorPing))
             }
+            // A disconnected tunnel keeps its last measured numbers in the
+            // store; showing them at full strength read as "this delay is
+            // current" right after a disconnect. Dim the stale readings (the
+            // values stay — they come back at full strength on reconnect).
+            val disconnectedDim = if (mainViewModel.isRunning.value) 1f else 0.4f
+            holder.views.tvTestResult.alpha = disconnectedDim
+            holder.views.tvCountryCode.alpha = disconnectedDim
+            holder.views.layoutTestMetadata?.alpha = disconnectedDim
 
             val isTrafficEnabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_TRAFFIC_ENABLED) == true
             val trafficStr = MmkvManager.getProfileTrafficString(guid)
