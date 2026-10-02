@@ -20,6 +20,13 @@ object MikuCoreBridge {
         fun connectionElapsedMillis(): Long = 0L
         fun startOnBoot(): Boolean = false
 
+        /**
+         * True while the service is starting (CONNECTING), before [isRunning]
+         * flips. Screens that gate a "reload now" action on [isRunning] treat
+         * this as live too — the bridge queues the reload either way.
+         */
+        fun isConnecting(): Boolean = false
+
         /** Starts the tunnel with [config]; false when it could not start. */
         fun start(config: String): Boolean
 
@@ -66,6 +73,8 @@ object MikuCoreBridge {
     fun startOnBoot(): Boolean = impl.startOnBoot()
 
     fun isRunning(): Boolean = impl.isRunning()
+
+    fun isConnecting(): Boolean = impl.isConnecting()
 
     fun connectionElapsedMillis(): Long = impl.connectionElapsedMillis()
 
