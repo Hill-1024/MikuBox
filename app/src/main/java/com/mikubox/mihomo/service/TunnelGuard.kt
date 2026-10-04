@@ -63,7 +63,29 @@ object TunnelGuard {
      */
     fun expectRunningWhileConnecting(context: Context) {
         recordExpectation(context, true)
+        RecoveryBackoff.markAttempt(context)
         schedule(context)
+    }
+
+    /**
+     * Counts a start that died with its process. Only failures the service
+     * reports itself reach [failed]; a native crash or a low-memory kill while
+     * connecting reports nothing, so a profile that reliably brings the core
+     * down would be relaunched every check interval forever. The attempt marker
+     * set when connecting began is still standing when a fresh process looks, and
+     * it is cleared by every outcome that was reported (connected, failed,
+     * disconnected).
+     */
+    fun noteDeadAttempt(context: Context): Boolean {
+        if (MikuVpnService.running || MikuVpnService.starting) return false
+        if (!RecoveryBackoff.consumeAttempt(context)) return false
+        LogUtil.w(message = "A previous connection attempt ended without an outcome; counting it as a failure")
+        RecoveryBackoff.failed(context)
+        if (recoveryPaused(context)) {
+            cancel(context)
+            LogUtil.w(message = "Automatic VPN recovery paused after three failures; reconnect manually")
+        }
+        return true
     }
 
     private fun recordExpectation(context: Context, expected: Boolean) {
@@ -118,6 +140,8 @@ class TunnelGuardReceiver : BroadcastReceiver() {
             TunnelGuard.cancel(context)
             return
         }
+        TunnelGuard.noteDeadAttempt(context)
+        if (TunnelGuard.recoveryPaused(context)) { TunnelGuard.cancel(context); return }
         if (RecoveryBackoff.remainingMillis(context) > 0) { TunnelGuard.schedule(context); return }
         if (!MikuVpnService.running && ConnectionStatus.phase.value != ConnectionStatus.Phase.CONNECTING) {
             LogUtil.w(message = "Tunnel expected but not running; restarting it")
@@ -145,7 +169,16 @@ internal object RecoveryBackoff {
     @Synchronized fun failed(context: Context, now: Long = System.currentTimeMillis()) {
         val failures = (failures(context) + 1).coerceAtMost(3)
         prefs(context).edit().putInt("failures", failures)
-            .putLong("retry_at", now + (30_000L shl (failures - 1))).commit()
+            .putLong("retry_at", now + (30_000L shl (failures - 1)))
+            .putBoolean("attempting", false).commit()
+    }
+    fun attempting(context: Context): Boolean = prefs(context).getBoolean("attempting", false)
+    @Synchronized fun markAttempt(context: Context) { prefs(context).edit().putBoolean("attempting", true).commit() }
+    /** True exactly once per marked attempt, so one death is never counted twice. */
+    @Synchronized fun consumeAttempt(context: Context): Boolean {
+        if (!attempting(context)) return false
+        prefs(context).edit().putBoolean("attempting", false).commit()
+        return true
     }
     @Synchronized fun reset(context: Context) { prefs(context).edit().clear().commit() }
 }
