@@ -254,6 +254,9 @@ class BackupActivity : HelperBaseActivity() {
             )
             return
         }
+        // The manager only talks to the server it was last initialised with; the
+        // saved settings are what the user just configured, so adopt them here.
+        WebDavManager.init(saved)
 
         showLoading()
 
@@ -314,6 +317,7 @@ class BackupActivity : HelperBaseActivity() {
             )
             return
         }
+        WebDavManager.init(saved)
 
         showLoading()
 
@@ -332,7 +336,7 @@ class BackupActivity : HelperBaseActivity() {
                     return@launch
                 }
 
-                val result = BackupManager.importFromFile(this@BackupActivity, target!!)
+                val result = BackupManager.importFromFile(this@BackupActivity, target)
                 withContext(Dispatchers.Main) {
                     when (result) {
                         is BackupManager.ImportResult.Success -> {
