@@ -21,6 +21,11 @@ object MihomoProfileImporter {
     ): MihomoProfileStore.Profile {
         val profile = MihomoProfileStore.createSubscription(context, name, url, intervalMinutes, updateWhenConnectedOnly, groupId = groupId)
         // First fetch is an import operation, independent of the periodic schedule.
+        // A failed fetch deliberately keeps the shell subscription: the user can
+        // retry it from the edit page, and a blank-config profile cannot hold the
+        // tunnel up nor route another subscription's proxied fetch through itself
+        // (a first fetch always bootstraps directly), so it stays inert until it
+        // finally downloads.
         MihomoSubscriptionUpdater.update(context, profile)
         return MihomoProfileStore.profiles(context).first { it.id == profile.id }
     }
