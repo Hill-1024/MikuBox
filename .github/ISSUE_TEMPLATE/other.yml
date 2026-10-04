@@ -1,0 +1,24 @@
+name: "[其他/Other]"
+description: 不属于以上分类的反馈/Feedback that doesn't fit the other templates
+title: "[其他/Other] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请尽量描述清楚，必要时附上应用版本、日志或截图。
+
+        Please describe as clearly as possible; attach the app version, logs or screenshots when useful.
+  - type: textarea
+    id: content
+    attributes:
+      label: 反馈内容/Feedback
+      description: 想反馈的内容/What you would like to raise
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: 补充信息/Additional Info
+      description: 版本、机型、日志、截图等（可选）/Version, device, logs, screenshots (optional)
+    validations:
+      required: false
