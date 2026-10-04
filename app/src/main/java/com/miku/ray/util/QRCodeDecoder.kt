@@ -38,6 +38,29 @@ object QRCodeDecoder {
         return syncDecodeQRCode(getDecodeAbleBitmap(picturePath))
     }
 
+    /**
+     * Decodes an image from a content Uri at a bounded size. A photo straight
+     * from a camera is tens of megapixels, and the rotation passes below each
+     * allocate a full pixel array; decoding it unsampled on the UI thread
+     * stalls it or runs out of memory.
+     */
+    fun syncDecodeQRCode(context: android.content.Context, uri: android.net.Uri): String? {
+        val resolver = context.contentResolver
+        return try {
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+            var sample = 1
+            while (maxOf(bounds.outWidth, bounds.outHeight) / sample > MAX_BITMAP_SIDE) sample *= 2
+            val options = BitmapFactory.Options().apply { inSampleSize = sample }
+            val bitmap = resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
+            syncDecodeQRCode(bitmap)
+        } catch (e: Exception) {
+            null
+        } catch (e: OutOfMemoryError) {
+            null
+        }
+    }
+
     fun syncDecodeQRCode(bitmap: Bitmap?): String? {
         if (bitmap == null || bitmap.isRecycled) return null
 

@@ -1694,20 +1694,15 @@ ShareConfigBottomSheet.OnShareOptionClickListener {
         launchFileChooser("image/*") { uri ->
             if (uri == null) return@launchFileChooser
 
-            try {
-                val inputStream = contentResolver.openInputStream(uri)
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                inputStream?.close()
-
-                val text = QRCodeDecoder.syncDecodeQRCode(bitmap)
+            showLoading()
+            lifecycleScope.launch {
+                val text = withContext(Dispatchers.Default) { QRCodeDecoder.syncDecodeQRCode(this@MainActivity, uri) }
+                hideLoading()
                 if (text.isNullOrEmpty()) {
                     snackbarDefault(R.string.toast_decoding_failed, title = getString(R.string.title_alerter_info))
                 } else {
                     importBatchConfig(text)
                 }
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to decode QR code from file", e)
-                snackbarDefault(R.string.toast_decoding_failed, title = getString(R.string.title_alerter_info))
             }
         }
     }

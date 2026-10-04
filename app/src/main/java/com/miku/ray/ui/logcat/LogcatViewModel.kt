@@ -76,15 +76,7 @@ class LogcatViewModel : ViewModel() {
             .redirectErrorStream(true)
             .start()
 
-            val exited = process.waitForCompat(5, TimeUnit.SECONDS)
-            if (!exited) {
-                process.destroy()
-                return null
-            }
-
-            val lines = process.inputStream.bufferedReader().readLines()
-            if (lines.isEmpty()) null
-            else lines.reversed()
+            readLinesWithin(process)
         } catch (e: IOException) {
             LogUtil.w(AppConfig.TAG, "logcat ProcessBuilder failed: ${e.message}")
             null
@@ -101,19 +93,31 @@ class LogcatViewModel : ViewModel() {
             .redirectErrorStream(true)
             .start()
 
-            val exited = process.waitForCompat(5, TimeUnit.SECONDS)
-            if (!exited) {
-                process.destroy()
-                return null
-            }
-
-            val lines = process.inputStream.bufferedReader().readLines()
-            if (lines.isEmpty()) null
-            else lines.reversed()
+            readLinesWithin(process)
         } catch (e: Exception) {
             LogUtil.w(AppConfig.TAG, "logcat --pid fallback failed: ${e.message}")
             null
         }
+    }
+
+    /**
+     * Drains the process while it runs. Waiting for the exit before reading
+     * deadlocks once the output outgrows the pipe buffer (logcat blocks on its
+     * write, the wait times out, and the whole dump is thrown away), which is
+     * what a busy session's core log always does.
+     */
+    private fun readLinesWithin(process: java.lang.Process): List<String>? {
+        val lines = java.util.Collections.synchronizedList(ArrayList<String>())
+        val reader = Thread({
+            runCatching { process.inputStream.bufferedReader().forEachLine { lines.add(it) } }
+        }, "logcat-reader").apply { isDaemon = true; start() }
+        reader.join(TimeUnit.SECONDS.toMillis(5))
+        if (reader.isAlive) {
+            process.destroy()
+            return null
+        }
+        process.waitForCompat(1, TimeUnit.SECONDS)
+        return synchronized(lines) { lines.toList() }.takeIf { it.isNotEmpty() }?.reversed()
     }
 
     fun clearLogcat() {
