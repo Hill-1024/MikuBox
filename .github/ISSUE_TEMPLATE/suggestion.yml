@@ -1,0 +1,41 @@
+name: "[建议/Suggestions]"
+description: 提出新增、删除或改进功能的建议/Propose a feature to add, remove or improve
+title: "[建议/Suggestions] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢建议！请说明建议方向与期望效果。
+
+        Thanks for your suggestion! Describe the direction and the outcome you expect.
+
+        > 提交前请先搜索是否已有相同建议。/ Please search existing issues before submitting.
+  - type: dropdown
+    id: suggestion-type
+    attributes:
+      label: 建议类型/Suggestion Type
+      description: 选择建议的类别/Choose the category
+      options:
+        - 增加功能/Add Feature
+        - 删除功能/Remove Feature
+        - 改进功能/Improve Feature
+    validations:
+      required: true
+  - type: textarea
+    id: direction
+    attributes:
+      label: 建议方向/Direction
+      description: 针对哪个模块或场景，期望达成什么效果/Which module or scenario, and the result you expect
+      placeholder: |
+        模块/Module：主页、路由、DNS、订阅、内核、界面交互 ……
+        期望/Expected：
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 补充说明/Additional Context
+      description: 参考实现、截图、链接等（可选）/Reference implementations, screenshots, links (optional)
+    validations:
+      required: false

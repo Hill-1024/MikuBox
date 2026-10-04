@@ -1,0 +1,115 @@
+name: "[问题/BUG]"
+description: 报告缺陷、闪退或异常行为/Report a defect, crash or misbehavior
+title: "[问题/BUG] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈！请尽量完整填写以下信息，信息越完整越容易定位问题。
+
+        Thanks for reporting! The more complete the information, the faster the issue can be located.
+
+        > 提交前请先搜索是否已有相同问题。/ Please search existing issues before submitting.
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: 问题类型/Issue Type
+      description: 选择最接近的一类/Choose the closest category
+      options:
+        - UI/UX
+        - 安全性/Security
+        - 性能/Performance
+        - mihomo内核/mihomo Core
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述/Description
+      description: 实际表现与期望表现的差异/What happened vs. what you expected
+      placeholder: |
+        实际表现/Actual:
+        期望表现/Expected:
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现过程/Steps to Reproduce
+      description: 按步骤逐条列出，能稳定复现最好/List the steps one by one; a stable reproduction is best
+      placeholder: |
+        1.
+        2.
+        3.
+        复现频率/Frequency：必现 Always · 偶尔 Sometimes · 仅一次 Once
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        ### 复现环境/Environment
+  - type: input
+    id: app-version
+    attributes:
+      label: 应用版本/App Version
+      description: 可在应用内「关于」页查看/See the About screen in the app
+      placeholder: "0.2.5 (205)"
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: 机型/Device Model
+      placeholder: "Xiaomi 15 Pro"
+    validations:
+      required: true
+  - type: input
+    id: rom
+    attributes:
+      label: 系统版本/ROM Version
+      placeholder: "HyperOS 2.0.7 / ColorOS 15 / One UI 7 ..."
+    validations:
+      required: true
+  - type: input
+    id: android
+    attributes:
+      label: 安卓版本/Android Version
+      placeholder: "Android 15 (API 35)"
+    validations:
+      required: true
+  - type: dropdown
+    id: privilege
+    attributes:
+      label: 权限环境/Permission Environment
+      options:
+        - Root
+        - "非Root + Shizuku/Non-root + Shizuku"
+        - "非Root + Dhizuku/Non-root + Dhizuku"
+        - "未解锁/Locked (no Root)"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志/Logs
+      description: 主菜单 → Logcat →「分享日志」导出后，直接拖拽文件到此处/Main menu → Logcat → Share log, then drag & drop the file here
+      render: shell
+    validations:
+      required: false
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 截图或录屏/Screenshots or Screen Recordings
+      description: 直接拖拽图片或视频到此处/Drag & drop images or videos here
+    validations:
+      required: false
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 提交前确认/Before Submitting
+      options:
+        - label: 我已搜索过现有 issue，确认不是重复问题。/I have searched existing issues and this is not a duplicate.
+          required: true
+        - label: 我已尝试在最新版本上复现该问题。/I have tried to reproduce this on the latest release.
+          required: false
