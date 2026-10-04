@@ -3039,23 +3039,28 @@
         <activity
             android:exported="false"
             android:name="com.miku.ray.ui.ScannerActivity" />
+        <!--
+            No android:process here or on the Tasker receiver below, unlike
+            MikuRay: its tunnel ran in :daemon, but MikuBox's VPN service and its
+            state live in the main process. In a separate process
+            MikuVpnService.running always read false, so the switch shortcut
+            could only ever start, never stop, and the profile selection was
+            committed from a stale SharedPreferences copy.
+        -->
         <activity
             android:excludeFromRecents="true"
             android:exported="false"
             android:name="com.miku.ray.ui.shortcut.ScSwitchActivity"
-            android:process=":daemon"
             android:theme="@style/AppThemeDayNight.NoActionBar.Translucent" />
         <activity
             android:excludeFromRecents="true"
             android:exported="false"
             android:name="com.miku.ray.ui.shortcut.ScStartActivity"
-            android:process=":daemon"
             android:theme="@style/AppThemeDayNight.NoActionBar.Translucent" />
         <activity
             android:excludeFromRecents="true"
             android:exported="false"
             android:name="com.miku.ray.ui.shortcut.ScStopActivity"
-            android:process=":daemon"
             android:theme="@style/AppThemeDayNight.NoActionBar.Translucent" />
         <activity
             android:exported="false"
@@ -3082,8 +3087,7 @@
         </receiver>
         <receiver
             android:exported="true"
-            android:name="com.miku.ray.receiver.TaskerReceiver"
-            android:process=":daemon">
+            android:name="com.miku.ray.receiver.TaskerReceiver">
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
             </intent-filter>
