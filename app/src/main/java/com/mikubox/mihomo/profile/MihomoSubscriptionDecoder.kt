@@ -96,6 +96,7 @@ object MihomoSubscriptionDecoder {
         link.startsWith("hy2://", true) || link.startsWith("hysteria2://", true) -> hysteria2(link)
         link.startsWith("hysteria://", true) || link.startsWith("hy://", true) -> hysteria(link)
         link.startsWith("tuic://", true) -> tuic(link)
+        link.startsWith("wireguard://", true) -> wireguard(link)
         link.startsWith("socks://", true) || link.startsWith("socks5://", true) -> socks(link)
         link.startsWith("http://", true) || link.startsWith("https://", true) -> http(link)
         link.startsWith("ssh://", true) -> ssh(link)
@@ -257,10 +258,44 @@ object MihomoSubscriptionDecoder {
     private fun http(link: String): ProxyYaml? = basicProxy(link, "http")
     private fun ssh(link: String): ProxyYaml? = basicProxy(link, "ssh")
 
+    /**
+     * Single-peer WireGuard, the shape the share encoder writes: the private key
+     * is the userinfo, everything else is query. mihomo wants the local address
+     * split into `ip`/`ipv6` and `reserved` as a numeric list.
+     */
+    private fun wireguard(link: String): ProxyYaml? {
+        val uri = Uri.parse(link)
+        val host = uri.host ?: return null
+        val port = uri.port.takeIf { it > 0 } ?: return null
+        val privateKey = Uri.decode(uri.userInfo ?: return null).takeIf { it.isNotBlank() } ?: return null
+        val publicKey = uri.getQueryParameter("publickey")?.takeIf { it.isNotBlank() } ?: return null
+        val addresses = (uri.getQueryParameter("address") ?: "172.16.0.2/32")
+            .split(',').map(String::trim).filter(String::isNotEmpty)
+        val ipv4 = addresses.firstOrNull { !it.contains(':') }
+        val ipv6 = addresses.firstOrNull { it.contains(':') }
+        val reserved = uri.getQueryParameter("reserved")?.split(',')?.map(String::trim)
+            ?.takeIf { parts -> parts.size == 3 && parts.all { it.toIntOrNull() in 0..255 } }
+            ?.takeIf { parts -> parts.any { it != "0" } }
+        val fields = mutableListOf("server" to host, "port" to port.toString(), "private-key" to privateKey, "public-key" to publicKey)
+        ipv4?.let { fields += "ip" to it }
+        ipv6?.let { fields += "ipv6" to it }
+        if (ipv4 == null && ipv6 == null) return null
+        uri.getQueryParameter("presharedkey")?.takeIf { it.isNotBlank() }?.let { fields += "pre-shared-key" to it }
+        uri.getQueryParameter("mtu")?.toIntOrNull()?.let { fields += "mtu" to it.toString() }
+        reserved?.let { fields += "reserved" to it.joinToString(",", "[", "]") }
+        fields += "udp" to "true"
+        return ProxyYaml(name(uri.fragment, host), "wireguard", fields)
+    }
+
     private fun basicProxy(link: String, type: String): ProxyYaml? {
         val uri = Uri.parse(link)
         val host = uri.host ?: return null
-        val userInfo = Uri.decode(uri.userInfo ?: "")
+        var userInfo = Uri.decode(uri.userInfo ?: "")
+        // The app's own share encoder writes base64("user:pass") as the userinfo
+        // (SocksFmt.toUri), as v2rayN does; plain "user:pass" has its colon.
+        if (userInfo.isNotBlank() && !userInfo.contains(':')) {
+            base64(userInfo)?.takeIf { it.contains(':') }?.let { userInfo = it }
+        }
         return ProxyYaml(name(uri.fragment, host), type, listOf(
             "server" to host, "port" to (uri.port.takeIf { it > 0 } ?: if (type == "http") 80 else 443).toString(),
             "username" to userInfo.substringBefore(':', ""),
@@ -332,7 +367,7 @@ object MihomoSubscriptionDecoder {
 
     /** Numbers and booleans must stay unquoted or Mihomo rejects the whole config. */
     private fun scalar(value: String): String =
-        if (value == "true" || value == "false" || value.matches(Regex("-?\\d+"))) value else value.yaml()
+        if (value == "true" || value == "false" || value.matches(Regex("-?\\d+")) || value.matches(Regex("\\[\\d+(,\\d+)*]"))) value else value.yaml()
 
     private fun String.yaml(): String = "'${replace("'", "''")}'"
 }
