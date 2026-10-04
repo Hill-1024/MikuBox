@@ -197,6 +197,7 @@ class MikuVpnService : VpnService(), ServiceControl {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         LogUtil.i(message = "service command action=${intent?.action} startId=$startId")
         val recovery = intent == null || intent.action == vpnAction(packageName, ACTION_RECOVER)
+        if (recovery) TunnelGuard.noteDeadAttempt(this)
         if (recovery && (!TunnelGuard.isExpected(this) || TunnelGuard.recoveryPaused(this))) {
             // Recovery reaches this service through startForegroundService, so
             // the platform contract requires startForeground before this service
