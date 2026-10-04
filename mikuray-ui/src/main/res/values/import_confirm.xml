@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="import_confirm_title">Import this link?</string>
+    <string name="import_confirm_message">Another app or web page asked MikuBox to import a configuration from:\n\n%1$s\n\nAn imported profile decides where your traffic goes. Only continue if you trust the source.</string>
+    <string name="import_confirm_positive">Import</string>
+</resources>
