@@ -16,7 +16,21 @@ object ConfigDocument {
         val value = Yaml(SafeConstructor(options)).load<Any?>(text)
         require(value is Map<*, *> && value.keys.all { it is String }) { "配置必须是 YAML 对象" }
         @Suppress("UNCHECKED_CAST")
-        return value as MutableMap<String, Any?>
+        return value.normalizeKeys() as MutableMap<String, Any?>
+    }
+
+    /**
+     * YAML 1.1 reads `on:`/`yes:` as a Boolean key, `1.5:` as a number and `~:`
+     * as null. The visual editor addresses nested fields by String key or list
+     * index, so a non-string key below the top level crashed it; stringifying
+     * them matches how mihomo's own parser reads such a key.
+     */
+    private fun Any?.normalizeKeys(): Any? = when (this) {
+        is Map<*, *> -> LinkedHashMap<String, Any?>().also { out ->
+            forEach { (k, v) -> out[k?.toString() ?: "null"] = v.normalizeKeys() }
+        }
+        is List<*> -> mapTo(ArrayList()) { it.normalizeKeys() }
+        else -> this
     }
 
     fun dump(value: Any?): String = Yaml(DumperOptions().apply {
