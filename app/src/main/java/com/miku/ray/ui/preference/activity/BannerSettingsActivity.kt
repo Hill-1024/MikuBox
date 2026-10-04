@@ -132,7 +132,7 @@ class BannerSettingsActivity : BaseActivity() {
                     }
                 }
             } else if (result.resultCode == UCrop.RESULT_ERROR) {
-                UCrop.getError(result.data!!)?.printStackTrace()
+                result.data?.let { UCrop.getError(it) }?.printStackTrace()
             }
         }
 
@@ -154,7 +154,7 @@ class BannerSettingsActivity : BaseActivity() {
                     }
                 }
             } else if (result.resultCode == UCrop.RESULT_ERROR) {
-                UCrop.getError(result.data!!)?.printStackTrace()
+                result.data?.let { UCrop.getError(it) }?.printStackTrace()
             }
         }
 
@@ -175,7 +175,7 @@ class BannerSettingsActivity : BaseActivity() {
                     }
                 }
             } else if (result.resultCode == UCrop.RESULT_ERROR) {
-                UCrop.getError(result.data!!)?.printStackTrace()
+                result.data?.let { UCrop.getError(it) }?.printStackTrace()
             }
         }
 
@@ -198,7 +198,7 @@ class BannerSettingsActivity : BaseActivity() {
                     }
                 }
             } else if (result.resultCode == UCrop.RESULT_ERROR) {
-                UCrop.getError(result.data!!)?.printStackTrace()
+                result.data?.let { UCrop.getError(it) }?.printStackTrace()
             }
         }
 
