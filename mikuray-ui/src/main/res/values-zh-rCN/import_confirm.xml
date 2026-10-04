@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="import_confirm_title">导入此链接？</string>
+    <string name="import_confirm_message">其他应用或网页请求 MikuBox 从以下来源导入配置：\n\n%1$s\n\n导入的配置会决定你的流量走向，请仅在信任来源时继续。</string>
+    <string name="import_confirm_positive">导入</string>
+</resources>

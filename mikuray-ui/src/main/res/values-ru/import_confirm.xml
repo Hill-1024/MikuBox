@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="import_confirm_title">Импортировать эту ссылку?</string>
+    <string name="import_confirm_message">Другое приложение или веб-страница просит MikuBox импортировать конфигурацию из:\n\n%1$s\n\nИмпортированный профиль определяет, куда идёт ваш трафик. Продолжайте, только если доверяете источнику.</string>
+    <string name="import_confirm_positive">Импортировать</string>
+</resources>

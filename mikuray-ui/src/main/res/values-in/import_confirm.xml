@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="import_confirm_title">Impor tautan ini?</string>
+    <string name="import_confirm_message">Aplikasi atau halaman web lain meminta MikuBox mengimpor konfigurasi dari:\n\n%1$s\n\nProfil yang diimpor menentukan ke mana lalu lintas Anda dikirim. Lanjutkan hanya jika Anda memercayai sumbernya.</string>
+    <string name="import_confirm_positive">Impor</string>
+</resources>
