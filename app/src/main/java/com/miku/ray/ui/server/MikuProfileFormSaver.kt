@@ -39,19 +39,22 @@ object MikuProfileFormSaver {
             return null
         }
 
-        val uri = when (config.configType) {
-            EConfigType.VMESS -> VmessFmt.toUri(config)
-            EConfigType.VLESS -> VlessFmt.toUri(config)
-            EConfigType.TROJAN -> TrojanFmt.toUri(config)
-            EConfigType.SHADOWSOCKS -> ShadowsocksFmt.toUri(config)
-            EConfigType.SOCKS -> SocksFmt.toUri(config)
-            EConfigType.WIREGUARD -> WireguardFmt.toUri(config)
-            EConfigType.HYSTERIA2 -> Hysteria2Fmt.toUri(config)
-            else -> return "Unsupported protocol: ${config.configType}"
-        }
-        val link = config.configType.protocolScheme + uri
+        if (config.configType !in SUPPORTED) return "Unsupported protocol: ${config.configType}"
 
         return runCatching {
+            // Encoding is inside the guard: the IDN conversion behind toUri throws
+            // on an address holding a prohibited code point (an invisible mark
+            // pasted from a chat is enough), and the form must report it, not die.
+            val uri = when (config.configType) {
+                EConfigType.VMESS -> VmessFmt.toUri(config)
+                EConfigType.VLESS -> VlessFmt.toUri(config)
+                EConfigType.TROJAN -> TrojanFmt.toUri(config)
+                EConfigType.SHADOWSOCKS -> ShadowsocksFmt.toUri(config)
+                EConfigType.SOCKS, EConfigType.HTTP -> SocksFmt.toUri(config)
+                EConfigType.WIREGUARD -> WireguardFmt.toUri(config)
+                else -> Hysteria2Fmt.toUri(config)
+            }
+            val link = config.configType.protocolScheme + uri
             val name = config.remarks.ifBlank { config.description.orEmpty() }
             impl.saveShareLink(
                 editGuid.takeIf { it.isNotBlank() },
@@ -61,4 +64,9 @@ object MikuProfileFormSaver {
             )
         }.exceptionOrNull()?.let { it.message ?: it.toString() }
     }
+
+    private val SUPPORTED = setOf(
+        EConfigType.VMESS, EConfigType.VLESS, EConfigType.TROJAN, EConfigType.SHADOWSOCKS,
+        EConfigType.SOCKS, EConfigType.HTTP, EConfigType.WIREGUARD, EConfigType.HYSTERIA2,
+    )
 }
