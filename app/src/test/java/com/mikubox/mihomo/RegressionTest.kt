@@ -323,6 +323,48 @@ class RegressionTest {
         assertTrue(MihomoProfileStore.profiles(context).filter { it.subscriptionUrl == url }.all { it.config.contains("MATCH,DIRECT") })
     }
 
+    @Test fun failedFirstFetchKeepsTheSubscriptionForRetry() = withSubscriptionServer { url, _, status ->
+        MikuRayBridgeContext.attach(context)
+        status.set(503)
+        // The failed subscription stays behind on purpose: the edit page offers
+        // the retry, and a blank-config subscription is inert — it cannot hold
+        // the tunnel up nor route another subscription's fetch through itself.
+        assertThrows(IllegalStateException::class.java) {
+            com.mikubox.mihomo.profile.MihomoProfileImporter.importSubscription(context, "Dead", url, intervalMinutes = 0)
+        }
+        val kept = MihomoProfileStore.profiles(context).single()
+        assertEquals("Dead", kept.name)
+        assertEquals(url, kept.subscriptionUrl)
+        assertTrue(kept.config.isBlank())
+        // The retry from the edit page fills it in.
+        status.set(200)
+        com.mikubox.mihomo.profile.MihomoSubscriptionUpdater.update(context, kept)
+        assertTrue(MihomoProfileStore.profiles(context).single().config.contains("MATCH,DIRECT"))
+    }
+
+    @Test fun onlyFailedSubscriptionDoesNotBlockAThroughProxyImport() = withSubscriptionServer { url, _, status ->
+        MikuRayBridgeContext.attach(context)
+        com.miku.ray.MikuSubscriptions.install(com.mikubox.mihomo.core.MikuRaySubscriptions)
+        status.set(503)
+        assertThrows(IllegalStateException::class.java) {
+            com.mikubox.mihomo.profile.MihomoProfileImporter.importSubscription(context, "Dead", url, intervalMinutes = 0)
+        }
+        status.set(200)
+        // With only the failed subscription present, importing another one that
+        // asks for the proxy must still succeed: a first fetch has no config to
+        // route through, and the failed (blank) one cannot hold the tunnel up,
+        // so the fetch bypasses it straight to the network.
+        kotlinx.coroutines.runBlocking {
+            var id: String? = null
+            assertTrue(com.miku.ray.MikuSubscriptions.saveAndRefresh(null, "Alive", url, false, 0, true) { id = it })
+            val alive = MihomoProfileStore.profiles(context).single { it.id == id }
+            assertTrue(alive.config.contains("MATCH,DIRECT"))
+            assertTrue(alive.updateThroughProxy)
+        }
+        // The failed subscription is untouched and still awaiting its retry.
+        assertTrue(MihomoProfileStore.profiles(context).single { it.name == "Dead" }.config.isBlank())
+    }
+
     @Test fun scriptBindingsUseStableIdsAndExplicitDisableSurvivesDeletion() {
         val library = com.mikubox.mihomo.core.ScriptLibrary
         val extras = com.mikubox.mihomo.core.CoreOverrides
@@ -502,6 +544,85 @@ class RegressionTest {
             assertTrue(config.contains(name))
             assertTrue(config.contains("11080"))
         }
+    }
+
+    @Test fun socksLinkWithBase64CredentialsKeepsItsLogin() {
+        // SocksFmt.toUri writes base64("user:pass") as the userinfo; the decoder
+        // used to split it on ':' and drop both halves, saving an auth-less node.
+        val userInfo = android.util.Base64.encodeToString("alice:s3cret".toByteArray(), android.util.Base64.NO_WRAP)
+        val config = MihomoSubscriptionDecoder.toMihomoConfig(context, "socks://$userInfo@10.0.0.1:1080#Auth")
+        assertTrue(config, config.contains("username: 'alice'"))
+        assertTrue(config, config.contains("password: 's3cret'"))
+        val plain = MihomoSubscriptionDecoder.toMihomoConfig(context, "socks5://bob:pw@10.0.0.2:1081#Plain")
+        assertTrue(plain, plain.contains("username: 'bob'") && plain.contains("password: 'pw'"))
+    }
+
+    @Test fun wireguardLinkBecomesAMihomoWireguardProxy() {
+        val key = android.util.Base64.encodeToString(ByteArray(32) { it.toByte() }, android.util.Base64.NO_WRAP)
+        val pub = android.util.Base64.encodeToString(ByteArray(32) { (it + 1).toByte() }, android.util.Base64.NO_WRAP)
+        val link = "wireguard://" + java.net.URLEncoder.encode(key, "UTF-8") + "@198.51.100.7:51820" +
+            "?publickey=" + java.net.URLEncoder.encode(pub, "UTF-8") +
+            "&address=" + java.net.URLEncoder.encode("172.16.0.2/32,fd00::2/128", "UTF-8") +
+            "&mtu=1280&reserved=1,2,3#WG"
+        val config = MihomoSubscriptionDecoder.toMihomoConfig(context, link)
+        assertTrue(config, config.contains("type: 'wireguard'"))
+        assertTrue(config, config.contains("ip: '172.16.0.2/32'"))
+        assertTrue(config, config.contains("ipv6: 'fd00::2/128'"))
+        assertTrue(config, config.contains("private-key: '$key'"))
+        assertTrue(config, config.contains("public-key: '$pub'"))
+        assertTrue(config, config.contains("reserved: [1,2,3]"))
+        // mihomo needs a numeric list here; a quoted string is rejected.
+        assertFalse(config, config.contains("reserved: '"))
+    }
+
+    @Test fun visualEditorKeysAreAlwaysStrings() {
+        val document = com.miku.ray.ui.server.ConfigDocument.parse("""
+            dns:
+              on: true
+              1.5: x
+            proxies:
+              - {name: A, yes: 1}
+        """.trimIndent())
+        val dns = document["dns"] as Map<*, *>
+        assertTrue(dns.keys.all { it is String })
+        assertEquals(true, dns["true"])
+        val node = (document["proxies"] as List<*>).single() as Map<*, *>
+        assertTrue(node.keys.all { it is String })
+    }
+
+    @Test fun failedConnectionAttemptThatLeftNoOutcomeIsCounted() {
+        val guard = com.mikubox.mihomo.service.TunnelGuard
+        val backoff = com.mikubox.mihomo.service.RecoveryBackoff
+        backoff.reset(context)
+        // A quiet process start finds nothing pending.
+        assertFalse(guard.noteDeadAttempt(context))
+        // Connecting began, then the process died before any outcome was recorded.
+        backoff.markAttempt(context)
+        assertTrue(guard.noteDeadAttempt(context))
+        assertEquals(1, backoff.failures(context))
+        // Counting it consumed the marker: the same attempt is not counted twice.
+        assertFalse(guard.noteDeadAttempt(context))
+        repeat(2) { backoff.markAttempt(context); guard.noteDeadAttempt(context) }
+        assertTrue(guard.recoveryPaused(context))
+        backoff.reset(context)
+        assertFalse(backoff.attempting(context))
+    }
+
+    @Test fun importConfirmationNamesTheSourceWithoutEchoingSecrets() {
+        val describe = com.miku.ray.util.ImportConfirmation::describe
+        // A provider link shows the provider, not the wrapper, and never the token.
+        assertEquals("https://sub.example.org",
+            describe("clash://install-config?url=" + java.net.URLEncoder.encode("https://sub.example.org/api/v1?token=SECRET", "UTF-8")))
+        assertEquals("https://sub.example.org", describe("https://user:pw@sub.example.org/a?token=SECRET"))
+        // A node link shows where it points, not the credentials in front of it.
+        val shown = describe("trojan://hunter2@198.51.100.9:443?sni=x#name")
+        assertEquals("trojan://198.51.100.9", shown)
+        assertFalse(shown.contains("hunter2"))
+        // Several links: the first plus how many follow.
+        assertEquals("ss://a.example (+1)", describe("ss://x@a.example:1\nss://y@b.example:2"))
+        // Opaque payloads name nothing rather than echoing a Base64 blob.
+        assertFalse(describe("vmess://" + "A".repeat(200)).contains("AAAA"))
+        assertEquals("", describe("  \n "))
     }
 
     @Test fun offlineCustomGlobalOnlyOffersItsDeclaredMembers() {
