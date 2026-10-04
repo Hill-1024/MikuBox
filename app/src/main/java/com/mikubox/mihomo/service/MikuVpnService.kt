@@ -721,6 +721,10 @@ class MikuVpnService : VpnService(), ServiceControl {
             .setSession(getString(R.string.app_name))
             .setMtu(AndroidVpnSettings.mtu(this))
             .addAddress(address.ipv4Client, PRIVATE_VLAN4_PREFIX)
+        // Apps targeting Q+ are metered by default, which made every network look
+        // metered while connected and stalled Wi-Fi-only downloads and jobs; false
+        // lets the VPN inherit the meteredness of the network underneath.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) builder.setMetered(false)
         if (AndroidVpnSettings.allowBypass(this)) builder.allowBypass()
         // Without a resolver of its own Android answers from the underlying
         // network (or refuses to answer at all, depending on the vendor), so the

@@ -117,7 +117,10 @@ class MainRepository(
             app,
             serviceReceiver,
             IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY),
-            Utils.receiverFlags(),
+            // Same-app channel (MessageUtil pins the package): receiverFlags()
+            // is RECEIVER_EXPORTED on API 33+, which let any installed app fake
+            // a "connected" state or exit IP on the home screen.
+            ContextCompat.RECEIVER_NOT_EXPORTED,
         )
     }
 
