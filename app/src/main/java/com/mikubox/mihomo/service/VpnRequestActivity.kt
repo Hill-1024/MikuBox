@@ -38,7 +38,13 @@ class VpnRequestActivity : AppCompatActivity() {
         if (savedInstanceState != null) return
         val prepare = VpnService.prepare(this)
         if (prepare != null) {
-            consent.launch(prepare)
+            // Some TV and locked-down ROMs ship no VPN consent dialog, so the
+            // intent resolves to nothing and launching it throws.
+            runCatching { consent.launch(prepare) }.onFailure {
+                ConnectionStatus.update(this, ConnectionStatus.Phase.DISCONNECTED)
+                com.miku.ray.util.MessageUtil.sendMsg2UI(this, com.miku.ray.AppConfig.MSG_STATE_START_FAILURE, "")
+                finish()
+            }
         } else {
             startRequestedMode()
             finish()

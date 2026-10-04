@@ -64,6 +64,9 @@ object LauncherAliasSwitcher {
     }
 
     internal fun applyAliases(context: Context, iconVariant: String, nameVariant: String) {
+        // A value from an imported theme or backup that names no alias would
+        // disable every launcher entry, and the app would vanish from the launcher.
+        if (iconVariant !in ICON_KEYS || nameVariant !in NAME_KEYS) return
         val pm = context.packageManager
         val target = aliasName(iconVariant, nameVariant)
         for (iconKey in ICON_KEYS) {
