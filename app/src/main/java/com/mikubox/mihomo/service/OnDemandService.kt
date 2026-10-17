@@ -114,9 +114,13 @@ class OnDemandService : Service() {
             if (VpnService.prepare(this) != null || MihomoProfileStore.selected(this) == null) {
                 message = R.string.mihomo_on_demand_setup
             } else if (ConnectionStatus.phase.value == ConnectionStatus.Phase.DISCONNECTED) {
+                // Attribution: a tunnel that came up on its own has to be
+                // traceable to this line when the user reads the log later.
+                com.miku.ray.util.LogUtil.i(message = "on-demand: auto-connecting on $state")
                 runCatching { MikuVpnService.start(this) }.onFailure { message = R.string.mihomo_on_demand_setup }
             }
         } else if (ConnectionStatus.phase.value != ConnectionStatus.Phase.DISCONNECTED) {
+            com.miku.ray.util.LogUtil.i(message = "on-demand: pausing the tunnel on $state")
             MikuVpnService.stop(this)
         }
         getSystemService(NotificationManager::class.java).notify(ID, notification(getString(message)))

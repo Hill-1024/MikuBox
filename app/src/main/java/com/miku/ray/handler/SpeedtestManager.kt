@@ -1,6 +1,7 @@
 package com.miku.ray.handler
 
 import com.miku.ray.AppConfig
+import com.miku.ray.core.endpointHost
 import com.miku.ray.dto.IPAPIInfo
 import com.miku.ray.dto.UrlContentRequest
 import com.miku.ray.util.HttpUtil
@@ -18,6 +19,16 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withTimeoutOrNull
 
 object SpeedtestManager {
+
+    /**
+     * The interpreted line of the last failed probe round, null after any
+     * success. Callers that surface probe health (the notification, the
+     * connection card) quote it instead of re-deriving why the exit is
+     * unreadable.
+     */
+    @Volatile
+    var lastFailureDetail: String? = null
+        private set
 
     fun socketConnectTime(url: String, port: Int, timeoutMs: Int = 1500): Long {
         var socket: Socket? = null
@@ -103,21 +114,26 @@ object SpeedtestManager {
             "https://api.ipify.org?format=json", "https://api.ip.sb/geoip").distinct()
 
         val winner = CompletableDeferred<Pair<IPAPIInfo, String>>()
+        val outcomes = java.util.Collections.synchronizedList(mutableListOf<Pair<String, String?>>())
         val found = coroutineScope {
             val probes = urls.map { endpoint ->
                 async(Dispatchers.IO) {
-                    val candidate = runCatching {
+                    val host = endpointHost(endpoint)
+                    val reason: String? = runCatching {
                         val content = HttpUtil.getUrlContent(UrlContentRequest(
                             url = endpoint, timeout = PROBE_TIMEOUT_MS, httpPort = httpPort,
                             proxyUsername = proxyUsername, proxyPassword = proxyPassword,
                             quiet = true,
-                        )) ?: return@runCatching null
-                        JsonUtil.fromJsonSafe(content, IPAPIInfo::class.java)
-                    }.getOrNull() ?: return@async
-                    val candidateIp = listOf(candidate.ip, candidate.clientIp, candidate.ip_addr, candidate.query)
-                        .firstOrNull { !it.isNullOrBlank() && Utils.isPureIpAddress(it) }
-                        ?: return@async
-                    winner.complete(candidate to candidateIp)
+                        )) ?: return@runCatching "no content"
+                        val info = JsonUtil.fromJsonSafe(content, IPAPIInfo::class.java)
+                            ?: return@runCatching "unparseable answer"
+                        val candidateIp = listOf(info.ip, info.clientIp, info.ip_addr, info.query)
+                            .firstOrNull { !it.isNullOrBlank() && Utils.isPureIpAddress(it) }
+                            ?: return@runCatching "no address in the answer"
+                        winner.complete(info to candidateIp)
+                        null
+                    }.getOrElse { it.javaClass.simpleName }
+                    outcomes.add(host to reason)
                 }
             }
             // Once any endpoint answers (or none does within the window), the
@@ -128,7 +144,17 @@ object SpeedtestManager {
             // a failure that a retry a second later would not have seen.
             val result = withTimeoutOrNull(PROBE_WINDOW_MS) { winner.await() }
             probes.forEach { it.cancel() }
-            if (result == null) LogUtil.w(message = "remote-IP probe window elapsed with no answer (direct=$direct, port=$httpPort)")
+            if (result == null) {
+                val line = probeRoundFailureLine(
+                    direct, httpPort,
+                    com.miku.ray.MikuCoreBridge.isRunning(), com.miku.ray.MikuCoreBridge.isConnecting(),
+                    outcomes.toList(),
+                )
+                LogUtil.w(message = line)
+                lastFailureDetail = line
+            } else {
+                lastFailureDetail = null
+            }
             result
         } ?: return null
         val (ipInfo, ip) = found
@@ -160,4 +186,31 @@ object SpeedtestManager {
 
     /** Whole-race budget: the window [PROBE_TIMEOUT_MS] plus hand-off slack. */
     private const val PROBE_WINDOW_MS = 5_000L
+}
+
+/**
+ * The one line a failed probe round logs: which path the requests took, what
+ * the tunnel was doing at that moment, and how each endpoint failed. Those
+ * three together are what a bare "probe failed" warning conflates — a dead
+ * exit (tunnel=running, timeouts through the inbound), a core that no longer
+ * accepts probes (tunnel=running, connect refused on its own inbound), and a
+ * device with no usable network (path=device network, tunnel=down). Public and
+ * top level (the vendored layer is its own module) so the wording is
+ * unit-testable without a running core.
+ */
+fun probeRoundFailureLine(
+    direct: Boolean,
+    httpPort: Int,
+    tunnelRunning: Boolean,
+    tunnelConnecting: Boolean,
+    outcomes: List<Pair<String, String?>>,
+): String {
+    val path = if (direct) "device network" else "core inbound 127.0.0.1:$httpPort"
+    val tunnel = when {
+        tunnelRunning -> "running"
+        tunnelConnecting -> "connecting"
+        else -> "down"
+    }
+    val detail = outcomes.joinToString("; ") { (host, reason) -> "$host=${reason ?: "ok"}" }
+    return "exit-IP probe failed (path=$path, tunnel=$tunnel): $detail"
 }

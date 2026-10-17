@@ -15,6 +15,7 @@
     <string name="vpn_notification_speeds">↑%1$s ↓%2$s</string>
     <string name="vpn_notification_session">本次连接 ↑%1$s ↓%2$s</string>
     <string name="vpn_notification_exit_ip">出口 %1$s</string>
+    <string name="vpn_exit_unresponsive">出口无响应</string>
     <string name="vpn_action_stop">停止</string>
     <string name="vpn_tile_title">MikuBox VPN</string>
     <string name="subscription_channel_name">订阅更新</string>

@@ -183,6 +183,25 @@ class RegressionTest {
         assertNull(com.miku.ray.handler.SpeedtestManager.countryCode(info.copy(countryCode = null)))
     }
 
+    @Test fun probeFailureLineSeparatesDeadExitFromDeviceOffline() {
+        val throughTunnel = com.miku.ray.handler.probeRoundFailureLine(
+            direct = false, httpPort = 7890, tunnelRunning = true, tunnelConnecting = false,
+            outcomes = listOf("api.ip.sb" to "SocketTimeoutException", "api.ipify.org" to "SocketTimeoutException"))
+        assertTrue(throughTunnel.contains("tunnel=running"))
+        assertTrue(throughTunnel.contains("core inbound 127.0.0.1:7890"))
+        assertTrue(throughTunnel.contains("api.ip.sb=SocketTimeoutException"))
+        val warming = com.miku.ray.handler.probeRoundFailureLine(
+            direct = false, httpPort = 7890, tunnelRunning = false, tunnelConnecting = true,
+            outcomes = listOf("api.ip.sb" to "ConnectException"))
+        assertTrue(warming.contains("tunnel=connecting"))
+        val offline = com.miku.ray.handler.probeRoundFailureLine(
+            direct = true, httpPort = 0, tunnelRunning = false, tunnelConnecting = false,
+            outcomes = listOf("api.ip.sb" to "UnknownHostException", "api.ipify.org" to null))
+        assertTrue(offline.contains("path=device network"))
+        assertTrue(offline.contains("tunnel=down"))
+        assertTrue(offline.contains("api.ipify.org=ok"))
+    }
+
     @Test fun nativeProbeRemovesListenersAndKeepsProxyDefinition() {
         val original = """
             mixed-port: 7890

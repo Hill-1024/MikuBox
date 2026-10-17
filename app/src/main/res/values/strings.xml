@@ -23,6 +23,7 @@
     <string name="vpn_notification_speeds">↑%1$s ↓%2$s</string>
     <string name="vpn_notification_session">Session ↑%1$s ↓%2$s</string>
     <string name="vpn_notification_exit_ip">Exit %1$s</string>
+    <string name="vpn_exit_unresponsive">no answer from the exit</string>
     <string name="vpn_action_stop">Stop</string>
     <string name="vpn_tile_title">MikuBox VPN</string>
     <string name="subscription_channel_name">Subscription updates</string>
