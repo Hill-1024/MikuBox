@@ -83,6 +83,17 @@ class MikuVpnService : VpnService(), ServiceControl {
     private var startRequested = false
     private var startReplayQueued = false
 
+    /**
+     * Whether the start now in flight came from the recovery path — the guard's
+     * alarm or a sticky restart. A failed recovery keeps the tunnel owed so the
+     * backoff can retry it; a failed start the user asked for clears the
+     * expectation instead. Its failure was already surfaced to the person who
+     * can act on it, and the silent retry ~30 s later is what turned a failed
+     * connect into a tunnel the user never saw starting.
+     */
+    @Volatile
+    private var recoveryAttempt = false
+
     private val checkpointHandler = Handler(Looper.getMainLooper())
 
     /**
@@ -178,6 +189,7 @@ class MikuVpnService : VpnService(), ServiceControl {
     override fun startService() {
         TunnelGuard.resetFailures(this)
         startRequested = true
+        recoveryAttempt = false
         startVpn()
     }
 
@@ -240,6 +252,7 @@ class MikuVpnService : VpnService(), ServiceControl {
             ?.let { LogUtil.w(message = "unhandled service action: $it") }
         if (!running && !starting) {
             startRequested = true
+            recoveryAttempt = recovery
             startVpn()
         }
         return START_STICKY
@@ -335,7 +348,8 @@ class MikuVpnService : VpnService(), ServiceControl {
             // outright — a background start without an exemption — rejects both,
             // and the FGS start-timeout may still fire; that residual window is
             // a platform limit this retry narrows but cannot close.
-            TunnelGuard.failed(this)
+            TunnelGuard.failed(this, retry = recoveryAttempt)
+            if (!recoveryAttempt) TunnelGuard.expectRunning(this, false)
             stopVpn()
             return
         }
@@ -560,9 +574,27 @@ class MikuVpnService : VpnService(), ServiceControl {
                 MessageUtil.sendMsg2UI(this@MikuVpnService, AppConfig.MSG_MEASURE_IP_SUCCESS, fetched, "")
             } else {
                 exitIpFailures++
+                if (exitIpFailures == EXIT_PROBE_UNRESPONSIVE_AFTER) {
+                    // Once per transition, not per round: each round already
+                    // logs its own per-endpoint detail, and this marks the
+                    // moment the notification's exit line switches from "…"
+                    // to the no-answer text.
+                    LogUtil.w(message =
+                        "the exit has answered none of the last $exitIpFailures probe rounds while the tunnel is up " +
+                        "(${SpeedtestManager.lastFailureDetail.orEmpty()})")
+                }
             }
         }
     }
+
+    /**
+     * What the exit line shows while there is no reading: "…" while the tunnel
+     * may still be warming up, and — once several rounds have failed — a
+     * statement that the exit is not answering, so a dead node does not keep
+     * posing as a connection that is merely between measurements.
+     */
+    private fun exitUnreadableLine(): String =
+        if (exitIpFailures >= EXIT_PROBE_UNRESPONSIVE_AFTER) getString(R.string.vpn_exit_unresponsive) else "…"
 
     private fun updateStatsNotification(traffic: MihomoCore.Traffic, request: Int) {
         val now = SystemClock.elapsedRealtime()
@@ -588,7 +620,8 @@ class MikuVpnService : VpnService(), ServiceControl {
                         traffic.uploadTotal.toTrafficString(),
                         traffic.downloadTotal.toTrafficString()),
                     getString(R.string.vpn_notification_exit_ip,
-                        com.miku.ray.handler.ExitIpSnapshot.current()?.let { compactExitIspForNotification(it) } ?: "…"),
+                        com.miku.ray.handler.ExitIpSnapshot.current()?.let { compactExitIspForNotification(it) }
+                            ?: exitUnreadableLine()),
                 ),
             ),
         )
@@ -602,7 +635,12 @@ class MikuVpnService : VpnService(), ServiceControl {
     }
 
     private fun reportStartFailure(detail: String) {
-        TunnelGuard.failed(this)
+        TunnelGuard.failed(this, retry = recoveryAttempt)
+        // A start the guard did not make must not be retried by it: the user
+        // (or on-demand) already saw the failure and can ask again. Clearing
+        // here is what keeps a failed manual connect from turning into a
+        // background resurrection half a minute later.
+        if (!recoveryAttempt) TunnelGuard.expectRunning(this, false)
         val message = detail.ifBlank { getString(R.string.mihomo_start_failed) }
         LogUtil.e(message = "VPN start failed: $message")
         sendBroadcast(
@@ -629,6 +667,10 @@ class MikuVpnService : VpnService(), ServiceControl {
         stopCore()
         // Both calls run on the same executor, so the start can never overtake the
         // stop and the old core is always shut down first.
+        // A reload of a running tunnel is not a recovery: if the new
+        // configuration fails to start, the failure is reported and the tunnel
+        // stays down instead of the guard quietly resurrecting the old state.
+        recoveryAttempt = false
         startVpn()
     }
 
@@ -1036,6 +1078,13 @@ internal const val MAX_NOTIFICATION_ISP_LENGTH = 24
 
 /** Exit IP is a network probe; re-fetching it every beat would be wasteful. */
 internal const val EXIT_IP_REFRESH_MS = 60_000L
+
+/**
+ * Failed probe rounds before the notification's exit line says "unresponsive"
+ * instead of "…" — about a minute at the 15/30 s backoff pace, i.e. past the
+ * warm-up window a normal connect spends with no answer.
+ */
+internal const val EXIT_PROBE_UNRESPONSIVE_AFTER = 3
 
 /**
  * Retry delay for the notification's exit probe while the reading is missing.

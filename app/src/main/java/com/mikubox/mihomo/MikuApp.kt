@@ -38,33 +38,17 @@ class MikuApp : com.miku.ray.AngApplication() {
             override fun mixedPort() = com.mikubox.mihomo.core.MihomoCoreSettings.listeningPort(this@MikuApp)
         }
         if (com.mikubox.mihomo.core.NativeProfileProbe.isProbeProcess(this)) return
-        // Alarms do not survive a reboot, so a tunnel that was up before it —
-        // or before the process was killed and never brought back — would stay
-        // down with the expectation still recorded. Re-arming here (every
-        // process start, from any entry point) hands it back to the guard,
-        // which restores the connection if it really is missing. A disconnect
-        // clears the expectation, so nothing here resurrects a stopped tunnel.
+        // Hand an owed tunnel back to the guard — but only when the guard's
+        // alarm record survived whatever ended the previous process. A record
+        // still standing means the process merely died (LMK, crash) and the
+        // tunnel is genuinely owed. A wiped record means reboot or force-stop;
+        // the expectation is stale and is cleared, so a boot no longer
+        // resurrects the tunnel with the boot switch never consulted.
         runCatching {
-            if (com.mikubox.mihomo.service.TunnelGuard.isExpected(this) &&
-                !com.mikubox.mihomo.service.MikuVpnService.running
-            ) {
-                com.mikubox.mihomo.service.TunnelGuard.schedule(this)
-            }
-        }
-        // Opt-in cold-start auto connect. It only fires when the user both
-        // enabled the switch and granted VPN consent earlier, and the tunnel is
-        // neither running nor already owed by the guard — the guard stays the
-        // sole owner of resurrecting an expected tunnel. connect() swallows a
-        // rejected background start itself, so a process spun up from the
-        // background (sync job, broadcast) degrades to a log line, not a crash.
-        runCatching {
-            if (com.mikubox.mihomo.core.MihomoCoreSettings.autoConnectOnStart(this) &&
-                android.net.VpnService.prepare(this) == null &&
-                !com.mikubox.mihomo.service.MikuVpnService.running &&
-                !com.mikubox.mihomo.service.TunnelGuard.isExpected(this)
-            ) {
-                com.mikubox.mihomo.service.VpnController.connect(this)
-            }
+            com.mikubox.mihomo.service.TunnelGuard.rearmAfterProcessStart(
+                this,
+                com.mikubox.mihomo.service.MikuVpnService.running,
+            )
         }
         // Scheduling does not gate the first frame. The home screen refreshes
         // its persisted profile mirror on IO when resumed, instead of parsing
@@ -146,6 +130,32 @@ class MikuApp : com.miku.ray.AngApplication() {
         com.miku.ray.AngApplication.getCustomTypeface(this)?.let { typeface ->
             com.miku.ray.util.CustomFontManager.applyGlobalOverride(typeface)
             com.miku.ray.util.CustomFontManager.applyToViewTree(typeface, activity.window.decorView)
+        }
+        maybeAutoConnectOnLaunch(activity, savedInstanceState)
+    }
+
+    /**
+     * 「启动时自动连接」 fires when the user actually launches the app — the
+     * launcher activity freshly created — and nowhere else. It used to run from
+     * Application.onCreate, so a process started by a subscription job, a boot
+     * broadcast or a quick-settings tile binding connected too; a consented VPN
+     * app may start its foreground service from the background, so those really
+     * did bring the tunnel up. Scoping it to a fresh launcher create also keeps
+     * a deliberate disconnect sticky: resuming the existing task does not
+     * re-fire, and neither does any background entry point.
+     */
+    private fun maybeAutoConnectOnLaunch(activity: Activity, savedInstanceState: Bundle?) {
+        if (savedInstanceState != null) return
+        if (activity !is com.miku.ray.ui.welcome.WelcomeActivity) return
+        runCatching {
+            if (com.mikubox.mihomo.core.MihomoCoreSettings.autoConnectOnStart(this) &&
+                android.net.VpnService.prepare(this) == null &&
+                !com.mikubox.mihomo.service.MikuVpnService.running &&
+                !com.mikubox.mihomo.service.TunnelGuard.isExpected(this)
+            ) {
+                com.miku.ray.util.LogUtil.i(message = "auto-connect on launch: starting the tunnel")
+                com.mikubox.mihomo.service.VpnController.connect(this)
+            }
         }
     }
 

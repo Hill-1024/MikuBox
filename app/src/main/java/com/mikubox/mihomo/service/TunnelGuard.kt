@@ -28,19 +28,56 @@ object TunnelGuard {
 
     fun resetFailures(context: Context) = RecoveryBackoff.reset(context)
 
-    fun failed(context: Context) {
+    /**
+     * Records a failed start. [retry] false marks a start the guard did not
+     * make — the user's own connect, a reload: its failure was surfaced to
+     * whoever asked for the tunnel, and the caller clears the expectation, so
+     * no alarm goes out and the backoff never runs. Only a recovery attempt
+     * keeps the tunnel owed and retries on the backoff schedule.
+     */
+    fun failed(context: Context, retry: Boolean = true) {
         if (!isExpected(context)) return
         RecoveryBackoff.failed(context)
         if (recoveryPaused(context)) {
             cancel(context)
             LogUtil.w(message = "Automatic VPN recovery paused after three failures; reconnect manually")
-        } else schedule(context)
+        } else if (retry) schedule(context)
     }
 
     /** True while the tunnel is supposed to be up. */
     fun isExpected(context: Context): Boolean =
         runCatching { MmkvManager.decodeSettingsBool(AppConfig.PREF_TUNNEL_EXPECTED) }
             .getOrDefault(false)
+
+    /**
+     * Re-arms the guard after a process start — but only when the alarm record
+     * survived whatever ended the previous process. An alarm (and its
+     * PendingIntent) survives a process kill or a crash; a reboot and a
+     * force-stop wipe it. Only in the first case is the tunnel genuinely still
+     * owed. In the other two the expectation is stale: re-arming from here used
+     * to resurrect the tunnel ~30 s after every boot with the boot switch never
+     * consulted, and left the stale expectation sitting in the way of the
+     * launch auto-connect afterwards. Clearing it hands the decision back to
+     * the boot switch (BootReceiver) or the user.
+     */
+    fun rearmAfterProcessStart(context: Context, tunnelRunning: Boolean) {
+        if (!isExpected(context) || tunnelRunning) return
+        if (alarmArmed(context)) {
+            schedule(context)
+        } else {
+            expectRunning(context, false)
+        }
+    }
+
+    /** True while an alarm is standing. Reboot and force-stop clear PendingIntents; a process kill does not. */
+    private fun alarmArmed(context: Context): Boolean = runCatching {
+        PendingIntent.getBroadcast(
+            context,
+            0,
+            Intent(context, TunnelGuardReceiver::class.java),
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
+        ) != null
+    }.getOrDefault(false)
 
     /**
      * Records whether a tunnel should be running, arming or disarming the
