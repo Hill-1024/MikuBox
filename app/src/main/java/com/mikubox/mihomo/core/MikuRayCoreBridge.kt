@@ -37,7 +37,11 @@ object MikuRayCoreBridge : MikuCoreBridge.Impl {
                     message = "startOnBoot could not start the VPN service; falling back to the tunnel guard",
                     throwable = it,
                 )
-                com.mikubox.mihomo.service.TunnelGuard.schedule(context)
+                // schedule() is a no-op unless the tunnel is owed: arming the
+                // expectation first is what makes the fallback actually retry
+                // in the next window the platform allows, instead of leaving
+                // a boot with the switch on and no tunnel ever attempted.
+                com.mikubox.mihomo.service.TunnelGuard.expectRunning(context, true)
             }
         return true
     }
@@ -64,13 +68,14 @@ object MikuRayCoreBridge : MikuCoreBridge.Impl {
         // being trusted: an unknown id used to throw after the mirror had
         // already been pointed at it.
         val requested = MikuRayProfileSync.selectedProfileId()
-        if (requested != null && MihomoProfileStore.profiles(context).none { it.id == requested }) {
-            com.miku.ray.util.LogUtil.w(message = "Refusing to select unknown profile id=$requested")
-            MihomoProfileStore.selected(context)?.let { com.miku.ray.handler.MmkvManager.setSelectServer(it.id) }
-            return false
-        }
-        requested?.let { guid ->
-            MihomoProfileStore.select(context, guid)
+        if (requested != null) {
+            try {
+                MihomoProfileStore.select(context, requested)
+            } catch (_: IllegalArgumentException) {
+                com.miku.ray.util.LogUtil.w(message = "Refusing to select unknown profile id=$requested")
+                MihomoProfileStore.selected(context)?.let { com.miku.ray.handler.MmkvManager.setSelectServer(it.id) }
+                return false
+            }
         }
         VpnController.connect(context, source = "ui")
         return true // Request accepted; the service broadcasts the eventual result.

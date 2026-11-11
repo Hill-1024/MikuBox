@@ -318,7 +318,9 @@ class MikuVpnService : VpnService(), ServiceControl {
             // always-on start (SERVICE_INTERFACE) are exempt: the first only
             // runs while the tunnel is owed, the second is the platform asking.
             val sinceStop = SystemClock.elapsedRealtime() - lastStopAt
-            val graceApplies = action == vpnAction(packageName, ACTION_START)
+            // A legacy sender that predates ACTION_START sends a null action;
+            // it is still a normal start and must obey the grace as well.
+            val graceApplies = action == vpnAction(packageName, ACTION_START) || action == null
             if (!recovery && graceApplies && lastStopAt != 0L && sinceStop < STOP_GRACE_MS) {
                 LogUtil.i(message = "start command ignored: stop was ${sinceStop}ms ago (source=$source)")
                 // The requester already showed CONNECTING; this intent will
