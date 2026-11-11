@@ -3089,9 +3089,16 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
+        <!--
+            Tasker/Locale fire receiver. The host permission is the API's
+            standard guard; it is protectionLevel=normal, so it keeps ordinary
+            apps out but cannot authenticate a caller that asks for it. The
+            receiver therefore also validates the action and the bundle shape.
+        -->
         <receiver
             android:exported="true"
-            android:name="com.miku.ray.receiver.TaskerReceiver">
+            android:name="com.miku.ray.receiver.TaskerReceiver"
+            android:permission="com.twofortyfouram.locale.permission.FIRE_SETTING">
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
             </intent-filter>
