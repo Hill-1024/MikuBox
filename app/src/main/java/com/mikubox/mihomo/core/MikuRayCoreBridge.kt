@@ -31,7 +31,7 @@ object MikuRayCoreBridge : MikuCoreBridge.Impl {
         // crash the process inside the boot broadcast (every other caller of
         // MikuVpnService.start wraps this). Fall back to arming the tunnel
         // guard, which retries in the next window the platform allows.
-        runCatching { com.mikubox.mihomo.service.MikuVpnService.start(context) }
+        runCatching { com.mikubox.mihomo.service.MikuVpnService.start(context, source = "boot") }
             .onFailure {
                 com.miku.ray.util.LogUtil.w(
                     message = "startOnBoot could not start the VPN service; falling back to the tunnel guard",
@@ -59,11 +59,20 @@ object MikuRayCoreBridge : MikuCoreBridge.Impl {
         MihomoTrafficDelta.reset()
         // The selection made on MikuRay's list is a MikuBox profile id (see
         // MikuRayProfileSync), so the profile the user tapped is the one that
-        // gets connected.
-        MikuRayProfileSync.selectedProfileId()?.let { guid ->
+        // gets connected. The id can also arrive from an exported automation
+        // entry point, so it is checked against this app's own store instead of
+        // being trusted: an unknown id used to throw after the mirror had
+        // already been pointed at it.
+        val requested = MikuRayProfileSync.selectedProfileId()
+        if (requested != null && MihomoProfileStore.profiles(context).none { it.id == requested }) {
+            com.miku.ray.util.LogUtil.w(message = "Refusing to select unknown profile id=$requested")
+            MihomoProfileStore.selected(context)?.let { com.miku.ray.handler.MmkvManager.setSelectServer(it.id) }
+            return false
+        }
+        requested?.let { guid ->
             MihomoProfileStore.select(context, guid)
         }
-        VpnController.connect(context)
+        VpnController.connect(context, source = "ui")
         return true // Request accepted; the service broadcasts the eventual result.
     }
 

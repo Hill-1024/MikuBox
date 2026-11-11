@@ -187,7 +187,16 @@ class MikuVpnService : VpnService(), ServiceControl {
     override fun getService(): Service = this
 
     override fun startService() {
+        // The vendored layer's start contract is a user action, but it used to
+        // bypass the stop grace entirely and replay a start that arrived while
+        // the previous tunnel was still draining.
+        val sinceStop = SystemClock.elapsedRealtime() - lastStopAt
+        if (lastStopAt != 0L && sinceStop < STOP_GRACE_MS) {
+            LogUtil.i(message = "service-control start ignored: stop was ${sinceStop}ms ago")
+            return
+        }
         TunnelGuard.resetFailures(this)
+        TunnelGuard.clearUserStop(this)
         startRequested = true
         recoveryAttempt = false
         startVpn()
@@ -207,8 +216,27 @@ class MikuVpnService : VpnService(), ServiceControl {
         super<VpnService>.setUnderlyingNetworks(networks)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        LogUtil.i(message = "service command action=${intent?.action} startId=$startId")
-        val recovery = intent == null || intent.action == vpnAction(packageName, ACTION_RECOVER)
+        val action = intent?.action
+        // A null intent is the platform restarting a service that died with the
+        // tunnel still owed. It is the only sticky path left: every explicit
+        // start carries ACTION_START/RECOVER, so a plain "start" can no longer
+        // hide behind the same log line as a system restart.
+        val stickyRestart = intent == null
+        val source = intent?.getStringExtra(EXTRA_START_SOURCE) ?: when {
+            stickyRestart -> SOURCE_STICKY
+            // The platform restarting an always-on VPN. It is a start the user
+            // configured at the system level, not one this app decided on.
+            action == SERVICE_INTERFACE -> "system-always-on"
+            else -> "legacy"
+        }
+        // Everything that decides "did the user ask to be disconnected?" is in
+        // this line: a later report of a tunnel that came up on its own can be
+        // read back to its caller instead of being guessed from the action.
+        LogUtil.i(
+            message = "service command action=${action ?: "<sticky>"} startId=$startId source=$source" +
+                " expected=${TunnelGuard.isExpected(this)} running=$running starting=$starting",
+        )
+        val recovery = stickyRestart || action == vpnAction(packageName, ACTION_RECOVER)
         if (recovery) TunnelGuard.noteDeadAttempt(this)
         if (recovery && (!TunnelGuard.isExpected(this) || TunnelGuard.recoveryPaused(this))) {
             // Recovery reaches this service through startForegroundService, so
@@ -219,8 +247,15 @@ class MikuVpnService : VpnService(), ServiceControl {
             stopVpn()
             return START_NOT_STICKY
         }
-        when (intent?.action) {
+        when (action) {
             vpnAction(packageName, ACTION_STOP) -> {
+                // Recorded before the teardown: a start that arrives while this
+                // one is still draining is the same gesture, not a new request.
+                lastStopAt = SystemClock.elapsedRealtime()
+                // A stop the user asked for suppresses launch auto-connect until
+                // the next connect; an on-demand pause is automation and must
+                // not silence the user's own setting.
+                if (source != "on-demand" && source != "on-demand-off") TunnelGuard.noteUserStop(this)
                 startRequested = false
                 startReplayQueued = false
                 // The one place a disconnect is a decision rather than an
@@ -234,23 +269,64 @@ class MikuVpnService : VpnService(), ServiceControl {
             }
 
             vpnAction(packageName, ACTION_RESTART) -> {
+                // A reload that lands on a service with nothing to reload must
+                // not keep the service alive: it used to return START_STICKY
+                // here, leaving an empty foreground-less service the platform
+                // then recreated on its own. While a start is still in flight
+                // the request waits for the tunnel to come up instead.
+                if (starting) return START_STICKY
+                if (tunFd == MihomoCore.NO_TUN) {
+                    LogUtil.i(message = "reload ignored: no tunnel is up")
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
                 restartVpn()
                 return START_STICKY
             }
 
             vpnAction(packageName, ACTION_REFRESH) -> {
+                // Same reasoning as ACTION_RESTART: a refresh for a service that
+                // no longer runs must not turn into a live empty service.
+                if (starting) return START_STICKY
+                if (tunFd == MihomoCore.NO_TUN) {
+                    LogUtil.i(message = "refresh ignored: no tunnel is up")
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
                 // Settings the running service can adopt without touching the core.
                 applyRuntimeSettings()
                 return START_STICKY
             }
         }
-        // An unknown action means a sender and this service disagree about the
-        // action string (a bare suffix constant instead of vpnAction(...) is
-        // how the restart and refresh requests were silently dropped once
-        // before); say so instead of falling through to a no-op.
-        intent?.action?.takeUnless { it == vpnAction(packageName, ACTION_RECOVER) || it == SERVICE_INTERFACE }
-            ?.let { LogUtil.w(message = "unhandled service action: $it") }
+        // Only a start this service understands may bring the tunnel up. An
+        // unknown action used to fall through here and start it, so a stale or
+        // mistyped command (a bare suffix instead of vpnAction(...), an old
+        // sender, another component's action) could resurrect the tunnel right
+        // after a deliberate disconnect. Name it and leave the state alone.
+        val startAction = action == null ||
+            action == vpnAction(packageName, ACTION_START) ||
+            action == vpnAction(packageName, ACTION_RECOVER) ||
+            action == SERVICE_INTERFACE
+        if (!startAction) {
+            LogUtil.w(message = "unhandled service action: $action; not starting the tunnel")
+            if (!running && !starting) stopSelf()
+            return START_NOT_STICKY
+        }
         if (!running && !starting) {
+            // Same grace as companion start(), for a START intent that was
+            // already in flight when the stop landed. Recovery and the system's
+            // always-on start (SERVICE_INTERFACE) are exempt: the first only
+            // runs while the tunnel is owed, the second is the platform asking.
+            val sinceStop = SystemClock.elapsedRealtime() - lastStopAt
+            val graceApplies = action == vpnAction(packageName, ACTION_START)
+            if (!recovery && graceApplies && lastStopAt != 0L && sinceStop < STOP_GRACE_MS) {
+                LogUtil.i(message = "start command ignored: stop was ${sinceStop}ms ago (source=$source)")
+                // The requester already showed CONNECTING; this intent will
+                // never start the tunnel, so hand the tap back to the tile.
+                ConnectionStatus.update(this, ConnectionStatus.Phase.DISCONNECTED)
+                stopSelf()
+                return START_NOT_STICKY
+            }
             startRequested = true
             recoveryAttempt = recovery
             startVpn()
@@ -891,7 +967,9 @@ class MikuVpnService : VpnService(), ServiceControl {
         val stopIntent = PendingIntent.getService(
             this,
             0,
-            Intent(this, MikuVpnService::class.java).setAction(vpnAction(packageName, ACTION_STOP)),
+            Intent(this, MikuVpnService::class.java)
+                .setAction(vpnAction(packageName, ACTION_STOP))
+                .putExtra(EXTRA_START_SOURCE, "notification"),
             pendingFlags(),
         )
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -956,8 +1034,21 @@ class MikuVpnService : VpnService(), ServiceControl {
         // applicationId at the call site so a package rename cannot desync
         // senders and receivers.
         const val ACTION_STOP = "STOP_VPN"
+
+        /**
+         * An explicit start. Its own action (rather than a bare intent) is what
+         * lets the service tell this apart from the platform's sticky restart,
+         * whose intent is null — the two were indistinguishable in the log and
+         * in the recovery bookkeeping.
+         */
+        const val ACTION_START = "START_VPN"
         const val ACTION_RECOVER = "RECOVER_VPN"
         private const val STARTUP_TIMEOUT_MS = 45_000L
+
+        /** Where a start came from; carried in the intent and written to the log. */
+        const val EXTRA_START_SOURCE = "start_source"
+        const val SOURCE_STICKY = "system-sticky"
+        const val SOURCE_UNKNOWN = "unknown"
 
         /** Reloads the core in place so changed settings apply immediately. */
         const val ACTION_RESTART = "RESTART_VPN"
@@ -1013,10 +1104,46 @@ class MikuVpnService : VpnService(), ServiceControl {
         var startedAtMillis: Long = 0L
             private set
 
-        fun start(context: Context, recovery: Boolean = false) {
-            if (running) return
+        /**
+         * When the last deliberate stop was accepted, on [SystemClock]. A start
+         * that lands within [STOP_GRACE_MS] of it is almost always the same
+         * gesture delivered twice — a double tap on the connect control, a tile
+         * or widget event racing the screen, a delayed automation — and the
+         * user asked for the tunnel to be down. The service log in the field
+         * showed exactly this shape: STOP at :45.951, a fresh start at :47.027.
+         * Recovery starts (guard / sticky) are exempt because they only run
+         * while the tunnel is still owed.
+         */
+        @Volatile
+        private var lastStopAt = 0L
+        private const val STOP_GRACE_MS = 1_500L
+
+        /**
+         * Asks for the tunnel to be brought up.
+         *
+         * [source] is diagnostic only — it is carried in the intent and written
+         * to the log, so a tunnel that came up without a visible user action can
+         * be traced to the caller that asked for it.
+         *
+         * Returns false when the request was not handed to the platform (the
+         * stop grace, or a recovery gate), so an automation can retry instead
+         * of treating the network as handled.
+         */
+        fun start(context: Context, recovery: Boolean = false, source: String = SOURCE_UNKNOWN): Boolean {
+            if (running) return true
+            val sinceStop = SystemClock.elapsedRealtime() - lastStopAt
+            if (!recovery && lastStopAt != 0L && sinceStop < STOP_GRACE_MS) {
+                // Do not undo a stop the user just made. The caller is named so
+                // a start that keeps coming back can be traced to its source.
+                LogUtil.i(message = "start ignored: stop was ${sinceStop}ms ago (source=$source)")
+                // Callers set CONNECTING before asking; nothing will run now,
+                // so take it back or the tile stays "connecting" and refuses
+                // every later tap.
+                ConnectionStatus.update(context, ConnectionStatus.Phase.DISCONNECTED)
+                return false
+            }
             if (recovery) {
-                if (!TunnelGuard.isExpected(context) || TunnelGuard.recoveryPaused(context)) return
+                if (!TunnelGuard.isExpected(context) || TunnelGuard.recoveryPaused(context)) return false
             } else TunnelGuard.resetFailures(context)
             ConnectionStatus.update(context, ConnectionStatus.Phase.CONNECTING)
             // Throws when the platform refuses a background foreground-service
@@ -1025,12 +1152,18 @@ class MikuVpnService : VpnService(), ServiceControl {
             androidx.core.content.ContextCompat.startForegroundService(
                 context,
                 Intent(context, MikuVpnService::class.java).apply {
-                    if (recovery) action = vpnAction(context.packageName, ACTION_RECOVER)
+                    action = vpnAction(context.packageName, if (recovery) ACTION_RECOVER else ACTION_START)
+                    putExtra(EXTRA_START_SOURCE, source)
                 },
             )
+            return true
         }
 
-        fun stop(context: Context) {
+        fun stop(context: Context, source: String = "controller") {
+            lastStopAt = SystemClock.elapsedRealtime()
+            // On-demand pausing is automation, not a user decision: it must not
+            // suppress the user's own launch auto-connect setting.
+            if (source != "on-demand" && source != "on-demand-off") TunnelGuard.noteUserStop(context)
             // Persist before delivery: a rejected command or a concurrent process
             // death must not leave the guard armed after a deliberate disconnect.
             TunnelGuard.expectRunning(context, false)
@@ -1042,7 +1175,12 @@ class MikuVpnService : VpnService(), ServiceControl {
             // PendingIntent and is exempt from the restriction.
             val delivered = runCatching {
                 context.startService(
-                    Intent(context, MikuVpnService::class.java).setAction(vpnAction(context.packageName, ACTION_STOP))
+                    Intent(context, MikuVpnService::class.java)
+                        .setAction(vpnAction(context.packageName, ACTION_STOP))
+                        // Says who asked for the teardown, so a disconnect the
+                        // user did not make (a widget, Tasker, on-demand) can be
+                        // read back from the same service log.
+                        .putExtra(EXTRA_START_SOURCE, source)
                 )
             }.isSuccess
             if (!delivered) {

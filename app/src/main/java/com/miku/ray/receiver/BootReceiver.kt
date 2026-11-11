@@ -17,8 +17,18 @@ class BootReceiver : BroadcastReceiver() {
         LogUtil.i(AppConfig.TAG, "BootReceiver received: $action")
 
         when (action) {
-            Intent.ACTION_BOOT_COMPLETED,
+            Intent.ACTION_BOOT_COMPLETED -> {
+            }
             Intent.ACTION_MY_PACKAGE_REPLACED -> {
+                // An app update is not a boot. This receiver used to run the
+                // whole "start on boot" path for it, so every install brought
+                // the tunnel up within a minute while the user believed it was
+                // off — an update lands to replace code, not to reconnect.
+                // The periodic subscription work still needs its entries, so
+                // refresh those and stop here.
+                LogUtil.i(AppConfig.TAG, "BootReceiver: app updated, not starting the tunnel")
+                SubscriptionUpdater.sync(context)
+                return
             }
             Intent.ACTION_LOCKED_BOOT_COMPLETED -> {
                 val userManager = context.getSystemService(Context.USER_SERVICE) as? UserManager

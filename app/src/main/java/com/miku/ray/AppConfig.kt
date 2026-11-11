@@ -61,6 +61,13 @@ object AppConfig {
      * "nothing was ever asked for" after the process was killed.
      */
     const val PREF_TUNNEL_EXPECTED = "pref_tunnel_expected"
+
+    /**
+     * Set when the user disconnects on purpose, cleared by the next connect the
+     * user asks for. 「启动时自动连接」 respects it: a deliberate disconnect stays
+     * disconnected across cold starts until the user connects again.
+     */
+    const val PREF_TUNNEL_USER_STOPPED = "pref_tunnel_user_stopped"
     const val PREF_SEND_HWID = "pref_send_hwid"
     const val PREF_HIDE_FROM_RECENT_APPS = "hide_from_recent_apps"
     const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"

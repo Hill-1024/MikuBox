@@ -22,9 +22,23 @@ object VpnController {
     /**
      * Start the VPN. If the user has not yet granted VPN consent, this routes
      * through [VpnRequestActivity] to show the system consent dialog first.
+     *
+     * A request that lands while the previous tunnel is still shutting down is
+     * dropped instead of racing it: the teardown has already cleared the
+     * expectation and closed the mixed port, so a start that overtook it would
+     * bring the tunnel back up a second after the user asked for it to stop
+     * (which is how a double tap on the connect button could look like the app
+     * reconnecting on its own). [source] is diagnostic, see MikuVpnService.start.
      */
-    fun connect(context: Context) {
+    fun connect(context: Context, source: String = "controller") {
         if (isRunning) return
+        if (ConnectionStatus.phase.value == ConnectionStatus.Phase.DISCONNECTING) {
+            LogUtil.i(message = "VPN start ignored while the previous tunnel is still shutting down (source=$source)")
+            return
+        }
+        // This is a connect the user asked for (UI, tile, Tasker, widget): the
+        // deliberate-disconnect flag only suppresses *automatic* connects.
+        TunnelGuard.clearUserStop(context)
         ConnectionStatus.update(context, ConnectionStatus.Phase.CONNECTING)
         if (VpnService.prepare(context) != null) {
             context.startActivity(
@@ -32,7 +46,7 @@ object VpnController {
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             )
         } else {
-            runCatching { MikuVpnService.start(context) }.onFailure { error ->
+            runCatching { MikuVpnService.start(context, source = source) }.onFailure { error ->
                 // Tasker/widget callers run with no background-start exemption:
                 // the platform rejects the service start, and both the crash it
                 // would raise here and a phase stuck on CONNECTING (the tile

@@ -151,10 +151,14 @@ class MikuApp : com.miku.ray.AngApplication() {
             if (com.mikubox.mihomo.core.MihomoCoreSettings.autoConnectOnStart(this) &&
                 android.net.VpnService.prepare(this) == null &&
                 !com.mikubox.mihomo.service.MikuVpnService.running &&
-                !com.mikubox.mihomo.service.TunnelGuard.isExpected(this)
+                !com.mikubox.mihomo.service.TunnelGuard.isExpected(this) &&
+                // A deliberate disconnect stays disconnected: without this the
+                // flag above is false exactly because the user stopped, and the
+                // next cold start reconnected "on its own".
+                !com.mikubox.mihomo.service.TunnelGuard.userStopped(this)
             ) {
                 com.miku.ray.util.LogUtil.i(message = "auto-connect on launch: starting the tunnel")
-                com.mikubox.mihomo.service.VpnController.connect(this)
+                com.mikubox.mihomo.service.VpnController.connect(this, source = "launch-auto")
             }
         }
     }

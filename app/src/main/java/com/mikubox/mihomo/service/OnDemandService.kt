@@ -67,7 +67,7 @@ class OnDemandService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == STOP) {
             OnDemandSettings.setEnabled(this, false)
-            MikuVpnService.stop(this)
+            MikuVpnService.stop(this, source = "on-demand-off")
         }
         if (!OnDemandSettings.enabled(this)) { stopSelf(); return START_NOT_STICKY }
         schedule()
@@ -104,7 +104,18 @@ class OnDemandService : Service() {
         val key = "${entry?.key}:$state:$decision"
         if (lastKey == key) return // No retry storm after a failed connection or a manual stop.
         if (ConnectionStatus.phase.value == ConnectionStatus.Phase.DISCONNECTING) { schedule(); return }
-        lastKey = key
+        // lastKey lives in this instance and is cleared by any settings change;
+        // a stop the user made has to outrank on-demand automation even after a
+        // fresh process has lost both. VpnController clears the flag when the
+        // user connects again.
+        if (decision == Decision.CONNECT &&
+            ConnectionStatus.phase.value == ConnectionStatus.Phase.DISCONNECTED &&
+            TunnelGuard.userStopped(this)
+        ) {
+            lastKey = key
+            getSystemService(NotificationManager::class.java).notify(ID, notification(getString(R.string.mihomo_on_demand_paused)))
+            return
+        }
         var message = when (decision) {
             Decision.CONNECT -> R.string.mihomo_on_demand_connecting
             Decision.DISCONNECT -> R.string.mihomo_on_demand_paused
@@ -112,16 +123,34 @@ class OnDemandService : Service() {
         }
         if (decision == Decision.CONNECT) {
             if (VpnService.prepare(this) != null || MihomoProfileStore.selected(this) == null) {
+                lastKey = key
                 message = R.string.mihomo_on_demand_setup
             } else if (ConnectionStatus.phase.value == ConnectionStatus.Phase.DISCONNECTED) {
                 // Attribution: a tunnel that came up on its own has to be
                 // traceable to this line when the user reads the log later.
                 com.miku.ray.util.LogUtil.i(message = "on-demand: auto-connecting on $state")
-                runCatching { MikuVpnService.start(this) }.onFailure { message = R.string.mihomo_on_demand_setup }
+                when (runCatching { MikuVpnService.start(this, source = "on-demand") }.getOrNull()) {
+                    true -> lastKey = key
+                    // A rejected start is surfaced once, not retried in a storm.
+                    null -> {
+                        lastKey = key
+                        ConnectionStatus.update(this, ConnectionStatus.Phase.DISCONNECTED)
+                        message = R.string.mihomo_on_demand_setup
+                    }
+                    // The stop grace swallowed it: leave this network unhandled
+                    // so the deferred evaluation asks again once it has passed.
+                    false -> {
+                        message = R.string.mihomo_on_demand_waiting
+                        schedule()
+                    }
+                }
+            } else lastKey = key
+        } else {
+            lastKey = key
+            if (ConnectionStatus.phase.value != ConnectionStatus.Phase.DISCONNECTED) {
+                com.miku.ray.util.LogUtil.i(message = "on-demand: pausing the tunnel on $state")
+                MikuVpnService.stop(this, source = "on-demand")
             }
-        } else if (ConnectionStatus.phase.value != ConnectionStatus.Phase.DISCONNECTED) {
-            com.miku.ray.util.LogUtil.i(message = "on-demand: pausing the tunnel on $state")
-            MikuVpnService.stop(this)
         }
         getSystemService(NotificationManager::class.java).notify(ID, notification(getString(message)))
     }

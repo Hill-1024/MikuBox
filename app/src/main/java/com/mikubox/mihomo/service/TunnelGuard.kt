@@ -50,6 +50,27 @@ object TunnelGuard {
             .getOrDefault(false)
 
     /**
+     * Records a disconnect the user asked for. 「启动时自动连接」 used to fire on
+     * every fresh launcher create (it only checked `isExpected`, which a manual
+     * stop sets to false), so opening the app after a deliberate disconnect
+     * brought the tunnel back — the exact "it woke up at the wrong time" shape.
+     * The flag survives cold starts and is cleared by the next connect the user
+     * asks for, not by an automatic one.
+     */
+    fun noteUserStop(context: Context) {
+        runCatching { MmkvManager.encodeSettings(AppConfig.PREF_TUNNEL_USER_STOPPED, true) }
+    }
+
+    /** The user asked to connect: auto-connect may resume on later launches. */
+    fun clearUserStop(context: Context) {
+        runCatching { MmkvManager.encodeSettings(AppConfig.PREF_TUNNEL_USER_STOPPED, false) }
+    }
+
+    fun userStopped(context: Context): Boolean =
+        runCatching { MmkvManager.decodeSettingsBool(AppConfig.PREF_TUNNEL_USER_STOPPED) }
+            .getOrDefault(false)
+
+    /**
      * Re-arms the guard after a process start — but only when the alarm record
      * survived whatever ended the previous process. An alarm (and its
      * PendingIntent) survives a process kill or a crash; a reboot and a
@@ -186,7 +207,7 @@ class TunnelGuardReceiver : BroadcastReceiver() {
             // background foreground-service start (no battery-optimization
             // exemption, device in Doze); say so instead of throwing out of a
             // broadcast, and keep the alarm armed so the next window retries.
-            runCatching { MikuVpnService.start(context, recovery = true) }
+            runCatching { MikuVpnService.start(context, recovery = true, source = "guard") }
                 .onFailure {
                     ConnectionStatus.update(context, ConnectionStatus.Phase.DISCONNECTED)
                     TunnelGuard.failed(context)

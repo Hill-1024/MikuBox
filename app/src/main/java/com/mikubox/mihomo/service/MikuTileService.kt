@@ -65,7 +65,7 @@ class MikuTileService : TileService() {
                     if (Build.VERSION.SDK_INT >= 34) startActivityAndCollapse(PendingIntent.getActivity(
                         this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
                     else startActivityAndCollapse(intent)
-                } else VpnController.connect(this)
+                } else VpnController.connect(this, source = "tile")
             }
         }
         refresh()
