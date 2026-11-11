@@ -26,6 +26,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -128,7 +129,13 @@ object CoreServiceManager {
 
     private val connectionEpoch = java.util.concurrent.atomic.AtomicLong()
     private val ipSequence = java.util.concurrent.atomic.AtomicLong()
-    private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    /**
+     * Owns the probes for the current connection only. Cancelling it on stop
+     * keeps a probe that was already in flight from logging a misleading
+     * "cannot reach 127.0.0.1:10808" after the core's inbound is gone; a new
+     * start replaces it so an old round cannot answer for the new tunnel.
+     */
+    @Volatile private var probeScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var receiverRegistered = false
 
     /**
@@ -185,6 +192,7 @@ object CoreServiceManager {
      */
     fun announceTunnelStarted(service: Service) {
         connectionEpoch.incrementAndGet()
+        restartProbeRound()
         com.miku.ray.handler.MmkvManager.encodeSettings(AppConfig.PREF_VPN_CONNECT_START_TIME, System.currentTimeMillis())
         registerControlReceiver(service)
         MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, false)
@@ -194,9 +202,17 @@ object CoreServiceManager {
     /** The tunnel is down: nothing left to answer, and the UI has to hear about it. */
     fun announceTunnelStopped(service: Service) {
         connectionEpoch.incrementAndGet()
+        // The inbound is about to close: drop the probes with it instead of
+        // letting them fail against a port that is being torn down.
+        restartProbeRound()
         com.miku.ray.handler.MmkvManager.encodeSettings(AppConfig.PREF_VPN_CONNECT_START_TIME, 0L)
         unregisterControlReceiver(service)
         MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, "")
+    }
+
+    private fun restartProbeRound() {
+        probeScope.cancel()
+        probeScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     }
 
     /**
@@ -241,7 +257,7 @@ object CoreServiceManager {
     private fun measureConnection(service: Service, requestId: String) {
         if (!isRunning()) return
         measureIp(service, requestId)
-        backgroundScope.launch {
+        probeScope.launch {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, connectionTestResult(service), requestId)
         }
     }
@@ -286,9 +302,12 @@ object CoreServiceManager {
      * inbound, so what comes back is what a browser would see.
      */
     private fun measureIp(service: Service, requestId: String) {
+        // A request that arrives after the teardown began has no inbound to
+        // ask; starting it would only produce a ConnectException in the log.
+        if (!isRunning()) return
         val epoch = connectionEpoch.get()
         val sequence = ipSequence.incrementAndGet()
-        backgroundScope.launch {
+        probeScope.launch {
             val ip = runCatching { SpeedtestManager.getRemoteIPInfo() }.getOrNull()
             if (ip.isNullOrBlank()) {
                 // The probe has its own failure logs; this marks the request
